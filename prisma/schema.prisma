@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int        @id @default(autoincrement())
+  email       String     @unique
+  name        String?
+  password    String?
+  phoneNumber String?
+  address     String?
+  token       String?
+  profile     String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  solutions   Solution[]
+  roles       Role[]     @relation("RoleToUser")
+}
+
+model Role {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  users     User[]   @relation("RoleToUser")
+}
+
+model Call {
+  id          Int        @id @default(autoincrement())
+  name        String     @db.Text
+  startedAt   DateTime
+  endedAt     DateTime
+  description String     @db.Text
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  solutions   Solution[]
+  thematics   Thematic[] @relation("CallToThematic")
+}
+
+model Thematic {
+  id         Int         @id @default(autoincrement())
+  name       String      @db.Text
+  odds       String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  solutions  Solution[]
+  calls      Call[]      @relation("CallToThematic")
+  challenges Challenge[] @relation("ChallengeToThematic")
+}
+
+model Solution {
+  id              Int         @id @default(autoincrement())
+  name            String      @db.Text
+  videoLink       String?
+  imageLink       String?
+  description     String      @db.Text
+  callId          Int
+  thematicId      Int
+  targetedProblem String      @db.Text
+  statusId        Int
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  userId          Int?
+  call            Call        @relation(fields: [callId], references: [id])
+  status          Status      @relation(fields: [statusId], references: [id])
+  thematic        Thematic    @relation(fields: [thematicId], references: [id])
+  user            User?       @relation(fields: [userId], references: [id])
+  challenges      Challenge[] @relation("ChallengeToSolution")
+
+  @@index([callId], map: "Solution_callId_fkey")
+  @@index([statusId], map: "Solution_statusId_fkey")
+  @@index([thematicId], map: "Solution_thematicId_fkey")
+  @@index([userId], map: "Solution_userId_fkey")
+}
+
+model Status {
+  id        Int        @id @default(autoincrement())
+  name      String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  solutions Solution[]
+}
+
+model Challenge {
+  id        Int        @id @default(autoincrement())
+  name      String     @db.Text
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  solutions Solution[] @relation("ChallengeToSolution")
+  thematics Thematic[] @relation("ChallengeToThematic")
+}
