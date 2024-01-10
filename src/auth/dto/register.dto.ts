@@ -1,18 +1,18 @@
-import { IsEmail, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 
 export class SignupDto {
   @IsEmail({}, { message: 'L\'email saisi est invalide' })
   email: string;
 
-  @MinLength(4, { message: 'Minimum 4 caractères' })
+  @MinLength(4, { message: 'Le mot de passe doit contenir au-moins 4 caractères' })
   password: string;
 
-  @MinLength(4, { message: 'Minimum 4 caractères' })
+  @IsNotEmpty({ message: 'Le nom est obligatoire' })
   name: string;
 
   @MinLength(10, { message: 'Minimum 10 caractères' })
   phoneNumber: string;
 
-  @MinLength(10, { message: 'Minimum 10 caractères' })
+  @IsNotEmpty( { message: "L'adresse est obligatoire" })
   address: string;
 }

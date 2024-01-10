@@ -14,6 +14,8 @@ import {Prisma} from '@prisma/client';
 import {FileInterceptor} from "@nestjs/platform-express";
 import {diskStorage} from "multer";
 import {v4 as uuidv4} from 'uuid';
+import { CreateSolutionDto } from './dto/create-solution.dto';
+import { UpdateSolutionDto } from './dto/update-solution.dto';
 
 @Controller('solutions')
 export class SolutionsController {
@@ -21,13 +23,8 @@ export class SolutionsController {
     }
 
     @Post()
-    create(@Body() createSolutionDto: Prisma.SolutionCreateInput & {
-        thematic: number,
-        call: number,
-        challenges: number[],
-        user: string
-    }) {
-        return this.solutionsService.create(createSolutionDto);
+    create(@Body() data: CreateSolutionDto) {
+        return this.solutionsService.create(data);
     }
 
     @Get('approved')
@@ -56,8 +53,8 @@ export class SolutionsController {
     }
 
     @Patch(':id')
-    update(@Param('id') id: string, @Body() updateSolutionDto: Prisma.SolutionUpdateInput & { status: number }) {
-        return this.solutionsService.update(+id, updateSolutionDto);
+    update(@Param('id') id: string, @Body() data: UpdateSolutionDto) {
+        return this.solutionsService.update(+id, data);
     }
 
     @Delete(':id')

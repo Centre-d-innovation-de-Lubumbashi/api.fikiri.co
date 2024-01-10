@@ -1,8 +1,9 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
-import { Prisma } from '@prisma/client';
 import * as fs from 'fs';
 import { promisify } from 'util';
+import { CreateSolutionDto } from './dto/create-solution.dto';
+import { UpdateSolutionDto } from './dto/update-solution.dto';
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -13,29 +14,24 @@ export class SolutionsService {
   ) {
   }
 
-  async create(createSolutionDto: Prisma.SolutionCreateInput & {
-    thematic: number,
-    call: number,
-    challenges: number[],
-    user: string
-  }) {
+  async create(data: CreateSolutionDto) {
     try {
       await this.prismaService.solution.create({
         data: {
-          ...createSolutionDto,
+          ...data,
           thematic: {
             connect: {
-              id: createSolutionDto.thematic,
+              id: data.thematic,
             },
           },
           user: {
             connect: {
-              email: createSolutionDto.user,
+              email: data.user,
             },
           },
           call: {
             connect: {
-              id: createSolutionDto.call,
+              id: data.call,
             },
           },
           status: {
@@ -44,7 +40,7 @@ export class SolutionsService {
             },
           },
           challenges: {
-            connect: createSolutionDto.challenges.map((id) => ({ id })),
+            connect: data.challenges.map((id) => ({ id })),
           },
         },
       });
@@ -76,8 +72,6 @@ export class SolutionsService {
 
   async findAll() {
     const solutions = await this.prismaService.solution.findMany({
-      // skip: offset,
-      // take: limit,
       include: {
         thematic: true,
         status: true,
@@ -137,29 +131,44 @@ export class SolutionsService {
     };
   }
 
-  async update(id: number, updateSolutionDto: Prisma.SolutionUpdateInput & { status: number }) {
+  async update(id: number, data: UpdateSolutionDto) {
     try {
       await this.prismaService.solution.update({
+        where: { id },
         data: {
-          ...updateSolutionDto,
-          status: {
+          ...data,
+          thematic: {
             connect: {
-              id: updateSolutionDto.status,
+              id: data.thematic,
             },
           },
+          user: {
+            connect: {
+              email: data.user,
+            },
+          },
+          call: {
+            connect: {
+              id: data.call,
+            },
+          },
+          status: {
+            connect: {
+              id: data.status,
+            },
+          },
+          challenges: {
+            connect: data.challenges.map((id) => ({ id })),
+          },
         },
-        where: { id },
       });
     } catch {
       throw new HttpException(
-        'Thématiques non valides',
+        'Mauvaise demande, essayez à nouveau',
         HttpStatus.BAD_REQUEST,
       );
     }
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Mise à jour de la solution réussie',
-    };
+
   }
 
   async remove(id: number) {
@@ -184,18 +193,18 @@ export class SolutionsService {
     const solution = await this.prismaService.solution.findUnique({
       where: { id },
     });
-   try {
-     if (solution.imageLink) {
-       await unlinkAsync(`./uploads/${solution.imageLink}`);
-     }
-   }finally {
-     await this.prismaService.solution.update({
-       where: { id },
-       data: {
-         imageLink: image.filename,
-       },
-     });
-   }
+    try {
+      if (solution.imageLink) {
+        await unlinkAsync(`./uploads/${solution.imageLink}`);
+      }
+    } finally {
+      await this.prismaService.solution.update({
+        where: { id },
+        data: {
+          imageLink: image.filename,
+        },
+      });
+    }
     return {
       statusCode: HttpStatus.CREATED,
       message: 'L\'upload a réussi',
@@ -206,12 +215,15 @@ export class SolutionsService {
     const solution = await this.prismaService.solution.findUnique({
       where: { id },
     });
-    if (!solution) throw new NotFoundException('L\'utilisateur n\'existe pas');
+    if (!solution)
+      throw new HttpException(
+        'La solution n\'a pas été trouvé',
+        HttpStatus.NOT_FOUND,
+      );
     await unlinkAsync(`./uploads/${solution.imageLink}`);
     await this.prismaService.solution.update({
       where: { id },
       data: {
-        ...solution,
         imageLink: null,
       },
     });

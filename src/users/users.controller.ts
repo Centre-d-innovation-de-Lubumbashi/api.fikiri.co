@@ -14,6 +14,9 @@ import { Prisma } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
+import CreateUserDto from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateWithGoogleDto } from './dto/create-with-google.dto';
 
 @Controller('users')
 export class UsersController {
@@ -21,7 +24,7 @@ export class UsersController {
   }
 
   @Post()
-  create(@Body() createUserDto: Prisma.UserCreateInput & { roles: number[] }): Promise<any> {
+  create(@Body() createUserDto: CreateUserDto): Promise<any> {
     return this.userService.create(createUserDto);
   }
 
@@ -36,14 +39,14 @@ export class UsersController {
   }
 
   @Post('create')
-  findOrCreate(@Body() userDto: Prisma.UserCreateInput) {
-    return this.userService.findOrCreate(userDto.email, userDto.name);
+  findOrCreate(@Body() userDto: CreateWithGoogleDto) {
+    return this.userService.findOrCreate(userDto);
   }
 
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() updateUserDto: Prisma.UserUpdateInput,
+    @Body() updateUserDto: UpdateUserDto,
   ): Promise<any> {
     return this.userService.update(+id, updateUserDto);
   }
