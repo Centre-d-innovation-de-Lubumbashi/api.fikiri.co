@@ -1,6 +1,5 @@
-import { PrismaService } from './../database/prisma.service';
+import { PrismaService } from '../database/prisma.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { CreateThematicDto } from './dto/create-thematic.dto';
 import { UpdateThematicDto } from './dto/update-thematic.dto';
 
