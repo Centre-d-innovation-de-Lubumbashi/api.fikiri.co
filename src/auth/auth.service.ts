@@ -22,12 +22,7 @@ export class AuthService {
     return {
       message: 'Connexion réussie',
       statusCode: HttpStatus.OK,
-      data: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        roles: user.roles,
-      },
+      user,
     };
   }
 
@@ -37,7 +32,7 @@ export class AuthService {
       const user = await this.userService.findByEmail(email);
       return {
         statusCode: HttpStatus.OK,
-        data: user,
+        user,
       };
     }
   }
