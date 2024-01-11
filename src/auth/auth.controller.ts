@@ -1,7 +1,19 @@
-import { Body, Controller, Param, Post, Get } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get, Param,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto';
+import { LocalGuard } from './guards/local.guard';
+import { Request } from 'express';
+import { Public } from './decorators/public.decorator';
+import { CurrentUser } from './decorators/user.decorator';
 import { SignupDto } from './dto/register.dto';
+import { UpdateUserDto } from '../users/dto/update-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -10,18 +22,31 @@ export class AuthController {
   ) {
   }
 
+  @Get('logout')
+  logout(@Req() request: Request): Promise<any> {
+    return this.authService.logout(request);
+  }
+
+  @Patch('profile')
+  updateProfile(@CurrentUser() user: any, @Body() data: UpdateUserDto) {
+    return this.authService.updateProfile(user, data);
+  }
+
+  @Public()
+  @UseGuards(LocalGuard)
   @Post('login')
-  loginWithCredentials(@Body() loginDto: LoginDto): Promise<any> {
-    return this.authService.login(loginDto);
+  login() {
+    return this.authService.login();
+  }
+
+  @Public()
+  @Post('register')
+  register(@Body() registerDto: SignupDto): Promise<any> {
+    return this.authService.register(registerDto);
   }
 
   @Get('profile/:email')
   profile(@Param('email') email: string): Promise<any> {
     return this.authService.profile(email);
-  }
-
-  @Post('register')
-  register(@Body() signupDto: SignupDto): Promise<any> {
-    return this.authService.register(signupDto);
   }
 }
