@@ -22,7 +22,7 @@ export class ThematicsService {
     const thematics = await this.prismaService.thematic.findMany();
     return {
       statusCode: HttpStatus.OK,
-      thematics,
+      data: thematics,
     };
   }
 
@@ -36,7 +36,7 @@ export class ThematicsService {
     if (!thematic) throw new HttpException('La thématique n\'a pas été trouvé', HttpStatus.NOT_FOUND);
     return {
       statusCode: HttpStatus.OK,
-      thematic,
+      data: thematic,
     };
   }
 

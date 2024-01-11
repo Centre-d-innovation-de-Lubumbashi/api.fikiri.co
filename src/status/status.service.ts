@@ -20,12 +20,11 @@ export class StatusService {
     };
   }
 
-
   async findAll() {
     const status = await this.prismaService.status.findMany();
     return {
       statusCode: HttpStatus.OK,
-      status,
+      data: status,
     };
   }
 
@@ -35,7 +34,7 @@ export class StatusService {
     });
     return {
       statusCode: HttpStatus.OK,
-      status,
+      data: status,
     };
   }
 

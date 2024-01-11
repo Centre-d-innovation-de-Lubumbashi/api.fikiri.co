@@ -66,7 +66,7 @@ export class SolutionsService {
     const solutionsToDisplay = solutions.filter((solution) => solution.status.id > 1);
     return {
       statusCode: HttpStatus.OK,
-      solutionsToDisplay,
+      data: solutionsToDisplay,
     };
   }
 
@@ -79,7 +79,7 @@ export class SolutionsService {
     });
     return {
       statusCode: HttpStatus.OK,
-      solutions,
+      data: solutions,
     };
   }
 
@@ -98,7 +98,7 @@ export class SolutionsService {
       );
     return {
       statusCode: HttpStatus.OK,
-      solution,
+      data: solution,
     };
   }
 
@@ -115,7 +115,7 @@ export class SolutionsService {
       });
       return {
         statusCode: HttpStatus.OK,
-        solutions,
+        data: solutions,
       };
     }
   }
@@ -127,7 +127,7 @@ export class SolutionsService {
     });
     return {
       statusCode: HttpStatus.OK,
-      solutions,
+      data: solutions,
     };
   }
 
@@ -168,7 +168,6 @@ export class SolutionsService {
         HttpStatus.BAD_REQUEST,
       );
     }
-
   }
 
   async remove(id: number) {

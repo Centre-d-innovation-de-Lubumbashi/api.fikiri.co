@@ -88,7 +88,7 @@ export class UsersService {
 
     return {
       statusCode: HttpStatus.OK,
-      users,
+      data: users,
     };
   }
 
@@ -106,7 +106,7 @@ export class UsersService {
     if (!user) throw new HttpException('L\'utilisateur n\'a pas été trouvé', HttpStatus.NOT_FOUND);
     return {
       statusCode: HttpStatus.OK,
-      user,
+      data: user,
     };
   }
 
@@ -117,7 +117,7 @@ export class UsersService {
     if (user) {
       return {
         statusCode: HttpStatus.OK,
-        user,
+        data: user,
       };
     } else {
       await this.prismaService.user.create({

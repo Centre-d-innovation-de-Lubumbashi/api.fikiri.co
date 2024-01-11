@@ -1,20 +1,11 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseInterceptors,
-  UploadedFiles,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { SolutionsService } from './solutions.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateSolutionDto } from './dto/create-solution.dto';
 import { UpdateSolutionDto } from './dto/update-solution.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('solutions')
 export class SolutionsController {
@@ -26,6 +17,7 @@ export class SolutionsController {
     return this.solutionsService.create(data);
   }
 
+  @Public()
   @Get('approved')
   findApproved() {
     return this.solutionsService.findApproved();

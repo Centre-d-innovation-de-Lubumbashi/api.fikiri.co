@@ -28,7 +28,7 @@ export class RolesService {
     const roles = await this.prismaService.role.findMany({});
     return {
       statusCode: HttpStatus.OK,
-      roles,
+      data: roles,
     };
   }
 
@@ -39,7 +39,7 @@ export class RolesService {
     if (!role) throw new HttpException('Le rôle n\'a pas été trouvé', HttpStatus.NOT_FOUND);
     return {
       statusCode: HttpStatus.OK,
-      role,
+      data: role,
     };
   }
 
