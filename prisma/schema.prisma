@@ -54,23 +54,32 @@ model Thematic {
 }
 
 model Solution {
-  id              Int         @id @default(autoincrement())
-  name            String      @db.Text
+  id              Int              @id @default(autoincrement())
+  name            String           @db.Text
   videoLink       String?
-  imageLink       String?
-  description     String      @db.Text
+  description     String           @db.Text
   callId          Int
   thematicId      Int
-  targetedProblem String      @db.Text
+  targetedProblem String           @db.Text
   statusId        Int
-  createdAt       DateTime?   @default(now())
-  updatedAt       DateTime?   @updatedAt
+  createdAt       DateTime?        @default(now())
+  updatedAt       DateTime?        @updatedAt
   userId          Int?
-  call            Call        @relation(fields: [callId], references: [id])
-  status          Status      @relation(fields: [statusId], references: [id])
-  thematic        Thematic    @relation(fields: [thematicId], references: [id])
-  user            User?       @relation(fields: [userId], references: [id])
-  challenges      Challenge[] @relation("ChallengeToSolution")
+  call            Call             @relation(fields: [callId], references: [id])
+  status          Status           @relation(fields: [statusId], references: [id])
+  thematic        Thematic         @relation(fields: [thematicId], references: [id])
+  user            User?            @relation(fields: [userId], references: [id])
+  challenges      Challenge[]      @relation("ChallengeToSolution")
+  images          SolutionImages[]
+}
+
+model SolutionImages {
+  id         Int       @id @default(autoincrement())
+  imageLink  String
+  solution   Solution  @relation(fields: [solutionId], references: [id])
+  solutionId Int
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
 }
 
 model Status {
