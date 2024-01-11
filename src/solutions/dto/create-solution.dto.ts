@@ -7,9 +7,6 @@ export class CreateSolutionDto {
   @IsOptional()
   videoLink: string;
 
-  @IsOptional()
-  imageLink: string;
-
   @IsNotEmpty({ message: 'La description de la solution est obligatoire' })
   description: string;
 
