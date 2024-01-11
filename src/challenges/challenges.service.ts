@@ -29,7 +29,7 @@ export class ChallengesService {
     const thematics = await this.prismaService.challenge.findMany();
     return {
       statusCode: HttpStatus.OK,
-      data: thematics,
+      thematics,
     };
   }
 
