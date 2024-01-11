@@ -8,7 +8,8 @@ import { UpdateUserDto } from '../users/dto/update-user.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) {
+  }
 
   async validateUser(email: string, password: string) {
     const user = await this.usersService.findByEmail(email);
@@ -21,23 +22,6 @@ export class AuthService {
       user,
     };
   }
-
-  // async validateUser(email: string, password: string): Promise<any> {
-  //   const user = await this.usersService.findByEmail(email);
-  //   const passwordMatch: boolean = await this.passwordMatch(
-  //     password,
-  //     user.password,
-  //   );
-  //   if (!passwordMatch)
-  //     throw new HttpException('Invalid credentials', HttpStatus.BAD_REQUEST);
-  //
-  //   return {
-  //     id: user.id,
-  //     email: user.email,
-  //     name: user.name,
-  //     roles: user.roles.map((role: any) => role.name),
-  //   };
-  // }
 
   async passwordMatch(password: string, hash: string): Promise<boolean> {
     return await bcrypt.compare(password, hash);
