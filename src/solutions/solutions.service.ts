@@ -189,22 +189,15 @@ export class SolutionsService {
     };
   }
 
-  async uploadImage(id: number, image: Express.Multer.File): Promise<any> {
-    const solution = await this.prismaService.solution.findUnique({
+  async uploadImage(id: number, images: Express.Multer.File[]): Promise<any> {
+    await this.prismaService.solution.update({
       where: { id },
-    });
-    try {
-      if (solution.imageLink) {
-        await unlinkAsync(`./uploads/${solution.imageLink}`);
-      }
-    } finally {
-      await this.prismaService.solution.update({
-        where: { id },
-        data: {
-          imageLink: image.filename,
+      data: {
+        images: {
+          create: images.map((image) => ({ imageLink: image.filename })),
         },
-      });
-    }
+      },
+    });
     return {
       statusCode: HttpStatus.CREATED,
       message: 'L\'upload a réussi',
@@ -212,20 +205,17 @@ export class SolutionsService {
   }
 
   async deleteImage(id: number): Promise<any> {
-    const solution = await this.prismaService.solution.findUnique({
+    const image = await this.prismaService.solutionImages.findUnique({
       where: { id },
     });
-    if (!solution)
+    if (!image)
       throw new HttpException(
-        'La solution n\'a pas été trouvé',
+        'L\'image n\'a pas été trouvée',
         HttpStatus.NOT_FOUND,
       );
-    await unlinkAsync(`./uploads/${solution.imageLink}`);
-    await this.prismaService.solution.update({
+    await unlinkAsync(`./uploads/${image.imageLink}`);
+    await this.prismaService.solutionImages.delete({
       where: { id },
-      data: {
-        imageLink: null,
-      },
     });
     return {
       statusCode: HttpStatus.OK,
