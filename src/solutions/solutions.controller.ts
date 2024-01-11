@@ -62,7 +62,7 @@ export class SolutionsController {
   }
 
   @UseInterceptors(
-    FilesInterceptor('thumbs', 4, {
+    FilesInterceptor('thumbs', 10, {
       storage: diskStorage({
         destination: './uploads',
         filename: function(_req, file, cb) {
