@@ -15,5 +15,4 @@ export default class CreateUserDto {
 
   @IsNotEmpty({ message: 'Le rôle est obligatoire' })
   roles: number[];
-
 }
