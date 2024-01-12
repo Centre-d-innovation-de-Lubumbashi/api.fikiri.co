@@ -40,8 +40,8 @@ export class AuthController {
 
   @Public()
   @Post('register')
-  register(data: SignupDto) {
-    return this.authService.register(data)
+  register(@Body() data: SignupDto) {
+    return this.authService.register(data);
   }
 
   @Public()
