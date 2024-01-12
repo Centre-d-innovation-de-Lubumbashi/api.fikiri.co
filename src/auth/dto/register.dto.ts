@@ -10,9 +10,9 @@ export class SignupDto {
   @IsNotEmpty({ message: 'Le nom est obligatoire' })
   name: string;
 
-  @MinLength(10, { message: 'Minimum 10 caractères' })
+  @MinLength(7, { message: 'Minimum 10 caractères' })
   phoneNumber: string;
 
-  @IsNotEmpty( { message: "L'adresse est obligatoire" })
+  @IsNotEmpty({ message: 'L\'adresse est obligatoire' })
   address: string;
 }
