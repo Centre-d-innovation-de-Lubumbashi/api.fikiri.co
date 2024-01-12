@@ -1,19 +1,12 @@
-import {
-  Body,
-  Controller,
-  Get, Param,
-  Patch,
-  Post,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalGuard } from './guards/local.guard';
 import { Request } from 'express';
 import { Public } from './decorators/public.decorator';
 import { CurrentUser } from './decorators/user.decorator';
-import { SignupDto } from './dto/register.dto';
 import { UpdateUserDto } from '../users/dto/update-user.dto';
+import { GoogleGuard } from './guards/google.guard';
+import { SignupDto } from './dto/register.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -22,7 +15,7 @@ export class AuthController {
   ) {
   }
 
-  @Get('logout')
+  @Post('logout')
   logout(@Req() request: Request): Promise<any> {
     return this.authService.logout(request);
   }
@@ -40,13 +33,26 @@ export class AuthController {
   }
 
   @Public()
-  @Post('register')
-  register(@Body() registerDto: SignupDto): Promise<any> {
-    return this.authService.register(registerDto);
+  @UseGuards(GoogleGuard)
+  @Get('login')
+  loginGoogle() {
   }
 
-  @Get('profile/:email')
-  profile(@Param('email') email: string): Promise<any> {
-    return this.authService.profile(email);
+  @Public()
+  @Post('register')
+  register(data: SignupDto) {
+    return this.authService.register(data)
   }
-}
+
+  @Public()
+  @UseGuards(GoogleGuard)
+  @Get('google/redirect')
+  googleAuthRedirect(@Req() req: any, @Res() res: any) {
+    return this.authService.loginGoogle(req, res);
+  }
+
+  @Get('profile')
+  profile(@CurrentUser() user: any): Promise<any> {
+    return this.authService.profile(user);
+  }
+}     

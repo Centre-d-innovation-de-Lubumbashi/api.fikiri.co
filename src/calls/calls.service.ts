@@ -22,7 +22,7 @@ export class CallsService {
     const calls = await this.prismaService.call.findMany({});
     return {
       statusCode: HttpStatus.OK,
-      calls,
+      data: calls,
     };
   }
 
@@ -36,7 +36,7 @@ export class CallsService {
     if (!call) throw new NotFoundException('L\'appel à solution introuvable');
     return {
       statusCode: HttpStatus.OK,
-      call,
+      data: call,
     };
   }
 

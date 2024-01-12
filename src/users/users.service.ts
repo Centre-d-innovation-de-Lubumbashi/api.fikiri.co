@@ -51,7 +51,7 @@ export class UsersService {
   }
 
   async register(registerDto: SignupDto): Promise<any> {
-    console.log(registerDto);
+    console.log(registerDto)
     const email: string = registerDto.email as string;
     const password: string = registerDto.password as string;
     const hash = await this.hashPassword(password);
@@ -72,7 +72,6 @@ export class UsersService {
         },
       },
     });
-
     return {
       statusCode: HttpStatus.CREATED,
       message: 'L\'inscription est réussie',
@@ -85,7 +84,6 @@ export class UsersService {
         roles: true,
       },
     });
-
     return {
       statusCode: HttpStatus.OK,
       data: users,

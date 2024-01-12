@@ -1,4 +1,4 @@
-import { BadRequestException, HttpStatus, Injectable, Req } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable, Req, Res } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
@@ -13,28 +13,35 @@ export class AuthService {
 
   async validateUser(email: string, password: string) {
     const user = await this.usersService.findByEmail(email);
-    const passwordMatch: boolean = await this.passwordMatch(
-      password,
-      user.password,
-    );
-    if (!passwordMatch) throw new BadRequestException('Les identifiants saisis sont invalides');
-    return {
-      user,
-    };
+    if (password) {
+      const passwordMatch: boolean = await this.passwordMatch(
+        password,
+        user.password,
+      );
+      if (!passwordMatch) throw new BadRequestException('Les identifiants saisis sont invalides');
+    }
+    return user;
   }
 
-  async passwordMatch(password: string, hash: string): Promise<boolean> {
+
+  async passwordMatch(password: string, hash: string) {
     return await bcrypt.compare(password, hash);
   }
 
-  async login(): Promise<any> {
+  async loginGoogle(@Req() req: any, @Res() res: any) {
+    await this.usersService.findOrCreate(req.user);
+    return res.redirect('http://localhost:3000/me');
+  }
+
+
+  async login() {
     return {
       message: 'Connexion réussie',
       statusCode: HttpStatus.OK,
     };
   }
 
-  async logout(@Req() request: Request): Promise<any> {
+  async logout(@Req() request: Request) {
     request.session.destroy(() => {
     });
     return {
@@ -55,11 +62,11 @@ export class AuthService {
     await this.usersService.update(+id, data);
     return {
       statusCode: HttpStatus.OK,
-      message: 'Profit mis à jour avec succès',
+      message: 'Profil mis à jour avec succès',
     };
   }
 
-  register(registerDto: SignupDto): Promise<any> {
+  register(registerDto: SignupDto) {
     return this.usersService.register(registerDto);
   }
 }
