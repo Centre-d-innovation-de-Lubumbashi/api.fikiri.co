@@ -50,8 +50,7 @@ export class UsersService {
     return await bcrypt.hash(password, salt);
   }
 
-  async register(registerDto: SignupDto): Promise<any> {
-    console.log(registerDto)
+  async register(registerDto: SignupDto) {
     const email: string = registerDto.email as string;
     const password: string = registerDto.password as string;
     const hash = await this.hashPassword(password);
