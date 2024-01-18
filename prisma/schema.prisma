@@ -15,6 +15,7 @@ model User {
   phoneNumber String?
   address     String?
   token       String?
+  googleImage String?
   profile     String?
   createdAt   DateTime?  @default(now())
   updatedAt   DateTime?  @updatedAt
@@ -57,6 +58,7 @@ model Solution {
   id              Int              @id @default(autoincrement())
   name            String           @db.Text
   videoLink       String?
+  imageLink       String?
   description     String           @db.Text
   callId          Int
   thematicId      Int
