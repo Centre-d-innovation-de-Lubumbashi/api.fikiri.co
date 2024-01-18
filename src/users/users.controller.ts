@@ -15,7 +15,6 @@ import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import CreateUserDto from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { CreateWithGoogleDto } from './dto/create-with-google.dto';
 
 @Controller('users')
 export class UsersController {
@@ -23,23 +22,23 @@ export class UsersController {
   }
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto): Promise<any> {
+  create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
 
   @Get()
-  findAll(@Query('page') page: string = '1'): Promise<any> {
+  findAll(@Query('page') page: string = '1') {
     return this.userService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<any> {
+  findOne(@Param('id') id: string) {
     return this.userService.findById(+id);
   }
 
-  @Post('create')
-  findOrCreate(@Body() userDto: CreateWithGoogleDto) {
-    return this.userService.findOrCreate(userDto);
+  @Get(':email')
+  findByMail(@Param('email') email: string) {
+    return this.userService.findByEmail(email);
   }
 
   @Patch(':id')
@@ -73,9 +72,8 @@ export class UsersController {
     return this.userService.deleteImage(+id);
   }
 
-
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<any> {
+  remove(@Param('id') id: string) {
     return this.userService.remove(+id);
   }
 }
