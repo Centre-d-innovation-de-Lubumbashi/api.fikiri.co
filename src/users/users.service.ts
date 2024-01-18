@@ -107,17 +107,12 @@ export class UsersService {
     };
   }
 
-  async findOrCreate(createWithGoofleDto: CreateWithGoogleDto): Promise<any> {
-    const user = await this.prismaService.user.findUnique({
+  async findOrCreate(createWithGoofleDto: CreateWithGoogleDto) {
+    let user = await this.prismaService.user.findUnique({
       where: { email: createWithGoofleDto.email },
     });
-    if (user) {
-      return {
-        statusCode: HttpStatus.OK,
-        data: user,
-      };
-    } else {
-      await this.prismaService.user.create({
+    if (!user) {
+     user = await this.prismaService.user.create({
         data: {
           ...createWithGoofleDto,
           roles: {
@@ -128,17 +123,17 @@ export class UsersService {
         },
       });
     }
+    return user
   }
 
-  async findByEmail(email: string): Promise<any> {
+  async findByEmail(email: string) {
     const user = await this.prismaService.user.findUnique({
       where: { email },
       include: {
         roles: true,
       },
     });
-    if (!user) throw new HttpException('L\'utilisateur n\'a pas été trouvé', HttpStatus.NOT_FOUND);
-    return user;
+    if (user) return user;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<any> {
@@ -161,6 +156,32 @@ export class UsersService {
     };
   }
 
+  async updateProfile(id: number, updateUserDto: UpdateUserDto): Promise<any> {
+    const user = await this.prismaService.user.findUnique({
+      where: { id },
+      include: {
+        roles: true,
+      },
+    });
+    if (!user) throw new HttpException('L\'utilisateur n\'a pas été trouvé', HttpStatus.NOT_FOUND);
+    try {
+      await this.prismaService.user.update({
+        where: { id },
+        data: {
+          ...updateUserDto,
+          roles: {
+            connect: user.roles,
+          },
+        },
+      });
+    } catch {
+      throw new HttpException('Rôles non valides', HttpStatus.BAD_REQUEST);
+    }
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Mise à jour de l\'utilisateur réussie',
+    };
+  }
 
   async remove(id: number): Promise<any> {
     const user = await this.prismaService.user.findUnique({
