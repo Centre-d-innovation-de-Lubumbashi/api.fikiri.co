@@ -22,9 +22,6 @@ export class CreateSolutionDto {
   @IsNotEmpty({ message: 'L\'appel est obligatoire' })
   call: number;
 
-  @IsNotEmpty({ message: 'Le statut est obligatoire' })
-  status: number;
-
   @IsNotEmpty({ message: 'Les challenges sont obligatoires' })
   challenges: number[];
 }
