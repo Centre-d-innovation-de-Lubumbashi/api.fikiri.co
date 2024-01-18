@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalGuard } from './guards/local.guard';
 import { Request } from 'express';
@@ -20,16 +20,16 @@ export class AuthController {
     return this.authService.logout(request);
   }
 
-  @Patch('profile')
-  updateProfile(@CurrentUser() user: any, @Body() data: UpdateUserDto) {
-    return this.authService.updateProfile(user, data);
+  @Patch('profile/:id')
+  updateProfile(@Param('id') id: string, @Body() data: UpdateUserDto) {
+    return this.authService.updateProfile(+id, data);
   }
 
   @Public()
   @UseGuards(LocalGuard)
   @Post('login')
-  login() {
-    return this.authService.login();
+  login(@Req() req: Request) {
+    return this.authService.login(req);
   }
 
   @Public()
@@ -47,12 +47,13 @@ export class AuthController {
   @Public()
   @UseGuards(GoogleGuard)
   @Get('google/redirect')
-  googleAuthRedirect(@Req() req: any, @Res() res: any) {
-    return this.authService.loginGoogle(req, res);
+  googleAuthRedirect(@Res() res: any) {
+    return this.authService.loginGoogle(res);
   }
 
   @Get('profile')
   profile(@CurrentUser() user: any): Promise<any> {
     return this.authService.profile(user);
   }
+
 }     
