@@ -5,10 +5,13 @@ import { Request } from 'express';
 import { CurrentUser } from './decorators/user.decorator';
 import { SignupDto } from './dto/register.dto';
 import { UpdateUserDto } from '../users/dto/update-user.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly usersService: UsersService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly usersService: UsersService) {
   }
 
   async validateUser(email: string, password: string) {
@@ -28,16 +31,16 @@ export class AuthService {
     return await bcrypt.compare(password, hash);
   }
 
-  async loginGoogle(@Req() req: any, @Res() res: any) {
-    await this.usersService.findOrCreate(req.user);
-    return res.redirect('http://localhost:3000/me');
+  async loginGoogle(@Res() res: any) {
+    return res.redirect(this.configService.get('FRONTEND_URI'));
   }
 
 
-  async login() {
+  async login(@Req() req: any) {
     return {
       message: 'Connexion réussie',
       statusCode: HttpStatus.OK,
+      data: req.user
     };
   }
 
@@ -57,9 +60,8 @@ export class AuthService {
     };
   }
 
-  async updateProfile(@CurrentUser() user: any, data: UpdateUserDto) {
-    const { id } = user;
-    await this.usersService.update(+id, data);
+  async updateProfile(id: number, data: UpdateUserDto) {
+    await this.usersService.updateProfile(+id, data);
     return {
       statusCode: HttpStatus.OK,
       message: 'Profil mis à jour avec succès',
