@@ -111,6 +111,7 @@ export class SolutionsService {
         where: { userId: user.id },
         include: {
           status: true,
+          images: true,
         },
       });
       return {
@@ -131,35 +132,22 @@ export class SolutionsService {
     };
   }
 
-  async update(id: number, data: UpdateSolutionDto) {
+  async update(id: number, data: any) {
+    const solution = await this.prismaService.solution.findUnique({
+      where: { id },
+    });
+    if (!solution)
+      throw new HttpException(
+        'La solution n\'a pas été trouvé',
+        HttpStatus.NOT_FOUND,
+      );
+
+    const updatedSolution = Object.assign(solution, data)
     try {
       await this.prismaService.solution.update({
         where: { id },
         data: {
-          ...data,
-          thematic: {
-            connect: {
-              id: data.thematic,
-            },
-          },
-          user: {
-            connect: {
-              email: data.user,
-            },
-          },
-          call: {
-            connect: {
-              id: data.call,
-            },
-          },
-          status: {
-            connect: {
-              id: data.status,
-            },
-          },
-          challenges: {
-            connect: data.challenges.map((id) => ({ id })),
-          },
+          ...updatedSolution,
         },
       });
     } catch {
