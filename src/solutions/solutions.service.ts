@@ -132,7 +132,7 @@ export class SolutionsService {
     };
   }
 
-  async update(id: number, data: any) {
+  async update(id: number, data: UpdateSolutionDto) {
     const solution = await this.prismaService.solution.findUnique({
       where: { id },
     });
@@ -141,13 +141,34 @@ export class SolutionsService {
         'La solution n\'a pas été trouvé',
         HttpStatus.NOT_FOUND,
       );
-
-    const updatedSolution = Object.assign(solution, data)
     try {
       await this.prismaService.solution.update({
         where: { id },
         data: {
-          ...updatedSolution,
+          ...data,
+          thematic: {
+            connect: {
+              id: data.thematic,
+            },
+          },
+          user: {
+            connect: {
+              email: data.user,
+            },
+          },
+          call: {
+            connect: {
+              id: data.call,
+            },
+          },
+          status: {
+            connect: {
+              id: 1,
+            },
+          },
+          challenges: {
+            connect: data.challenges.map((id: number) => ({ id })),
+          },
         },
       });
     } catch {
