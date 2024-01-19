@@ -58,7 +58,6 @@ model Solution {
   id              Int              @id @default(autoincrement())
   name            String           @db.Text
   videoLink       String?
-  imageLink       String?
   description     String           @db.Text
   callId          Int
   thematicId      Int
