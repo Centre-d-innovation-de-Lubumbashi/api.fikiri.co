@@ -117,7 +117,7 @@ export class UsersService {
           ...createWithGoofleDto,
           roles: {
             connect: {
-              id: 4,
+              name: 'user'.toUpperCase(),
             },
           },
         },
