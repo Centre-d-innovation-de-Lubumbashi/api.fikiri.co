@@ -112,18 +112,19 @@ export class UsersService {
       where: { email: createWithGoofleDto.email },
     });
     if (!user) {
-     user = await this.prismaService.user.create({
+      user = await this.prismaService.user.create({
         data: {
           ...createWithGoofleDto,
           roles: {
-            connect: {
-              name: 'user'.toUpperCase(),
+            connectOrCreate: {
+              where: { name: 'USER' },
+              create: { name: 'USER' },
             },
           },
         },
       });
     }
-    return user
+    return user;
   }
 
   async findByEmail(email: string) {
