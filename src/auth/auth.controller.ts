@@ -4,9 +4,9 @@ import { LocalGuard } from './guards/local.guard';
 import { Request } from 'express';
 import { Public } from './decorators/public.decorator';
 import { CurrentUser } from './decorators/user.decorator';
-import { UpdateUserDto } from '../users/dto/update-user.dto';
 import { GoogleGuard } from './guards/google.guard';
 import { SignupDto } from './dto/register.dto';
+import UpdateProfileDto from './dto/update-profile.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -21,7 +21,7 @@ export class AuthController {
   }
 
   @Patch('profile/:id')
-  updateProfile(@Param('id') id: string, @Body() data: UpdateUserDto) {
+  updateProfile(@Param('id') id: string, @Body() data: UpdateProfileDto) {
     return this.authService.updateProfile(+id, data);
   }
 

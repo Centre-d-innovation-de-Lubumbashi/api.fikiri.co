@@ -4,8 +4,8 @@ import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 import { CurrentUser } from './decorators/user.decorator';
 import { SignupDto } from './dto/register.dto';
-import { UpdateUserDto } from '../users/dto/update-user.dto';
 import { ConfigService } from '@nestjs/config';
+import UpdateProfileDto from './dto/update-profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -28,6 +28,7 @@ export class AuthService {
 
 
   async passwordMatch(password: string, hash: string) {
+    if (!hash) throw new BadRequestException('Les identifiants saisis sont invalides');
     return await bcrypt.compare(password, hash);
   }
 
@@ -40,7 +41,7 @@ export class AuthService {
     return {
       message: 'Connexion réussie',
       statusCode: HttpStatus.OK,
-      data: req.user
+      data: req.user,
     };
   }
 
@@ -60,7 +61,7 @@ export class AuthService {
     };
   }
 
-  async updateProfile(id: number, data: UpdateUserDto) {
+  async updateProfile(id: number, data: UpdateProfileDto) {
     await this.usersService.updateProfile(+id, data);
     return {
       statusCode: HttpStatus.OK,
