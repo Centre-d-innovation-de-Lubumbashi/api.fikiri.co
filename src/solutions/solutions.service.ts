@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import { promisify } from 'util';
 import { CreateSolutionDto } from './dto/create-solution.dto';
 import { UpdateSolutionDto } from './dto/update-solution.dto';
+import { UpdateUserSolutionDto } from './dto/update-user-solution.dto';
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -132,15 +133,25 @@ export class SolutionsService {
     };
   }
 
-  async update(id: number, data: UpdateSolutionDto) {
-    const solution = await this.prismaService.solution.findUnique({
-      where: { id },
-    });
-    if (!solution)
+  async updateUserSolution(id: number, data: UpdateUserSolutionDto) {
+    await this.findOne(id);
+    try {
+      await this.prismaService.solution.update({
+        where: { id },
+        data: {
+          ...data,
+        },
+      });
+    } catch {
       throw new HttpException(
-        'La solution n\'a pas été trouvé',
-        HttpStatus.NOT_FOUND,
+        'Erreur survenue lors de la mise',
+        HttpStatus.BAD_REQUEST,
       );
+    }
+  }
+
+  async update(id: number, data: UpdateSolutionDto) {
+    await this.findOne(id);
     try {
       await this.prismaService.solution.update({
         where: { id },
