@@ -18,7 +18,7 @@ export class UsersService {
   ) {
   }
 
-  async create(createUserDto: CreateUserDto): Promise<any> {
+  async create(createUserDto: CreateUserDto) {
     const { email } = createUserDto;
     const user = await this.prismaService.user.findUnique({
       where: { email },
@@ -150,7 +150,7 @@ export class UsersService {
         },
       });
     } catch {
-      throw new HttpException('Rôles non valides', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Echec lors de la mise à jour de l\'utlisateur', HttpStatus.BAD_REQUEST);
     }
     return {
       statusCode: HttpStatus.OK,
@@ -159,14 +159,13 @@ export class UsersService {
   }
 
   async updateProfile(id: number, data: UpdateProfileDto) {
-    await this.findById(id);
     try {
       await this.prismaService.user.update({
         where: { id },
         data,
       });
     } catch {
-      throw new HttpException('Rôles non valides', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Echec lors de la mise à jour du profile', HttpStatus.BAD_REQUEST);
     }
     return {
       statusCode: HttpStatus.OK,
