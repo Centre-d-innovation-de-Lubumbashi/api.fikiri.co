@@ -7,6 +7,7 @@ import * as process from 'process';
 const prisma = new PrismaClient();
 
 async function main() {
+  /*
   await prisma.role.createMany({
     data: [{ name: 'ADMIN' }, { name: 'CURATOR' }, { name: 'EXPLORATOR' }, { name: 'USER' }],
   });
@@ -129,6 +130,7 @@ async function main() {
       },
     });
   }
+  */
 }
 
 // execute the main function
