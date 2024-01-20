@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { CreateSolutionDto } from './dto/create-solution.dto';
 import { UpdateSolutionDto } from './dto/update-solution.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
+import { UpdateUserSolutionDto } from './dto/update-user-solution.dto';
 
 @Controller('solutions')
 export class SolutionsController {
@@ -53,8 +54,14 @@ export class SolutionsController {
     return this.solutionsService.remove(+id);
   }
 
+
+  @Patch(':id/user')
+  updateUser(@Param('id') id: string, @Body() data: UpdateUserSolutionDto) {
+    return this.solutionsService.updateUserSolution(+id, data);
+  }
+
   @UseInterceptors(
-    FilesInterceptor('thumbs', 10, {
+    FilesInterceptor('thumbs', 3, {
       storage: diskStorage({
         destination: './uploads',
         filename: function(_req, file, cb) {
