@@ -7,6 +7,7 @@ import { SignupDto } from '../auth/dto/register.dto';
 import CreateUserDto from './dto/create-user.dto';
 import { CreateWithGoogleDto } from './dto/create-with-google.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import UpdateProfileDto from '../auth/dto/update-profile.dto';
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -137,7 +138,7 @@ export class UsersService {
     if (user) return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<any> {
+  async update(id: number, updateUserDto: UpdateUserDto) {
     try {
       await this.prismaService.user.update({
         where: { id },
@@ -157,23 +158,12 @@ export class UsersService {
     };
   }
 
-  async updateProfile(id: number, updateUserDto: UpdateUserDto): Promise<any> {
-    const user = await this.prismaService.user.findUnique({
-      where: { id },
-      include: {
-        roles: true,
-      },
-    });
-    if (!user) throw new HttpException('L\'utilisateur n\'a pas été trouvé', HttpStatus.NOT_FOUND);
+  async updateProfile(id: number, data: UpdateProfileDto) {
+    await this.findById(id);
     try {
       await this.prismaService.user.update({
         where: { id },
-        data: {
-          ...updateUserDto,
-          roles: {
-            connect: user.roles,
-          },
-        },
+        data,
       });
     } catch {
       throw new HttpException('Rôles non valides', HttpStatus.BAD_REQUEST);
@@ -184,7 +174,7 @@ export class UsersService {
     };
   }
 
-  async remove(id: number): Promise<any> {
+  async remove(id: number) {
     const user = await this.prismaService.user.findUnique({
       where: { id },
     });
