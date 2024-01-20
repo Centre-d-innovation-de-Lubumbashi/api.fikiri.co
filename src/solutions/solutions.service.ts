@@ -134,7 +134,6 @@ export class SolutionsService {
   }
 
   async updateUserSolution(id: number, data: UpdateUserSolutionDto) {
-    await this.findOne(id);
     try {
       await this.prismaService.solution.update({
         where: { id },
@@ -144,7 +143,7 @@ export class SolutionsService {
       });
     } catch {
       throw new HttpException(
-        'Erreur survenue lors de la mise',
+        'Erreur survenue lors de la mise à jour',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -208,7 +207,7 @@ export class SolutionsService {
     };
   }
 
-  async uploadImage(id: number, images: Express.Multer.File[]): Promise<any> {
+  async uploadImages(id: number, images: Express.Multer.File[]) {
     await this.prismaService.solution.update({
       where: { id },
       data: {
