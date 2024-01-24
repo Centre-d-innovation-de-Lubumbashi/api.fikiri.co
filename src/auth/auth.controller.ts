@@ -20,6 +20,11 @@ export class AuthController {
     return this.authService.logout(request);
   }
 
+  @Get('profile')
+  profile(@CurrentUser() user: any): Promise<any> {
+    return this.authService.profile(user);
+  }
+
   @Patch('profile/:id')
   updateProfile(@Param('id') id: string, @Body() data: UpdateProfileDto) {
     return this.authService.updateProfile(+id, data);
@@ -50,10 +55,4 @@ export class AuthController {
   googleAuthRedirect(@Res() res: any) {
     return this.authService.loginGoogle(res);
   }
-
-  @Get('profile')
-  profile(@CurrentUser() user: any): Promise<any> {
-    return this.authService.profile(user);
-  }
-
 }     
