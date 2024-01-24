@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { CreateStatusDto } from './dto/create-status.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
@@ -11,19 +11,18 @@ export class StatusService {
   }
 
   async create(data: CreateStatusDto) {
-    await this.prismaService.status.create({
+    const status = await this.prismaService.status.create({
       data,
     });
     return {
-      statusCode: HttpStatus.CREATED,
       message: 'Le status a été créé avec succès',
+      data: status,
     };
   }
 
   async findAll() {
     const status = await this.prismaService.status.findMany();
     return {
-      statusCode: HttpStatus.OK,
       data: status,
     };
   }
@@ -33,19 +32,18 @@ export class StatusService {
       where: { id },
     });
     return {
-      statusCode: HttpStatus.OK,
       data: status,
     };
   }
 
   async update(id: number, data: UpdateStatusDto) {
-    await this.prismaService.status.update({
+    const status = await this.prismaService.status.update({
       where: { id },
       data,
     });
     return {
-      statusCode: HttpStatus.OK,
       message: 'Le status a été modifié avec succès',
+      data: status,
     };
   }
 
@@ -54,7 +52,6 @@ export class StatusService {
       where: { id },
     });
     return {
-      statusCode: HttpStatus.OK,
       message: 'Le status a été supprimé avec succès',
     };
   }

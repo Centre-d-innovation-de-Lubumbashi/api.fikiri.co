@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import * as fs from 'fs';
 import { promisify } from 'util';
@@ -16,8 +16,9 @@ export class SolutionsService {
   }
 
   async create(data: CreateSolutionDto) {
+    let solution = null;
     try {
-      await this.prismaService.solution.create({
+      solution = await this.prismaService.solution.create({
         data: {
           ...data,
           thematic: {
@@ -46,14 +47,11 @@ export class SolutionsService {
         },
       });
     } catch {
-      throw new HttpException(
-        'Mauvaise demande, essayez à nouveau',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException('Mauvaise demande, essayez à nouveau');
     }
     return {
-      statusCode: HttpStatus.CREATED,
       message: 'La solution a été ajouté avec succès',
+      data: solution,
     };
   }
 
@@ -66,7 +64,6 @@ export class SolutionsService {
     });
     const solutionsToDisplay = solutions.filter((solution) => solution.status.id > 1);
     return {
-      statusCode: HttpStatus.OK,
       data: solutionsToDisplay,
     };
   }
@@ -79,7 +76,6 @@ export class SolutionsService {
       },
     });
     return {
-      statusCode: HttpStatus.OK,
       data: solutions,
     };
   }
@@ -93,12 +89,8 @@ export class SolutionsService {
       },
     });
     if (!solution)
-      throw new HttpException(
-        'La solution n\'a pas été trouvé',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException('La solution n\'a pas été trouvé');
     return {
-      statusCode: HttpStatus.OK,
       data: solution,
     };
   }
@@ -116,7 +108,6 @@ export class SolutionsService {
         },
       });
       return {
-        statusCode: HttpStatus.OK,
         data: solutions,
       };
     }
@@ -134,8 +125,13 @@ export class SolutionsService {
   }
 
   async updateUserSolution(id: number, data: UpdateUserSolutionDto) {
+    const soultion = await this.prismaService.solution.findUnique({
+      where: { id },
+    });
+    if (!soultion) throw new NotFoundException('La solution est introuvable');
+    let newSolution = null;
     try {
-      await this.prismaService.solution.update({
+      newSolution = await this.prismaService.solution.update({
         where: { id },
         data: {
           ...data,
@@ -147,12 +143,20 @@ export class SolutionsService {
         HttpStatus.BAD_REQUEST,
       );
     }
+    return {
+      data: newSolution,
+      message: 'La solution a été mise à jour',
+    };
   }
 
   async update(id: number, data: UpdateSolutionDto) {
-    await this.findOne(id);
+    const soultion = await this.prismaService.solution.findUnique({
+      where: { id },
+    });
+    if (!soultion) throw new NotFoundException('La solution est introuvable');
+    let newSolution = null;
     try {
-      await this.prismaService.solution.update({
+      newSolution = await this.prismaService.solution.update({
         where: { id },
         data: {
           ...data,
@@ -182,27 +186,23 @@ export class SolutionsService {
         },
       });
     } catch {
-      throw new HttpException(
-        'Mauvaise demande, essayez à nouveau',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException('Mauvaise demande, essayez à nouveau');
     }
+    return {
+      message: 'La solution a été mise à jour',
+      data: newSolution,
+    };
   }
 
   async remove(id: number) {
     const solution = await this.prismaService.solution.findUnique({
       where: { id },
     });
-    if (!solution)
-      throw new HttpException(
-        'La solution n\'a pas été trouvé',
-        HttpStatus.NOT_FOUND,
-      );
+    if (!solution) throw new NotFoundException('La solution n\'a pas été trouvé');
     await this.prismaService.solution.delete({
       where: { id },
     });
     return {
-      statusCode: HttpStatus.OK,
       message: 'La solution est supprimé avec succès',
     };
   }
@@ -217,7 +217,6 @@ export class SolutionsService {
       },
     });
     return {
-      statusCode: HttpStatus.CREATED,
       message: 'L\'upload a réussi',
     };
   }
@@ -226,17 +225,12 @@ export class SolutionsService {
     const image = await this.prismaService.solutionImages.findUnique({
       where: { id },
     });
-    if (!image)
-      throw new HttpException(
-        'L\'image n\'a pas été trouvée',
-        HttpStatus.NOT_FOUND,
-      );
+    if (!image) throw new NotFoundException('L\'image n\'a pas été trouvée');
     await unlinkAsync(`./uploads/${image.imageLink}`);
     await this.prismaService.solutionImages.delete({
       where: { id },
     });
     return {
-      statusCode: HttpStatus.OK,
       message: 'L\'image a été suppimé',
     };
   }

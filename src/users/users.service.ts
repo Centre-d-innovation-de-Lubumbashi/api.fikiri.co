@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import * as bcrypt from 'bcrypt';
 import * as fs from 'fs';
@@ -23,12 +28,13 @@ export class UsersService {
     const user = await this.prismaService.user.findUnique({
       where: { email },
     });
+    let newUser = null;
     if (user)
-      throw new HttpException('L\'utilisateur existe déjà', HttpStatus.CONFLICT);
+      throw new ConflictException('L\'utilisateur existe déjà');
     try {
       const password: string = 'admin1234';
       const hash = await this.hashPassword(password);
-      await this.prismaService.user.create({
+      newUser = await this.prismaService.user.create({
         data: {
           ...createUserDto,
           password: hash,
@@ -38,10 +44,10 @@ export class UsersService {
         },
       });
     } catch {
-      throw new HttpException('Mauvaise demande, essayez à nouveau', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Mauvaise demande, essayez à nouveau');
     }
     return {
-      statusCode: HttpStatus.CREATED,
+      data: newUser,
       message: 'L\'utilisateur a été ajouté avec succès',
     };
   }
@@ -59,9 +65,9 @@ export class UsersService {
       where: { email },
     });
     if (user)
-      throw new HttpException('L\'utilisateur existe déjà', HttpStatus.CONFLICT);
+      throw new ConflictException('L\'utilisateur existe déjà');
 
-    await this.prismaService.user.create({
+    const newUser = await this.prismaService.user.create({
       data: {
         ...registerDto,
         password: hash,
@@ -73,7 +79,7 @@ export class UsersService {
       },
     });
     return {
-      statusCode: HttpStatus.CREATED,
+      data: newUser,
       message: 'L\'inscription est réussie',
     };
   }
@@ -85,7 +91,6 @@ export class UsersService {
       },
     });
     return {
-      statusCode: HttpStatus.OK,
       data: users,
     };
   }
@@ -101,9 +106,8 @@ export class UsersService {
         },
       },
     });
-    if (!user) throw new HttpException('L\'utilisateur n\'a pas été trouvé', HttpStatus.NOT_FOUND);
+    if (!user) throw new NotFoundException('L\'utilisateur n\'a pas été trouvé');
     return {
-      statusCode: HttpStatus.OK,
       data: user,
     };
   }
@@ -135,12 +139,14 @@ export class UsersService {
         roles: true,
       },
     });
-    if (user) return user;
+    if (!user) throw new NotFoundException('L\'utilisateur n\'a pas été trouvé');
+    return user;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
+    let user = null
     try {
-      await this.prismaService.user.update({
+     user = await this.prismaService.user.update({
         where: { id },
         data: {
           ...updateUserDto,
@@ -150,26 +156,27 @@ export class UsersService {
         },
       });
     } catch {
-      throw new HttpException('Echec lors de la mise à jour de l\'utlisateur', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Echec lors de la mise à jour de l\'utlisateur');
     }
     return {
-      statusCode: HttpStatus.OK,
+      data: user,
       message: 'Mise à jour de l\'utilisateur réussie',
     };
   }
 
   async updateProfile(id: number, data: UpdateProfileDto) {
+    let user = null;
     try {
-      await this.prismaService.user.update({
+      user = await this.prismaService.user.update({
         where: { id },
         data,
       });
     } catch {
-      throw new HttpException('Echec lors de la mise à jour du profile', HttpStatus.BAD_REQUEST);
+      throw new NotFoundException('Echec lors de la mise à jour du profile');
     }
     return {
-      statusCode: HttpStatus.OK,
-      message: 'Mise à jour de l\'utilisateur réussie',
+      message: 'Mise à jour du profile réussie',
+      data: user,
     };
   }
 
@@ -177,12 +184,11 @@ export class UsersService {
     const user = await this.prismaService.user.findUnique({
       where: { id },
     });
-    if (!user) throw new HttpException('L\'utilisateur n\'a pas été trouvé', HttpStatus.NOT_FOUND);
+    if (!user) throw new NotFoundException('L\'utilisateur n\'a pas été trouvé');
     await this.prismaService.user.delete({
       where: { id },
     });
     return {
-      statusCode: HttpStatus.OK,
       message: 'L\'utilisateur est supprimé avec succès',
     };
   }
@@ -203,7 +209,6 @@ export class UsersService {
       });
     }
     return {
-      statusCode: HttpStatus.OK,
       message: 'L\'image a été téléchargée avec succès',
     };
   }
@@ -222,7 +227,6 @@ export class UsersService {
       },
     });
     return {
-      statusCode: HttpStatus.OK,
       message: 'L\'image a été suppimé',
     };
   }

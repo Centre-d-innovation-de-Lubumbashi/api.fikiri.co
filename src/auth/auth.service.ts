@@ -1,4 +1,4 @@
-import { BadRequestException, HttpStatus, Injectable, Req, Res } from '@nestjs/common';
+import { BadRequestException, Injectable, Req, Res } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
@@ -37,10 +37,9 @@ export class AuthService {
   }
 
 
-  async login(@Req() req: any) {
+  async login(@Req() req: Request) {
     return {
       message: 'Connexion réussie',
-      statusCode: HttpStatus.OK,
       data: req.user,
     };
   }
@@ -50,23 +49,17 @@ export class AuthService {
     });
     return {
       message: 'Déconnexion réussie',
-      statusCode: HttpStatus.OK,
     };
   }
 
   async profile(@CurrentUser() user: any) {
     return {
-      statusCode: HttpStatus.OK,
       data: user,
     };
   }
 
   async updateProfile(id: number, data: UpdateProfileDto) {
-    await this.usersService.updateProfile(+id, data);
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Profil mis à jour avec succès',
-    };
+    return await this.usersService.updateProfile(+id, data);
   }
 
   register(registerDto: SignupDto) {

@@ -1,5 +1,5 @@
 import { PrismaService } from '../database/prisma.service';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
 
@@ -11,7 +11,7 @@ export class ChallengesService {
   }
 
   async create(data: CreateChallengeDto) {
-    await this.prismaService.challenge.create({
+    const challenge = await this.prismaService.challenge.create({
       data: {
         ...data,
         thematics: {
@@ -20,32 +20,34 @@ export class ChallengesService {
       },
     });
     return {
-      statusCode: HttpStatus.CREATED,
       message: 'Le défi ajouté avec succès',
+      data: challenge,
     };
   }
 
   async findAll() {
     const thematics = await this.prismaService.challenge.findMany();
     return {
-      statusCode: HttpStatus.OK,
-      thematics,
+      data: thematics,
     };
   }
 
   async findOne(id: number) {
-    const thematic = await this.prismaService.challenge.findUnique({
+    const challenge = await this.prismaService.challenge.findUnique({
       where: { id },
     });
-    if (!thematic) throw new HttpException('Le défi n\'a pas été trouvé', HttpStatus.NOT_FOUND);
+    if (!challenge) throw new NotFoundException('Le défi n\'a pas été trouvé');
     return {
-      statusCode: HttpStatus.OK,
-      thematic,
+      data: challenge,
     };
   }
 
   async update(id: number, data: UpdateChallengeDto) {
-    await this.prismaService.challenge.update({
+    const challenge = await this.prismaService.challenge.findUnique({
+      where: { id },
+    });
+    if (!challenge) throw new NotFoundException('Le défi est introuvable');
+    const newChallenge = await this.prismaService.challenge.update({
       where: { id },
       data: {
         ...data,
@@ -55,8 +57,8 @@ export class ChallengesService {
       },
     });
     return {
-      statusCode: HttpStatus.OK,
       message: 'Le défi a été mis à jour avec succès',
+      data: newChallenge,
     };
   }
 
@@ -65,7 +67,6 @@ export class ChallengesService {
       where: { id },
     });
     return {
-      statusCode: HttpStatus.OK,
       message: 'Le défi a été supprimé avec succès',
     };
   }

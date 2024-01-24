@@ -1,4 +1,4 @@
-import { Injectable, HttpStatus, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { CreateCallDto } from './dto/create-call.dto';
 import { UpdateCallDto } from './dto/update-call.dto';
@@ -11,17 +11,16 @@ export class CallsService {
   }
 
   async create(data: CreateCallDto) {
-    await this.prismaService.call.create({ data });
+    const call = await this.prismaService.call.create({ data });
     return {
-      statusCode: HttpStatus.CREATED,
       message: 'L\'appel à solution est ajouté',
+      data: call,
     };
   }
 
   async findAll() {
     const calls = await this.prismaService.call.findMany({});
     return {
-      statusCode: HttpStatus.OK,
       data: calls,
     };
   }
@@ -35,7 +34,6 @@ export class CallsService {
     });
     if (!call) throw new NotFoundException('L\'appel à solution introuvable');
     return {
-      statusCode: HttpStatus.OK,
       data: call,
     };
   }
@@ -45,10 +43,13 @@ export class CallsService {
       where: { id },
     });
     if (!call) throw new NotFoundException('L\'appel à solution introuvable');
-    await this.prismaService.call.update({
+    const newCall = await this.prismaService.call.update({
       data,
       where: { id },
     });
+    return {
+      data: newCall,
+    };
   }
 
   async remove(id: number) {
@@ -60,7 +61,6 @@ export class CallsService {
       where: { id },
     });
     return {
-      statusCode: HttpStatus.OK,
       message: 'L\'appel à solution est mis à jour',
     };
   }

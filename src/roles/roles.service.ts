@@ -1,5 +1,5 @@
 import { PrismaService } from '../database/prisma.service';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 
@@ -16,10 +16,9 @@ export class RolesService {
       where: { name },
     });
     if (role)
-      throw new HttpException('Le rôle existe déjà', HttpStatus.CONFLICT);
+      throw new ConflictException('Le rôle existe déjà');
     await this.prismaService.role.create({ data });
     return {
-      statusCode: HttpStatus.CREATED,
       message: 'Rôle ajouté avec succès',
     };
   }
@@ -27,7 +26,6 @@ export class RolesService {
   async findAll(): Promise<any> {
     const roles = await this.prismaService.role.findMany({});
     return {
-      statusCode: HttpStatus.OK,
       data: roles,
     };
   }
@@ -36,9 +34,8 @@ export class RolesService {
     const role = await this.prismaService.role.findUnique({
       where: { id },
     });
-    if (!role) throw new HttpException('Le rôle n\'a pas été trouvé', HttpStatus.NOT_FOUND);
+    if (!role) throw new NotFoundException('Le rôle n\'a pas été trouvé');
     return {
-      statusCode: HttpStatus.OK,
       data: role,
     };
   }
@@ -47,14 +44,14 @@ export class RolesService {
     const role = await this.prismaService.role.findUnique({
       where: { id },
     });
-    if (!role) throw new HttpException('Le rôle n\'a pas été trouvé', HttpStatus.NOT_FOUND);
-    await this.prismaService.role.update({
+    if (!role) throw new NotFoundException('Le rôle n\'a pas été trouvé');
+    const newRole = await this.prismaService.role.update({
       data,
       where: { id },
     });
     return {
-      statusCode: HttpStatus.OK,
       message: 'Rôle mis à jour avec succès',
+      data: newRole,
     };
   }
 
@@ -62,12 +59,11 @@ export class RolesService {
     const role = await this.prismaService.role.findUnique({
       where: { id },
     });
-    if (!role) throw new HttpException('Le rôle n\'a pas été trouvé', HttpStatus.NOT_FOUND);
+    if (!role) throw new NotFoundException('Le rôle n\'a pas été trouvé');
     await this.prismaService.role.delete({
       where: { id },
     });
     return {
-      statusCode: HttpStatus.OK,
       message: 'Le rôle a été supprimé avec succès',
     };
   }
