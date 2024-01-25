@@ -13,6 +13,8 @@ import CreateUserDto from './dto/create-user.dto';
 import { CreateWithGoogleDto } from './dto/create-with-google.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import UpdateProfileDto from '../auth/dto/update-profile.dto';
+import { MailerService } from '@nestjs-modules/mailer';
+import { ConfigService } from '@nestjs/config';
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -20,6 +22,8 @@ const unlinkAsync = promisify(fs.unlink);
 export class UsersService {
   constructor(
     private readonly prismaService: PrismaService,
+    private readonly mailerService: MailerService,
+    private readonly configService: ConfigService,
   ) {
   }
 
@@ -144,9 +148,9 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    let user = null
+    let user = null;
     try {
-     user = await this.prismaService.user.update({
+      user = await this.prismaService.user.update({
         where: { id },
         data: {
           ...updateUserDto,
@@ -230,4 +234,30 @@ export class UsersService {
       message: 'L\'image a été suppimé',
     };
   }
+
+
+  async senMailtoUser(id: number) {
+    const user = await this.prismaService.user.findUnique({
+      where: { id },
+    });
+    if (!user) throw new NotFoundException('L\'utilisateur n\'existe pas');
+    const { email } = user;
+    const subject = 'Mot de passe oublié';
+    const content = 'Votre mot de passe est 123456';
+    try {
+      await this.mailerService
+        .sendMail({
+          to: email,
+          from: this.configService.get('MAIL_USERNAME'),
+          subject,
+          text: content, 
+        })
+    } catch (e) {
+      console.log(e);
+    }
+    return {
+      message: 'L\'email a été envoyé avec succès',
+    };
+  }
+
 }
