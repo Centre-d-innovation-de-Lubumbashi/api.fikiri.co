@@ -9,15 +9,8 @@ const port = Number(process.env.PORT) as number;
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:4000",
-      "https://fikiri.co",
-      "https://admin.fikiri.co",
-      "https://www.admin.fikiri.co",
-      "https://www.fikiri.co",
-    ],
-    allowedHeaders: ['Content-Type', 'Origin', 'X-Requested-With', 'Accept', 'Authorization'],
+    origin: true,
+    allowedHeaders: ['Content-Type', 'Origin', 'Authorization'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
   });
