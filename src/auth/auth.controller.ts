@@ -11,6 +11,7 @@ import { PasswordService } from './password.service';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { ResetPasswordRequestDto } from './dto/reset-password-request.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { User } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -62,7 +63,7 @@ export class AuthController {
   }
 
   @Patch('update-password')
-  updatePassword(@CurrentUser() user: any, @Body() dto: UpdatePasswordDto) {
+  updatePassword(@CurrentUser() user: User, @Body() dto: UpdatePasswordDto) {
     return this.authPasswordService.updatePassword(user, dto);
   }
 
