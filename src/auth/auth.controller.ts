@@ -7,11 +7,16 @@ import { CurrentUser } from './decorators/user.decorator';
 import { GoogleGuard } from './guards/google.guard';
 import { SignupDto } from './dto/register.dto';
 import UpdateProfileDto from './dto/update-profile.dto';
+import { PasswordService } from './password.service';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { ResetPasswordRequestDto } from './dto/reset-password-request.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
+    private readonly authPasswordService: PasswordService,
   ) {
   }
 
@@ -54,5 +59,22 @@ export class AuthController {
   @Get('google/redirect')
   googleAuthRedirect(@Res() res: any) {
     return this.authService.loginGoogle(res);
+  }
+
+  @Patch('update-password')
+  updatePassword(@CurrentUser() user: any, @Body() dto: UpdatePasswordDto) {
+    return this.authPasswordService.updatePassword(user, dto);
+  }
+
+  @Public()
+  @Post('reset-password-request')
+  resetPasswordRequest(@Body() dto: ResetPasswordRequestDto): Promise<any> {
+    return this.authPasswordService.resetPasswordRequest(dto);
+  }
+
+  @Public()
+  @Post('reset-password')
+  resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authPasswordService.resetPassword(dto);
   }
 }     

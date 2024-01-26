@@ -235,6 +235,42 @@ export class UsersService {
     };
   }
 
+  async updatePassword(id: number, password: string): Promise<void> {
+    const passwordHash: string = await bcrypt.hash(password, 10);
+    await this.prismaService.user.update({
+      where: { id: id },
+      data: {
+        password: passwordHash,
+      },
+    });
+  }
+
+  async saveResetToken(id: number, token: string): Promise<any> {
+    await this.prismaService.user.update({
+      where: { id: id },
+      data: {
+        token,
+      },
+    });
+  }
+
+  async findByResetToken(token: string) {
+    const user = await this.prismaService.user.findFirst({
+      where: { token },
+    });
+    if (!user) throw new NotFoundException('User not found');
+    return user;
+  }
+
+  async removeResetToken(id: any) {
+    await this.prismaService.user.update({
+      where: { id },
+      data: {
+        token: null,
+      },
+    });
+  }
+
 
   async senMailtoUser(id: number) {
     const user = await this.prismaService.user.findUnique({
@@ -244,17 +280,13 @@ export class UsersService {
     const { email } = user;
     const subject = 'Mot de passe oublié';
     const content = 'Votre mot de passe est 123456';
-    try {
-      await this.mailerService
-        .sendMail({
-          to: email,
-          from: this.configService.get('MAIL_USERNAME'),
-          subject,
-          text: content, 
-        })
-    } catch (e) {
-      console.log(e);
-    }
+    await this.mailerService
+      .sendMail({
+        to: email,
+        from: this.configService.get('MAIL_USERNAME'),
+        subject,
+        text: content,
+      });
     return {
       message: 'L\'email a été envoyé avec succès',
     };
