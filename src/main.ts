@@ -10,10 +10,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
     origin: true,
-    allowedHeaders: ['Content-Type', 'Origin', 'Authorization', 'Access-Control-Allow-Origin'],
-    exposedHeaders: ['Content-Type', 'Origin', 'Authorization', 'Access-Control-Allow-Origin'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Origin', 'X-Requested-With', 'Accept', 'Authorization'],
+    exposedHeaders: ['Authorization'],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   });
   app.use(
     session({
