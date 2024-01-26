@@ -258,7 +258,7 @@ export class UsersService {
     const user = await this.prismaService.user.findFirst({
       where: { token },
     });
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundException('le code fourni est invalide');
     return user;
   }
 
