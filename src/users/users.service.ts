@@ -291,5 +291,4 @@ export class UsersService {
       message: 'L\'email a été envoyé avec succès',
     };
   }
-
 }

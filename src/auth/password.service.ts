@@ -29,9 +29,10 @@ export class PasswordService {
   }
 
   async resetPasswordEmail(to: string, token: string) {
+    let from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`
     await this.mailService.sendMail({
       to,
-      from: 'Support fikiri',
+      from,
       subject: 'Objet : Code de Réinitialisation de Mot de Passe Fikiri',
       text: `
 Cher(e) utilisateur(trice) de Fikiri,
