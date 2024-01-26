@@ -11,9 +11,10 @@ async function bootstrap() {
   app.enableCors({
     origin: true,
     allowedHeaders: ['Content-Type', 'Origin', 'X-Requested-With', 'Accept', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     exposedHeaders: ['Authorization'],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    optionsSuccessStatus: 204
   });
   app.use(
     session({
