@@ -262,7 +262,7 @@ export class UsersService {
     return user;
   }
 
-  async removeResetToken(id: any) {
+  async removeResetToken(id: number) {
     await this.prismaService.user.update({
       where: { id },
       data: {

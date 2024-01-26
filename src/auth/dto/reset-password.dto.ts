@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, MinLength } from 'class-validator';
 
 export class ResetPasswordDto {
   @IsNotEmpty({
@@ -6,8 +6,8 @@ export class ResetPasswordDto {
   })
   token: string;
 
-  @IsNotEmpty({
-    message: 'Le mot de passe ne peut pas être vide'
+  @MinLength(6, {
+    message: 'Le mot de passe doit contenir au moins 6 caractères',
   })
   password: string;
 }

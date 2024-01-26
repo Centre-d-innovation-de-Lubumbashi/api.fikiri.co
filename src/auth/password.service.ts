@@ -34,34 +34,35 @@ export class PasswordService {
       from: this.configService.get('MAIL_USERNAME'),
       subject: 'Objet : Code de Réinitialisation de Mot de Passe Fikiri',
       text: `
-        Cher(e) utilisateur(trice) de Fikiri,
-        
-        Pour réinitialiser votre mot de passe, utilisez le code suivant : ${token}.
-        
-        Veuillez vous rendre sur la page de réinitialisation et suivre les instructions pour finaliser le processus.
-    
-        Si vous n'avez pas initié cette demande, veuillez contacter notre équipe de support dès que possible.
-        
-        Merci,
-        L'équipe Fikiri
-      `,
+Cher(e) utilisateur(trice) de Fikiri,
+
+Pour réinitialiser votre mot de passe, utilisez le code suivant : ${token}.
+          
+Veuillez vous rendre sur la page de réinitialisation et suivre les instructions pour finaliser le processus.
+      
+Si vous n'avez pas initié cette demande, veuillez contacter notre équipe de support dès que possible.
+          
+Merci,
+L'équipe Fikiri.`,
     });
   }
 
   async resetPasswordRequest(dto: ResetPasswordRequestDto) {
     const { email } = dto;
     const user = await this.userService.findByEmail(email);
-    await this.userService.saveResetToken(user.id, randomPassword());
+    const token = randomPassword()
+    await this.userService.saveResetToken(user.id, token);
+    await this.resetPasswordEmail(email, token)
     return {
       statusCode: HttpStatus.OK,
-      message: 'Un code de réinitialisation à 6 chiffres a été généré et envoyé à votre adresse e-mail enregistrée. Veuillez vérifier votre boîte de réception et saisir le code ci-dessous pour compléter le processus.',
+      message: 'Code envoyé avec succès',
     };
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<any> {
     const { token, password } = resetPasswordDto;
     const user = await this.userService.findByResetToken(token);
-    await this.userService.removeResetToken(user);
+    await this.userService.removeResetToken(user.id);
     await this.userService.updatePassword(user.id, password);
     return {
       statusCode: HttpStatus.OK,
