@@ -92,7 +92,7 @@ export class SolutionsController {
   }
 
   @Public()
-  @Get('without-images')
+  @Get('send/without-images')
   getWithoutImages() {
     return this.solutionsService.sendMailToUserWithoutImageLink();
   }
