@@ -335,7 +335,8 @@ L'équipe Fikiri.
 
     for (const solution of solutions) {
       if (!solutionsWithImages.includes(solution) && !solutionsWithVideos.includes(solution) && !videosAndImages.includes(solution)) {
-        await this.sendEmail(solution.user.email, solution);
+        console.log(solution.user.email);
+        // await this.sendEmail(solution.user.email, solution);
       }
     }
 
