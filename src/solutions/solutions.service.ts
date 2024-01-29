@@ -292,4 +292,10 @@ export class SolutionsService {
     };
   }
 
+  async solutionsByPole(pole: number) {
+    const data = await this.prismaService.solution.findMany({
+      where: { pole }
+    })
+    return { data }
+  }
 }

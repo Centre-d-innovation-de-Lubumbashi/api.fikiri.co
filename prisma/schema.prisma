@@ -22,6 +22,7 @@ model User {
   solutions   Solution[]
   roles       Role[]     @relation("RoleToUser")
   feedbacks   Feedback[]
+  pole        Int?
 }
 
 model Role {
@@ -75,6 +76,7 @@ model Solution {
   challenges      Challenge[]      @relation("ChallengeToSolution")
   images          SolutionImages[]
   feedbacks       Feedback[]
+  pole            Int?
 }
 
 model Label {

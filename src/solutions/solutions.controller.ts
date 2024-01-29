@@ -7,6 +7,7 @@ import { CreateSolutionDto } from './dto/create-solution.dto';
 import { UpdateSolutionDto } from './dto/update-solution.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { UpdateUserSolutionDto } from './dto/update-user-solution.dto';
+import { CreateFeedbackDto } from './dto/create-feedback.dto';
 
 @Controller('solutions')
 export class SolutionsController {
@@ -78,5 +79,15 @@ export class SolutionsController {
   @Delete(':id/image/delete')
   removeImage(@Param('id') id: string) {
     return this.solutionsService.deleteImage(+id);
+  }
+
+  @Post('feddback/:id')
+  addFeedback(@Param('id') id: string, @Body() feedback: CreateFeedbackDto) {
+    return this.solutionsService.addFeedback(+id, feedback);
+  }
+
+  @Get('pole/:id')
+  getByPole(@Param('id') id: string) {
+    return this.solutionsService.solutionsByPole(+id);
   }
 }
