@@ -307,7 +307,8 @@ export class SolutionsService {
       },
     });
     const solutionsWithImages = solutions.filter((solution) => solution.images.length > 0 || solution.imageLink);
-    const solutionsWithVideos = solutions.filter((solution) => solution.videoLink !== null);
+    const solutionsWithVideos = solutions.filter((solution) => !solution.videoLink);
+
 //     const from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
 //     for (const solution of solutionsWithoutImageLink) {
 //       await this.mailService.sendMail({
@@ -334,7 +335,6 @@ export class SolutionsService {
       total: solutions.length,
       withImages: solutionsWithImages.length,
       withVideos: solutionsWithVideos.length,
-      message: 'Les emails ont été envoyés',
     };
   }
 }
