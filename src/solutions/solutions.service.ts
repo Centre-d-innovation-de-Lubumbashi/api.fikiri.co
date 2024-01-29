@@ -302,7 +302,7 @@ export class SolutionsService {
     const from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
 
     await this.mailService.sendMail({
-      to: solution.user.email,
+      to,
       from,
       subject: 'Objet : Urgent - Soumission de Preuves Cruciale pour Fikiri',
       text: `
