@@ -91,6 +91,7 @@ export class SolutionsService {
       where: { id },
       include: {
         thematic: true,
+        user: true,
         status: true,
         images: true,
       },
@@ -184,7 +185,7 @@ export class SolutionsService {
           },
           status: {
             connect: {
-              id: 1,
+              id: data.status,
             },
           },
           challenges: {
@@ -298,31 +299,36 @@ export class SolutionsService {
     return { data };
   }
 
-//   async sendEmail(solution: any) {
-//     const from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
-//
-//     await this.mailService.sendMail({
-//       to: solution.user.email,
-//       from,
-//       subject: `Objet : Urgent - Soumission de Preuves Cruciale pour Fikiri - ${solution.name}`,
-//       text: `
-// Bonjour ${solution.user.name},
-//
-// Nous espérons que ce message vous trouve bien. Nous vous rappelons l'importance vitale de fournir des preuves pour les solutions que vous avez soumises. Votre avancement dans le processus de sélection dépend de cette étape cruciale.
-//
-// Votre implication jusqu'à présent a été exceptionnelle, et nous comprenons que cette dernière étape peut sembler exigeante. Cependant, la qualité des preuves est essentielle pour évaluer la pertinence et l'applicabilité de vos solutions.
-//
-// Nous vous encourageons à soumettre ces preuves dans les plus brefs délais. L'avenir du pays dépend de votre engagement à fournir des solutions solides. Votre succès contribuera à l'avancement global de Fikiri en tant que plateforme d'innovation cruciale pour notre nation.
-//
-// Nous sommes là pour vous soutenir, et nous vous remercions sincèrement pour votre contribution précieuse.
-//
-// Cordialement,
-// L'équipe Fikiri.
-//  `,
-//     });
-//   }
+  async remindUser(id: number) {
+    const solution = await this.prismaService.solution.findFirst({
+      where: { id },
+      include: {
+        user: true,
+      }
+    })
+    const from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
+    await this.mailService.sendMail({
+      to: solution.user.email,
+      from,
+      subject: `Objet : Urgent - Soumission de Preuves Cruciale pour Fikiri - ${solution.name}`,
+      text: `
+Bonjour ${solution.user.name},
 
-  async sendMailToUserWithoutImageLink() {
+Nous espérons que ce message vous trouve bien. Nous vous rappelons l'importance vitale de fournir des preuves pour les solutions que vous avez soumises. Votre avancement dans le processus de sélection dépend de cette étape cruciale.
+
+Votre implication jusqu'à présent a été exceptionnelle, et nous comprenons que cette dernière étape peut sembler exigeante. Cependant, la qualité des preuves est essentielle pour évaluer la pertinence et l'applicabilité de vos solutions.
+
+Nous vous encourageons à soumettre ces preuves dans les plus brefs délais. L'avenir du pays dépend de votre engagement à fournir des solutions solides. Votre succès contribuera à l'avancement global de Fikiri en tant que plateforme d'innovation cruciale pour notre nation.
+
+Nous sommes là pour vous soutenir, et nous vous remercions sincèrement pour votre contribution précieuse.
+
+Cordialement,
+L'équipe Fikiri.
+ `,
+    });
+  }
+
+  async stats() {
     const solutions = await this.prismaService.solution.findMany({
       include: {
         user: true,

@@ -92,8 +92,13 @@ export class SolutionsController {
   }
 
   @Public()
-  @Get('send/without-images')
-  getWithoutImages() {
-    return this.solutionsService.sendMailToUserWithoutImageLink();
+  @Get('stats')
+  stats() {
+    return this.solutionsService.stats();
+  }
+
+  @Post('user/remind/:id')
+  remindUserToCompleteSolution(@Param('id') id: number) {
+    return this.solutionsService.remindUser(+id);
   }
 }
