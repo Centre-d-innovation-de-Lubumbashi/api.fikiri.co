@@ -12,7 +12,7 @@ export class RolesService {
 
   async create(data: CreateRoleDto) {
     const name: string = data.name as string;
-    const role = await this.prismaService.role.findUnique({
+    const role = await this.prismaService.role.findFirst({
       where: { name },
     });
     if (role)

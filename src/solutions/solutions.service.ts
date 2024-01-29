@@ -5,6 +5,9 @@ import { promisify } from 'util';
 import { CreateSolutionDto } from './dto/create-solution.dto';
 import { UpdateSolutionDto } from './dto/update-solution.dto';
 import { UpdateUserSolutionDto } from './dto/update-user-solution.dto';
+import { CreateFeedbackDto } from './dto/create-feedback.dto';
+import { MailerService } from '@nestjs-modules/mailer';
+import { ConfigService } from '@nestjs/config';
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -12,6 +15,8 @@ const unlinkAsync = promisify(fs.unlink);
 export class SolutionsService {
   constructor(
     private prismaService: PrismaService,
+    private mailService: MailerService,
+    private configService: ConfigService,
   ) {
   }
 
@@ -73,6 +78,7 @@ export class SolutionsService {
       include: {
         thematic: true,
         status: true,
+        images: true,
       },
     });
     return {
@@ -86,6 +92,7 @@ export class SolutionsService {
       include: {
         thematic: true,
         status: true,
+        images: true,
       },
     });
     if (!solution)
@@ -234,4 +241,55 @@ export class SolutionsService {
       message: 'L\'image a été suppimé',
     };
   }
+
+  async sendComment(to: string, comment: string) {
+    let from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
+    await this.mailService.sendMail({
+      to,
+      from,
+      subject: 'Objet : Commentaire sur votre solution soumise sur fikiri',
+      text: comment,
+    });
+  }
+
+  async addFeedback(id: number, feedback: CreateFeedbackDto) {
+    const solution = await this.prismaService.solution.findUnique({
+      where: { id },
+      include: {
+        user: true,
+      },
+    });
+    if (!solution) throw new NotFoundException('La solution n\'a pas été trouvé');
+
+    const label = await this.prismaService.feedback.create({
+      data: {
+        ...feedback,
+        user: {
+          connect: {
+            email: feedback.user,
+          },
+        },
+        labels: {
+          connect: feedback.labels.map((id) => ({ id })),
+        },
+      },
+    });
+
+    await this.prismaService.solution.update({
+      where: { id },
+      data: {
+        feedbacks: {
+          connect: {
+            id: label.id,
+          },
+        },
+      },
+    });
+
+    await this.sendComment(solution.user.email, feedback.userComment);
+    return {
+      message: 'Le feedback a été ajouté',
+    };
+  }
+
 }

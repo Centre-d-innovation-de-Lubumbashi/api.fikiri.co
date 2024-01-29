@@ -21,6 +21,7 @@ model User {
   updatedAt   DateTime?  @updatedAt
   solutions   Solution[]
   roles       Role[]     @relation("RoleToUser")
+  feedbacks   Feedback[]
 }
 
 model Role {
@@ -73,6 +74,25 @@ model Solution {
   user            User?            @relation(fields: [userId], references: [id])
   challenges      Challenge[]      @relation("ChallengeToSolution")
   images          SolutionImages[]
+  feedbacks       Feedback[]
+}
+
+model Label {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  feedbacks Feedback[]
+}
+
+model Feedback {
+  id           Int        @id @default(autoincrement())
+  adminComment String
+  userComment  String
+  createdAt    DateTime?  @default(now())
+  updatedAt    DateTime?  @updatedAt
+  labels       Label[]
+  solutions    Solution[]
+  user         User?      @relation(fields: [userId], references: [id])
+  userId       Int?
 }
 
 model SolutionImages {

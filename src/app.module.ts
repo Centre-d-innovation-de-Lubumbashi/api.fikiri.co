@@ -14,6 +14,8 @@ import { join } from 'path';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { LabelsModule } from './labels/labels.module';
+import { FeedbacksModule } from './feedbacks/feedbacks.module';
 
 @Module({
   imports: [
@@ -47,6 +49,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
     CallsModule,
     ChallengesModule,
     StatusModule,
+    LabelsModule,
+    FeedbacksModule,
   ],
   providers: [
     {
