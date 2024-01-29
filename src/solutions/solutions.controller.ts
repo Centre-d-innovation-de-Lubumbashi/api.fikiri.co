@@ -92,7 +92,7 @@ export class SolutionsController {
   }
 
   @Public()
-  @Get('stats')
+  @Get('stats/with-proof')
   stats() {
     return this.solutionsService.stats();
   }
