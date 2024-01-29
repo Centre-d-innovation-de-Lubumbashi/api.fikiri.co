@@ -294,9 +294,9 @@ export class SolutionsService {
 
   async solutionsByPole(pole: number) {
     const data = await this.prismaService.solution.findMany({
-      where: { pole }
-    })
-    return { data }
+      where: { pole },
+    });
+    return { data };
   }
 
   async sendMailToUserWithoutImageLink() {
@@ -306,7 +306,8 @@ export class SolutionsService {
         images: true,
       },
     });
-    const solutionsWithoutImageLink = solutions.filter((solution) => solution.images.length === 0 && solution.imageLink === null);
+    const solutionsWithImages = solutions.filter((solution) => solution.images.length > 0 || solution.imageLink !== null);
+    const solutionsWithVideos = solutions.filter((solution) => solution.videoLink !== null);
 //     const from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
 //     for (const solution of solutionsWithoutImageLink) {
 //       await this.mailService.sendMail({
@@ -331,7 +332,8 @@ export class SolutionsService {
 //     }
     return {
       total: solutions.length,
-      without: solutionsWithoutImageLink.length,
+      withImages: solutionsWithImages,
+      withVideo: solutionsWithVideos,
       message: 'Les emails ont été envoyés',
     };
   }
