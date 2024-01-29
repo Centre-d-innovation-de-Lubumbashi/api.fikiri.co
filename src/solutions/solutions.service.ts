@@ -260,7 +260,6 @@ export class SolutionsService {
       },
     });
     if (!solution) throw new NotFoundException('La solution n\'a pas été trouvé');
-
     const label = await this.prismaService.feedback.create({
       data: {
         ...feedback,
@@ -299,6 +298,30 @@ export class SolutionsService {
     return { data };
   }
 
+  async sendEmail(to: string, solution: any) {
+    const from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
+
+    await this.mailService.sendMail({
+      to: solution.user.email,
+      from,
+      subject: 'Objet : Urgent - Soumission de Preuves Cruciale pour Fikiri',
+      text: `
+Bonjour ${solution.user.name},
+
+Nous espérons que ce message vous trouve bien. Nous vous rappelons l'importance vitale de fournir des preuves pour les solutions que vous avez soumises. Votre avancement dans le processus de sélection dépend de cette étape cruciale.
+
+Votre implication jusqu'à présent a été exceptionnelle, et nous comprenons que cette dernière étape peut sembler exigeante. Cependant, la qualité des preuves est essentielle pour évaluer la pertinence et l'applicabilité de vos solutions.
+
+Nous vous encourageons à soumettre ces preuves dans les plus brefs délais. L'avenir du pays dépend de votre engagement à fournir des solutions solides. Votre succès contribuera à l'avancement global de Fikiri en tant que plateforme d'innovation cruciale pour notre nation.
+
+Nous sommes là pour vous soutenir, et nous vous remercions sincèrement pour votre contribution précieuse.
+
+Cordialement,
+L'équipe Fikiri.
+ `,
+    });
+  }
+
   async sendMailToUserWithoutImageLink() {
     const solutions = await this.prismaService.solution.findMany({
       include: {
@@ -310,28 +333,12 @@ export class SolutionsService {
     const solutionsWithVideos = solutions.filter((solution) => solution.videoLink && !solutionsWithImages.includes(solution));
     const videosAndImages = solutions.filter((solution) => solution.videoLink && (solution.images.length > 0 || solution.imageLink));
 
-//     const from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
-//     for (const solution of solutionsWithoutImageLink) {
-//       await this.mailService.sendMail({
-//         to: solution.user.email,
-//         from,
-//         subject: 'Objet : Urgent - Soumission de Preuves Cruciale pour Fikiri',
-//         text:  `
-// Bonjour ${solution.user.name},
-//
-// Nous espérons que ce message vous trouve bien. Nous vous rappelons l'importance vitale de fournir des preuves pour les solutions que vous avez soumises. Votre avancement dans le processus de sélection dépend de cette étape cruciale.
-//
-// Votre implication jusqu'à présent a été exceptionnelle, et nous comprenons que cette dernière étape peut sembler exigeante. Cependant, la qualité des preuves est essentielle pour évaluer la pertinence et l'applicabilité de vos solutions.
-//
-// Nous vous encourageons à soumettre ces preuves dans les plus brefs délais. L'avenir du pays dépend de votre engagement à fournir des solutions solides. Votre succès contribuera à l'avancement global de Fikiri en tant que plateforme d'innovation cruciale pour notre nation.
-//
-// Nous sommes là pour vous soutenir, et nous vous remercions sincèrement pour votre contribution précieuse.
-//
-// Cordialement,
-// L'équipe Fikiri.
-//  `  ,
-//       });
-//     }
+    for (const solution of solutions) {
+      if (!solutionsWithImages.includes(solution) && !solutionsWithVideos.includes(solution) && !videosAndImages.includes(solution)) {
+        await this.sendEmail(solution.user.email, solution);
+      }
+    }
+
     return {
       total: solutions.length,
       withImages: solutionsWithImages.length,
