@@ -307,7 +307,8 @@ export class SolutionsService {
       },
     });
     const solutionsWithImages = solutions.filter((solution) => solution.images.length > 0 || solution.imageLink);
-    const solutionsWithVideos = solutions.filter((solution) => solution.videoLink);
+    const solutionsWithVideos = solutions.filter((solution) => solution.videoLink && !solutionsWithImages.includes(solution));
+    const videosAndImages = solutions.filter((solution) => solution.videoLink && (solution.images.length > 0 || solution.imageLink));
 
 //     const from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
 //     for (const solution of solutionsWithoutImageLink) {
@@ -335,6 +336,7 @@ export class SolutionsService {
       total: solutions.length,
       withImages: solutionsWithImages.length,
       withVideos: solutionsWithVideos.length,
+      withVideosAndImages: videosAndImages.length,
     };
   }
 }
