@@ -298,11 +298,11 @@ export class SolutionsService {
     return { data };
   }
 
-  async sendEmail(to: string, solution: any) {
+  async sendEmail(solution: any) {
     const from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
 
     await this.mailService.sendMail({
-      to,
+      to: solution.user.email,
       from,
       subject: 'Objet : Urgent - Soumission de Preuves Cruciale pour Fikiri',
       text: `
@@ -335,8 +335,8 @@ L'équipe Fikiri.
 
     for (const solution of solutions) {
       if (!solutionsWithImages.includes(solution) && !solutionsWithVideos.includes(solution)) {
-        if (solution.user.email){
-          await this.sendEmail(solution.user.email, solution);
+        if (solution.user.email) {
+          await this.sendEmail(solution);
         }
       }
     }
