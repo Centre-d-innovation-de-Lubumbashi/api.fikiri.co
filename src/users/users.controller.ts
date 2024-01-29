@@ -15,7 +15,6 @@ import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import CreateUserDto from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -54,7 +53,7 @@ export class UsersController {
     FileInterceptor('thumb', {
       storage: diskStorage({
         destination: './uploads',
-        filename: function(_req, file, cb) {
+        filename: function (_req, file, cb) {
           cb(null, `${uuidv4()}.${file.mimetype.split('/')[1]}`);
         },
       }),
@@ -76,11 +75,5 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
-  }
-
-  @Public()
-  @Get('send/:id')
-  sendMail(@Param('id') id: string) {
-    return this.userService.senMailtoUser(+id);
   }
 }

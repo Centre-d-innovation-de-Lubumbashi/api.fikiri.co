@@ -90,4 +90,10 @@ export class SolutionsController {
   getByPole(@Param('id') id: string) {
     return this.solutionsService.solutionsByPole(+id);
   }
+
+  @Public()
+  @Get('without-images')
+  getWithoutImages() {
+    return this.solutionsService.sendMailToUserWithoutImageLink();
+  }
 }
