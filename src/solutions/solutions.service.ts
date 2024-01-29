@@ -334,7 +334,7 @@ L'équipe Fikiri.
     const videosAndImages = solutions.filter((solution) => solution.videoLink && (solution.images.length > 0 || solution.imageLink));
 
     for (const solution of solutions) {
-      if (!solutionsWithImages.includes(solution) && !solutionsWithVideos.includes(solution) && !videosAndImages.includes(solution)) {
+      if (!solutionsWithImages.includes(solution) && !solutionsWithVideos.includes(solution)) {
         console.log(solution.user.email);
         // await this.sendEmail(solution.user.email, solution);
       }
