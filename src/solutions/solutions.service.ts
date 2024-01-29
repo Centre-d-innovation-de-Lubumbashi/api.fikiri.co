@@ -332,8 +332,8 @@ export class SolutionsService {
 //     }
     return {
       total: solutions.length,
-      withImages: solutionsWithImages,
-      withVideo: solutionsWithVideos,
+      withImages: solutionsWithImages.length,
+      withVideo: solutionsWithVideos.length,
       message: 'Les emails ont été envoyés',
     };
   }
