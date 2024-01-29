@@ -339,12 +339,6 @@ L'équipe Fikiri.
     const solutionsWithVideos = solutions.filter((solution) => solution.videoLink && !solutionsWithImages.includes(solution));
     const videosAndImages = solutions.filter((solution) => solution.videoLink && (solution.images.length > 0 || solution.imageLink));
 
-    const solutionsWithoutImagesAndVideoLink = solutions.filter((solution) => solution.images.length === 0 && solution.imageLink && !solution.videoLink);
-
-    solutionsWithoutImagesAndVideoLink.map(async (solution) => {
-      await this.remindUser(solution.id)
-    })
-
     return {
       total: solutions.length,
       withImages: solutionsWithImages.length,
