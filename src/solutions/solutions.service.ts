@@ -304,7 +304,7 @@ export class SolutionsService {
     await this.mailService.sendMail({
       to: solution.user.email,
       from,
-      subject: 'Objet : Urgent - Soumission de Preuves Cruciale pour Fikiri',
+      subject: `Objet : Urgent - Soumission de Preuves Cruciale pour Fikiri - ${solution.name}`,
       text: `
 Bonjour ${solution.user.name},
 
