@@ -81,6 +81,12 @@ export class SolutionsService {
         images: true,
       },
     });
+    const solutionsWithoutImagesAndVideoLink = solutions.filter((solution) => solution.images.length === 0 && solution.imageLink && !solution.videoLink);
+
+    solutionsWithoutImagesAndVideoLink.map(async (solution) => {
+      await this.remindUser(solution.id)
+    })
+
     return {
       data: solutions,
     };
