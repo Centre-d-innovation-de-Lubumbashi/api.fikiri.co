@@ -307,7 +307,7 @@ export class SolutionsService {
       },
     });
     const solutionsWithImages = solutions.filter((solution) => solution.images.length > 0 || solution.imageLink);
-    const solutionsWithVideos = solutions.filter((solution) => !solution.videoLink);
+    const solutionsWithVideos = solutions.filter((solution) => solution.videoLink);
 
 //     const from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
 //     for (const solution of solutionsWithoutImageLink) {
