@@ -1,3 +1,4 @@
+import { CreateFeedbackDto } from './../feedbacks/dto/create-feedback.dto';
 import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import * as fs from 'fs';
@@ -5,59 +6,53 @@ import { promisify } from 'util';
 import { CreateSolutionDto } from './dto/create-solution.dto';
 import { UpdateSolutionDto } from './dto/update-solution.dto';
 import { UpdateUserSolutionDto } from './dto/update-user-solution.dto';
-import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
+import { FeedbacksService } from 'src/feedbacks/feedbacks.service';
+import { Solution, User } from '@prisma/client';
+import { UpdateFeedbackDto } from 'src/feedbacks/dto/update-feedback.dto';
 
 const unlinkAsync = promisify(fs.unlink);
 
 @Injectable()
 export class SolutionsService {
   constructor(
-    private prismaService: PrismaService,
-    private mailService: MailerService,
-    private configService: ConfigService,
-  ) {
-  }
+    private readonly prismaService: PrismaService,
+    private readonly mailService: MailerService,
+    private readonly configService: ConfigService,
+    private readonly feddbacksService: FeedbacksService,
+  ) { }
 
-  async create(data: CreateSolutionDto) {
-    let solution = null;
-    try {
-      solution = await this.prismaService.solution.create({
-        data: {
-          ...data,
-          thematic: {
-            connect: {
-              id: data.thematic,
-            },
-          },
-          user: {
-            connect: {
-              email: data.user,
-            },
-          },
-          call: {
-            connect: {
-              id: data.call,
-            },
-          },
-          status: {
-            connect: {
-              id: 1,
-            },
-          },
-          challenges: {
-            connect: data.challenges.map((id) => ({ id })),
+  async create(dto: CreateSolutionDto) {
+    const data: Solution = await this.prismaService.solution.create({
+      data: {
+        ...dto,
+        thematic: {
+          connect: {
+            id: dto.thematic,
           },
         },
-      });
-    } catch {
-      throw new BadRequestException('Mauvaise demande, essayez à nouveau');
-    }
-    return {
-      message: 'La solution a été ajouté avec succès',
-      data: solution,
-    };
+        user: {
+          connect: {
+            email: dto.user,
+          },
+        },
+        call: {
+          connect: {
+            id: dto.call,
+          },
+        },
+        status: {
+          connect: {
+            id: 1,
+          },
+        },
+        challenges: {
+          connect: dto.challenges.map((id) => ({ id })),
+        },
+      },
+    });
+    return { data };
   }
 
   async findApproved() {
@@ -67,27 +62,23 @@ export class SolutionsService {
         status: true,
       },
     });
-    const solutionsToDisplay = solutions.filter((solution) => solution.status.id > 1);
-    return {
-      data: solutionsToDisplay,
-    };
+    const data = solutions.filter((solution) => solution.status.id > 1);
+    return { data };
   }
 
   async findAll() {
-    const solutions = await this.prismaService.solution.findMany({
+    const data: Solution[] = await this.prismaService.solution.findMany({
       include: {
         thematic: true,
         status: true,
         images: true,
       },
     });
-    return {
-      data: solutions,
-    };
+    return { data };
   }
 
   async findOne(id: number) {
-    const solution = await this.prismaService.solution.findUnique({
+    const data = await this.prismaService.solution.findUnique({
       where: { id },
       include: {
         thematic: true,
@@ -96,11 +87,8 @@ export class SolutionsService {
         images: true,
       },
     });
-    if (!solution)
-      throw new NotFoundException('La solution n\'a pas été trouvé');
-    return {
-      data: solution,
-    };
+    if (!data) throw new NotFoundException('La solution n\'a pas été trouvé');
+    return { data };
   }
 
   async findbyUser(email: string) {
@@ -108,116 +96,80 @@ export class SolutionsService {
       where: { email },
     });
     if (user) {
-      const solutions = await this.prismaService.solution.findMany({
+      const data = await this.prismaService.solution.findMany({
         where: { userId: user.id },
         include: {
           status: true,
           images: true,
         },
       });
-      return {
-        data: solutions,
-      };
+      return { data };
     }
   }
 
   async findByCall(callId: number) {
-    const solutions = await this.prismaService.solution.findMany({
+    const data = await this.prismaService.solution.findMany({
       where: { callId },
       include: { thematic: true },
     });
-    return {
-      statusCode: HttpStatus.OK,
-      data: solutions,
-    };
+    return { data };
   }
 
-  async updateUserSolution(id: number, data: UpdateUserSolutionDto) {
-    const soultion = await this.prismaService.solution.findUnique({
+  async updateUserSolution(id: number, dto: UpdateUserSolutionDto) {
+    await this.findOne(id)
+    const data = await this.prismaService.solution.update({
       where: { id },
+      data: {
+        ...dto,
+      },
     });
-    if (!soultion) throw new NotFoundException('La solution est introuvable');
-    let newSolution = null;
-    try {
-      newSolution = await this.prismaService.solution.update({
-        where: { id },
-        data: {
-          ...data,
-        },
-      });
-    } catch {
-      throw new HttpException(
-        'Erreur survenue lors de la mise à jour',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    return {
-      data: newSolution,
-      message: 'La solution a été mise à jour',
-    };
+    return { data };
   }
 
   async update(id: number, dto: UpdateSolutionDto) {
-    const soultion = await this.prismaService.solution.findUnique({
+    await this.findOne(id)
+    const data = await this.prismaService.solution.update({
       where: { id },
-    });
-    if (!soultion) throw new NotFoundException('La solution est introuvable');
-    let newSolution = null;
-    try {
-      newSolution = await this.prismaService.solution.update({
-        where: { id },
-        data: {
-          ...dto,
-          pole: {
-            connect: {
-              id: dto.pole
-            }
-          },
-          thematic: {
-            connect: {
-              id: dto.thematic,
-            },
-          },
-          user: {
-            connect: {
-              email: dto.user,
-            },
-          },
-          call: {
-            connect: {
-              id: dto.call,
-            },
-          },
-          status: {
-            connect: {
-              id: dto.status,
-            },
-          },
-          challenges: {
-            connect: dto.challenges.map((id: number) => ({ id })),
+      data: {
+        ...dto,
+        pole: {
+          connect: {
+            id: dto.pole
+          }
+        },
+        thematic: {
+          connect: {
+            id: dto.thematic,
           },
         },
-      });
-    } catch {
-      throw new BadRequestException('Mauvaise demande, essayez à nouveau');
-    }
-    return {
-      message: 'La solution a été mise à jour',
-      data: newSolution,
-    };
+        user: {
+          connect: {
+            email: dto.user,
+          },
+        },
+        call: {
+          connect: {
+            id: dto.call,
+          },
+        },
+        status: {
+          connect: {
+            id: dto.status,
+          },
+        },
+        challenges: {
+          connect: dto.challenges.map((id: number) => ({ id })),
+        },
+      },
+    });
+    return { data };
   }
 
   async remove(id: number) {
-    const solution = await this.prismaService.solution.findUnique({
-      where: { id },
-    });
-    if (!solution) throw new NotFoundException('La solution n\'a pas été trouvé');
+    await this.findOne(id);
     await this.prismaService.solution.delete({
       where: { id },
     });
-    return {
-      message: 'La solution est supprimé avec succès',
-    };
   }
 
   async uploadImages(id: number, images: Express.Multer.File[]) {
@@ -229,9 +181,6 @@ export class SolutionsService {
         },
       },
     });
-    return {
-      message: 'L\'upload a réussi',
-    };
   }
 
   async deleteImage(id: number): Promise<any> {
@@ -243,58 +192,51 @@ export class SolutionsService {
     await this.prismaService.solutionImages.delete({
       where: { id },
     });
-    return {
-      message: 'L\'image a été suppimé',
-    };
   }
 
-  async sendComment(to: string, comment: string) {
+  async sendComment(user: User, comment: string) {
     let from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
     await this.mailService.sendMail({
-      to,
+      to: user.email,
       from,
       subject: 'Objet : Commentaire sur votre solution soumise sur fikiri',
-      text: comment,
+      text: `
+Bonjour ${user.name},
+
+${comment}
+
+L'équipe Fikiri,
+Cordialement.
+      `,
     });
   }
 
-  async addFeedback(id: number, feedback: CreateFeedbackDto) {
-    const solution = await this.prismaService.solution.findUnique({
-      where: { id },
-      include: {
-        user: true,
-      },
-    });
-    if (!solution) throw new NotFoundException('La solution n\'a pas été trouvé');
-    const label = await this.prismaService.feedback.create({
-      data: {
-        ...feedback,
-        user: {
-          connect: {
-            email: feedback.user,
-          },
-        },
-        labels: {
-          connect: feedback.labels.map((id) => ({ id })),
-        },
-      },
-    });
-
+  async addFeedback(id: number, dto: CreateFeedbackDto) {
+    const { data: solution } = await this.findOne(id);
+    const { data } = await this.feddbacksService.create(dto);
     await this.prismaService.solution.update({
       where: { id },
       data: {
         feedbacks: {
           connect: {
-            id: label.id,
+            id: data.id,
           },
         },
       },
     });
+    if (dto.userComment) await this.sendComment(solution.user, data.userComment);
+    return { data };
+  }
 
-    await this.sendComment(solution.user.email, feedback.userComment);
-    return {
-      message: 'Le feedback a été ajouté',
-    };
+  async updateFeedback(id: number, dto: UpdateFeedbackDto) {
+    await this.feddbacksService.findOne(id);
+    const { data } = await this.feddbacksService.update(id, dto);
+    return { data };
+  }
+
+  async deleteFeedback(id: number) {
+    await this.feddbacksService.findOne(id);
+    await this.feddbacksService.remove(id);
   }
 
   async solutionsByPole(pole: number) {
@@ -302,53 +244,5 @@ export class SolutionsService {
       where: { poleId: pole },
     });
     return { data };
-  }
-
-  async remindUser(id: number) {
-    const solution = await this.prismaService.solution.findFirst({
-      where: { id },
-      include: {
-        user: true,
-      }
-    })
-    const from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
-    await this.mailService.sendMail({
-      to: solution.user.email,
-      from,
-      subject: `Objet : Urgent - Soumission de Preuves Cruciale pour Fikiri - ${solution.name}`,
-      text: `
-Bonjour ${solution.user.name},
-
-Nous espérons que ce message vous trouve bien. Nous vous rappelons l'importance vitale de fournir des preuves pour les solutions que vous avez soumises. Votre avancement dans le processus de sélection dépend de cette étape cruciale.
-
-Votre implication jusqu'à présent a été exceptionnelle, et nous comprenons que cette dernière étape peut sembler exigeante. Cependant, la qualité des preuves est essentielle pour évaluer la pertinence et l'applicabilité de vos solutions.
-
-Nous vous encourageons à soumettre ces preuves dans les plus brefs délais. L'avenir du pays dépend de votre engagement à fournir des solutions solides. Votre succès contribuera à l'avancement global de Fikiri en tant que plateforme d'innovation cruciale pour notre nation.
-
-Nous sommes là pour vous soutenir, et nous vous remercions sincèrement pour votre contribution précieuse.
-
-Cordialement,
-L'équipe Fikiri.
- `,
-    });
-  }
-
-  async stats() {
-    const solutions = await this.prismaService.solution.findMany({
-      include: {
-        user: true,
-        images: true,
-      },
-    });
-    const solutionsWithImages = solutions.filter((solution) => solution.images.length > 0 || solution.imageLink);
-    const solutionsWithVideos = solutions.filter((solution) => solution.videoLink && !solutionsWithImages.includes(solution));
-    const videosAndImages = solutions.filter((solution) => solution.videoLink && (solution.images.length > 0 || solution.imageLink));
-
-    return {
-      total: solutions.length,
-      withImages: solutionsWithImages.length,
-      withVideos: solutionsWithVideos.length,
-      withVideosAndImages: videosAndImages.length,
-    };
   }
 }

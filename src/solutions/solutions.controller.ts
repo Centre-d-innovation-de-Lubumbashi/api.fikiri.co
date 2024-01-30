@@ -1,3 +1,4 @@
+import { CreateFeedbackDto } from './../feedbacks/dto/create-feedback.dto';
 import { Body, Controller, Delete, Get, Param, Patch, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { SolutionsService } from './solutions.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -7,12 +8,13 @@ import { CreateSolutionDto } from './dto/create-solution.dto';
 import { UpdateSolutionDto } from './dto/update-solution.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { UpdateUserSolutionDto } from './dto/update-user-solution.dto';
-import { CreateFeedbackDto } from './dto/create-feedback.dto';
+import { UpdateFeedbackDto } from 'src/feedbacks/dto/update-feedback.dto';
 
 @Controller('solutions')
 export class SolutionsController {
-  constructor(private readonly solutionsService: SolutionsService) {
-  }
+  constructor(
+    private readonly solutionsService: SolutionsService
+  ) { }
 
   @Post()
   create(@Body() data: CreateSolutionDto) {
@@ -65,7 +67,7 @@ export class SolutionsController {
     FilesInterceptor('thumbs', 3, {
       storage: diskStorage({
         destination: './uploads',
-        filename: function(_req, file, cb) {
+        filename: function (_req, file, cb) {
           cb(null, `${uuidv4()}.${file.mimetype.split('/')[1]}`);
         },
       }),
@@ -82,23 +84,22 @@ export class SolutionsController {
   }
 
   @Post('feddback/:id')
-  addFeedback(@Param('id') id: string, @Body() feedback: CreateFeedbackDto) {
-    return this.solutionsService.addFeedback(+id, feedback);
+  addFeedback(@Param('id') id: string, @Body() dto: CreateFeedbackDto) {
+    return this.solutionsService.addFeedback(+id, dto);
+  }
+
+  @Patch('feddback/:id')
+  updateFeedback(@Param('id') id: string, @Body() dto: UpdateFeedbackDto) {
+    return this.solutionsService.updateFeedback(+id, dto);
+  }
+
+  @Delete('feddback/:id')
+  deleteFeedback(@Param('id') id: string) {
+    return this.solutionsService.deleteFeedback(+id);
   }
 
   @Get('pole/:id')
   getByPole(@Param('id') id: string) {
     return this.solutionsService.solutionsByPole(+id);
-  }
-
-  @Public()
-  @Get('stats/with-proof')
-  stats() {
-    return this.solutionsService.stats();
-  }
-
-  @Post('user/remind/:id')
-  remindUserToCompleteSolution(@Param('id') id: number) {
-    return this.solutionsService.remindUser(+id);
   }
 }

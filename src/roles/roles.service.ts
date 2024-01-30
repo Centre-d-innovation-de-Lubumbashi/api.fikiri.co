@@ -2,6 +2,7 @@ import { PrismaService } from '../database/prisma.service';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class RolesService {
@@ -10,61 +11,43 @@ export class RolesService {
   ) {
   }
 
-  async create(data: CreateRoleDto) {
-    const name: string = data.name as string;
-    const role = await this.prismaService.role.findFirst({
+  async create(dto: CreateRoleDto) {
+    const name: string = dto.name
+    const data = await this.prismaService.role.findFirst({
       where: { name },
     });
-    if (role)
+    if (dto)
       throw new ConflictException('Le rôle existe déjà');
-    await this.prismaService.role.create({ data });
-    return {
-      message: 'Rôle ajouté avec succès',
-    };
+    await this.prismaService.role.create({ data: dto });
+    return { data };
   }
 
-  async findAll(): Promise<any> {
-    const roles = await this.prismaService.role.findMany({});
-    return {
-      data: roles,
-    };
+  async findAll() {
+    const data: Role[] = await this.prismaService.role.findMany({});
+    return { data };
   }
 
-  async findOne(id: number): Promise<any> {
-    const role = await this.prismaService.role.findUnique({
+  async findOne(id: number) {
+    const data: Role = await this.prismaService.role.findUnique({
       where: { id },
     });
-    if (!role) throw new NotFoundException('Le rôle n\'a pas été trouvé');
-    return {
-      data: role,
-    };
+    if (!data) throw new NotFoundException('Le rôle n\'a pas été trouvé');
+    return { data };
   }
 
-  async update(id: number, data: UpdateRoleDto): Promise<any> {
-    const role = await this.prismaService.role.findUnique({
+  async update(id: number, dto: UpdateRoleDto) {
+    await this.findOne(id)
+    const data: Role = await this.prismaService.role.update({
+      data: dto,
       where: { id },
     });
-    if (!role) throw new NotFoundException('Le rôle n\'a pas été trouvé');
-    const newRole = await this.prismaService.role.update({
-      data,
-      where: { id },
-    });
-    return {
-      message: 'Rôle mis à jour avec succès',
-      data: newRole,
-    };
+    return { data };
   }
 
-  async remove(id: number): Promise<any> {
-    const role = await this.prismaService.role.findUnique({
-      where: { id },
-    });
-    if (!role) throw new NotFoundException('Le rôle n\'a pas été trouvé');
+  async remove(id: number) {
+    await this.findOne(id)
     await this.prismaService.role.delete({
       where: { id },
     });
-    return {
-      message: 'Le rôle a été supprimé avec succès',
-    };
   }
 }

@@ -2,57 +2,46 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { CreateStatusDto } from './dto/create-status.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
+import { Status } from '@prisma/client';
 
 @Injectable()
 export class StatusService {
   constructor(
     private readonly prismaService: PrismaService,
-  ) {
-  }
+  ) { }
 
-  async create(data: CreateStatusDto) {
-    const status = await this.prismaService.status.create({
-      data,
+  async create(dto: CreateStatusDto) {
+    const data: Status = await this.prismaService.status.create({
+      data: dto,
     });
-    return {
-      message: 'Le status a été créé avec succès',
-      data: status,
-    };
+    return { data };
   }
 
   async findAll() {
-    const status = await this.prismaService.status.findMany();
-    return {
-      data: status,
-    };
+    const data: Status[] = await this.prismaService.status.findMany();
+    return { data };
   }
 
   async findOne(id: number) {
-    const status = await this.prismaService.status.findUnique({
+    const data: Status = await this.prismaService.status.findUnique({
       where: { id },
     });
-    return {
-      data: status,
-    };
+    return { data };
   }
 
-  async update(id: number, data: UpdateStatusDto) {
-    const status = await this.prismaService.status.update({
+  async update(id: number, dto: UpdateStatusDto) {
+    await this.findOne(id)
+    const data: Status = await this.prismaService.status.update({
       where: { id },
-      data,
+      data: dto,
     });
-    return {
-      message: 'Le status a été modifié avec succès',
-      data: status,
-    };
+    return { data };
   }
 
   async delete(id: number) {
+    await this.findOne(id)
     await this.prismaService.status.delete({
       where: { id },
     });
-    return {
-      message: 'Le status a été supprimé avec succès',
-    };
   }
 }

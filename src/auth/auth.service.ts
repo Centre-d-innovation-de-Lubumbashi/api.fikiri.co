@@ -6,13 +6,14 @@ import { CurrentUser } from './decorators/user.decorator';
 import { SignupDto } from './dto/register.dto';
 import { ConfigService } from '@nestjs/config';
 import UpdateProfileDto from './dto/update-profile.dto';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly configService: ConfigService,
-    private readonly usersService: UsersService) {
-  }
+    private readonly usersService: UsersService
+  ) { }
 
   async validateUser(email: string, password: string) {
     const user = await this.usersService.findBy(email);
@@ -38,28 +39,20 @@ export class AuthService {
 
 
   async login(@Req() req: Request) {
-    return {
-      message: 'Connexion réussie',
-      data: req.user,
-    };
+    const data = req.user
+    return { data }
   }
 
   async logout(@Req() request: Request) {
-    request.session.destroy(() => {
-    });
-    return {
-      message: 'Déconnexion réussie',
-    };
+    request.session.destroy(() => { });
   }
 
-  async profile(@CurrentUser() user: any) {
-    return {
-      data: user,
-    };
+  async profile(@CurrentUser() data: User) {
+    return { data };
   }
 
-  async updateProfile(id: number, data: UpdateProfileDto) {
-    return await this.usersService.updateProfile(+id, data);
+  async updateProfile(id: number, dto: UpdateProfileDto) {
+    return await this.usersService.updateProfile(+id, dto);
   }
 
   register(registerDto: SignupDto) {

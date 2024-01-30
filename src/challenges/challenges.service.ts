@@ -2,27 +2,24 @@ import { PrismaService } from '../database/prisma.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
+import { Challenge } from '@prisma/client';
 
 @Injectable()
 export class ChallengesService {
   constructor(
     private readonly prismaService: PrismaService,
-  ) {
-  }
+  ) { }
 
-  async create(data: CreateChallengeDto) {
-    const challenge = await this.prismaService.challenge.create({
+  async create(dto: CreateChallengeDto) {
+    const data: Challenge = await this.prismaService.challenge.create({
       data: {
-        ...data,
+        ...dto,
         thematics: {
-          connect: data.thematics.map((id) => ({ id })),
+          connect: dto.thematics.map((id) => ({ id })),
         },
       },
     });
-    return {
-      message: 'Le défi ajouté avec succès',
-      data: challenge,
-    };
+    return { data };
   }
 
   async findAll() {
@@ -33,42 +30,31 @@ export class ChallengesService {
   }
 
   async findOne(id: number) {
-    const challenge = await this.prismaService.challenge.findUnique({
+    const data = await this.prismaService.challenge.findUnique({
       where: { id },
     });
-    if (!challenge) throw new NotFoundException('Le défi n\'a pas été trouvé');
-    return {
-      data: challenge,
-    };
+    if (!data) throw new NotFoundException('Le défi n\'a pas été trouvé');
+    return { data };
   }
 
-  async update(id: number, data: UpdateChallengeDto) {
-    const challenge = await this.prismaService.challenge.findUnique({
-      where: { id },
-    });
-    if (!challenge) throw new NotFoundException('Le défi est introuvable');
-    const newChallenge = await this.prismaService.challenge.update({
+  async update(id: number, dto: UpdateChallengeDto) {
+    await this.findOne(id)
+    const data = await this.prismaService.challenge.update({
       where: { id },
       data: {
-        ...data,
+        ...dto,
         thematics: {
-          connect: data.thematics.map((id) => ({ id })),
+          connect: dto.thematics.map((id) => ({ id })),
         },
       },
     });
-    return {
-      message: 'Le défi a été mis à jour avec succès',
-      data: newChallenge,
-    };
+    return { data };
   }
 
   async remove(id: number) {
+    await this.findOne(id)
     await this.prismaService.challenge.delete({
       where: { id },
     });
-    return {
-      message: 'Le défi a été supprimé avec succès',
-    };
   }
-
 }

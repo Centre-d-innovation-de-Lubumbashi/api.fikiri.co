@@ -1,67 +1,49 @@
+import { Call } from '@prisma/client';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
 import { CreateCallDto } from './dto/create-call.dto';
 import { UpdateCallDto } from './dto/update-call.dto';
+import { PrismaService } from 'src/database/prisma.service';
 
 @Injectable()
 export class CallsService {
   constructor(
-    private readonly prismaService: PrismaService,
-  ) {
-  }
+    private readonly prisma: PrismaService,
+  ) { }
 
-  async create(data: CreateCallDto) {
-    const call = await this.prismaService.call.create({ data });
-    return {
-      message: 'L\'appel à solution est ajouté',
-      data: call,
-    };
+  async create(dto: CreateCallDto) {
+    const data: Call | null = await this.prisma.call.create({
+      data: dto
+    });
+    return { data };
   }
 
   async findAll() {
-    const calls = await this.prismaService.call.findMany({});
-    return {
-      data: calls,
-    };
+    const data: Call[] = await this.prisma.call.findMany({});
+    return { data };
   }
 
   async findOne(id: number) {
-    const call = await this.prismaService.call.findUnique({
+    const data = await this.prisma.call.findUnique({
       where: { id },
-      include: {
-        thematics: true,
-      },
+      include: { thematics: true },
     });
-    if (!call) throw new NotFoundException('L\'appel à solution introuvable');
-    return {
-      data: call,
-    };
+    if (!data) throw new NotFoundException('L\'appel à solution introuvable');
+    return { data };
   }
 
-  async update(id: number, data: UpdateCallDto) {
-    const call = await this.prismaService.call.findUnique({
+  async update(id: number, dto: UpdateCallDto) {
+    await this.findOne(id)
+    const data: Call | null = await this.prisma.call.update({
+      data: dto,
       where: { id },
     });
-    if (!call) throw new NotFoundException('L\'appel à solution introuvable');
-    const newCall = await this.prismaService.call.update({
-      data,
-      where: { id },
-    });
-    return {
-      data: newCall,
-    };
+    return { data };
   }
 
   async remove(id: number) {
-    const call = await this.prismaService.call.findUnique({
+    await this.findOne(id)
+    await this.prisma.call.delete({
       where: { id },
     });
-    if (!call) throw new NotFoundException('L\'appel à solution introuvable');
-    await this.prismaService.call.delete({
-      where: { id },
-    });
-    return {
-      message: 'L\'appel à solution est mis à jour',
-    };
   }
 }

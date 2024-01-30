@@ -1,26 +1,72 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
+import { Feedback } from '@prisma/client';
+import { PrismaService } from 'src/database/prisma.service';
 
 @Injectable()
 export class FeedbacksService {
-  create(createFeedbackDto: CreateFeedbackDto) {
-    return 'This action adds a new feedback';
+  constructor(
+    private readonly prisma: PrismaService
+  ) { }
+
+  async create(dto: CreateFeedbackDto) {
+    const data: Feedback = await this.prisma.feedback.create({
+      data: {
+        ...dto,
+        user: {
+          connect: {
+            email: dto.user
+          }
+        },
+        labels: {
+          connect: {
+            id: dto.label
+          }
+        }
+      }
+    })
+    return { data };
   }
 
-  findAll() {
-    return `This action returns all feedbacks`;
+  async findAll() {
+    const data = await this.prisma.feedback.findMany()
+    return { data };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} feedback`;
+  async findOne(id: number) {
+    const data = await this.prisma.feedback.findUnique({
+      where: { id }
+    })
+    if (!data) throw new NotFoundException(`Ce feedback n'existe pas`);
+    return { data };
   }
 
-  update(id: number, updateFeedbackDto: UpdateFeedbackDto) {
-    return `This action updates a #${id} feedback`;
+  async update(id: number, dto: UpdateFeedbackDto) {
+    await this.findOne(id);
+    const data = await this.prisma.feedback.update({
+      where: { id },
+      data: {
+        ...dto,
+        user: {
+          connect: {
+            email: dto.user
+          }
+        },
+        labels: {
+          connect: {
+            id: dto.label
+          }
+        }
+      }
+    })
+    return { data };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} feedback`;
+  async remove(id: number) {
+    await this.findOne(id);
+    await this.prisma.feedback.delete({
+      where: { id }
+    })
   }
 }

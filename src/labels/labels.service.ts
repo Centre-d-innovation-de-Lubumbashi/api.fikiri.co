@@ -8,8 +8,7 @@ import { Label } from '@prisma/client';
 export class LabelsService {
   constructor(
     private readonly prismaService: PrismaService,
-  ) {
-  }
+  ) { }
 
   async create(dto: CreateLableDto) {
     let data: Label | null = null;
@@ -24,12 +23,12 @@ export class LabelsService {
   }
 
   async findAll() {
-    const data = await this.prismaService.label.findMany({});
+    const data: Label[] = await this.prismaService.label.findMany({});
     return { data };
   }
 
   async findOne(id: number) {
-    const data = await this.prismaService.label.findUnique({
+    const data: Label = await this.prismaService.label.findUnique({
       where: { id },
     });
     if (!data) throw new NotFoundException('Le label n\'a pas été trouvé');
@@ -37,11 +36,8 @@ export class LabelsService {
   }
 
   async update(id: number, dto: UpdateLableDto) {
-    const label = await this.prismaService.label.findUnique({
-      where: { id },
-    });
-    if (!label) throw new NotFoundException('Le rôle n\'a pas été trouvé');
-    const data = await this.prismaService.label.update({
+    await this.findOne(id);
+    const data: Label = await this.prismaService.label.update({
       data: dto,
       where: { id },
     });
@@ -49,10 +45,7 @@ export class LabelsService {
   }
 
   async remove(id: number) {
-    const role = await this.prismaService.label.findUnique({
-      where: { id },
-    });
-    if (!role) throw new NotFoundException('Le label n\'a pas été trouvé');
+    await this.findOne(id);
     await this.prismaService.label.delete({
       where: { id },
     });
