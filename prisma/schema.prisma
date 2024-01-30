@@ -22,7 +22,8 @@ model User {
   solutions   Solution[]
   roles       Role[]     @relation("RoleToUser")
   feedbacks   Feedback[]
-  pole        Int?
+  pole        Pole?      @relation(fields: [poleId], references: [id])
+  poleId      Int?
 }
 
 model Role {
@@ -76,7 +77,17 @@ model Solution {
   challenges      Challenge[]      @relation("ChallengeToSolution")
   images          SolutionImages[]
   feedbacks       Feedback[]
-  pole            Int?
+  pole            Pole?            @relation(fields: [poleId], references: [id])
+  poleId          Int?
+}
+
+model Pole {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  createdAt DateTime?  @default(now())
+  updatedAt DateTime?  @updatedAt
+  Solution  Solution[]
+  User      User[]
 }
 
 model Label {
