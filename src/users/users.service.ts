@@ -23,8 +23,8 @@ export class UsersService {
   ) {
   }
 
-  async create(createUserDto: CreateUserDto) {
-    const { email } = createUserDto;
+  async create(dto: CreateUserDto) {
+    const { email } = dto;
     const user = await this.prismaService.user.findUnique({
       where: { email },
     });
@@ -36,10 +36,15 @@ export class UsersService {
       const hash = await this.hashPassword(password);
       newUser = await this.prismaService.user.create({
         data: {
-          ...createUserDto,
+          ...dto,
           password: hash,
+          pole: {
+            connect: {
+              id: dto.pole
+            }
+          },
           roles: {
-            connect: createUserDto.roles.map((id) => ({ id })),
+            connect: dto.roles.map((id) => ({ id })),
           },
         },
       });
@@ -95,7 +100,7 @@ export class UsersService {
     };
   }
 
-  async findById(id: number): Promise<any> {
+  async findOne(id: number): Promise<any> {
     const user = await this.prismaService.user.findUnique({
       where: { id },
       include: {
@@ -132,7 +137,7 @@ export class UsersService {
     return user;
   }
 
-  async findByEmail(email: string) {
+  async findBy(email: string) {
     const user = await this.prismaService.user.findUnique({
       where: { email },
       include: {
@@ -143,15 +148,20 @@ export class UsersService {
     return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, dto: UpdateUserDto) {
     let user = null;
     try {
       user = await this.prismaService.user.update({
         where: { id },
         data: {
-          ...updateUserDto,
+          ...dto,
+          pole: {
+            connect: {
+              id: dto.pole
+            }
+          },
           roles: {
-            connect: updateUserDto.roles.map((id) => ({ id })),
+            connect: dto.roles.map((id) => ({ id })),
           },
         },
       });
@@ -172,7 +182,7 @@ export class UsersService {
         data,
       });
     } catch {
-      throw new NotFoundException('Echec lors de la mise à jour du profile');
+      throw new BadRequestException('Echec lors de la mise à jour du profile');
     }
     return {
       message: 'Mise à jour du profile réussie',
@@ -229,41 +239,5 @@ export class UsersService {
     return {
       message: 'L\'image a été suppimé',
     };
-  }
-
-  async updatePassword(id: number, password: string): Promise<void> {
-    const passwordHash: string = await bcrypt.hash(password, 10);
-    await this.prismaService.user.update({
-      where: { id: id },
-      data: {
-        password: passwordHash,
-      },
-    });
-  }
-
-  async saveResetToken(id: number, token: string): Promise<any> {
-    await this.prismaService.user.update({
-      where: { id: id },
-      data: {
-        token,
-      },
-    });
-  }
-
-  async findByResetToken(token: string) {
-    const user = await this.prismaService.user.findFirst({
-      where: { token },
-    });
-    if (!user) throw new NotFoundException('le code fourni est invalide');
-    return user;
-  }
-
-  async removeResetToken(id: number) {
-    await this.prismaService.user.update({
-      where: { id },
-      data: {
-        token: null,
-      },
-    });
   }
 }

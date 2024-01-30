@@ -157,7 +157,7 @@ export class SolutionsService {
     };
   }
 
-  async update(id: number, data: UpdateSolutionDto) {
+  async update(id: number, dto: UpdateSolutionDto) {
     const soultion = await this.prismaService.solution.findUnique({
       where: { id },
     });
@@ -167,29 +167,34 @@ export class SolutionsService {
       newSolution = await this.prismaService.solution.update({
         where: { id },
         data: {
-          ...data,
+          ...dto,
+          pole: {
+            connect: {
+              id: dto.pole
+            }
+          },
           thematic: {
             connect: {
-              id: data.thematic,
+              id: dto.thematic,
             },
           },
           user: {
             connect: {
-              email: data.user,
+              email: dto.user,
             },
           },
           call: {
             connect: {
-              id: data.call,
+              id: dto.call,
             },
           },
           status: {
             connect: {
-              id: data.status,
+              id: dto.status,
             },
           },
           challenges: {
-            connect: data.challenges.map((id: number) => ({ id })),
+            connect: dto.challenges.map((id: number) => ({ id })),
           },
         },
       });
@@ -294,7 +299,7 @@ export class SolutionsService {
 
   async solutionsByPole(pole: number) {
     const data = await this.prismaService.solution.findMany({
-      where: { pole },
+      where: { poleId: pole },
     });
     return { data };
   }

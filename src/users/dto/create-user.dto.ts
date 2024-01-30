@@ -13,9 +13,9 @@ export default class CreateUserDto {
   @IsNotEmpty({ message: 'L\'adresse est obligatoire' })
   address: string;
 
-  @IsOptional()
-  pole: number;
-
   @IsNotEmpty({ message: 'Le rôle est obligatoire' })
   roles: number[];
+
+  @IsNotEmpty({ message: "Le pôle est obligatoire" })
+  pole: number
 }
