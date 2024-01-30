@@ -8,22 +8,32 @@ datasource db {
 }
 
 model User {
-  id          Int        @id @default(autoincrement())
-  email       String     @unique
-  name        String
-  password    String?
-  phoneNumber String?
-  address     String?
-  token       String?
-  googleImage String?
-  profile     String?
-  createdAt   DateTime?  @default(now())
-  updatedAt   DateTime?  @updatedAt
-  solutions   Solution[]
-  roles       Role[]     @relation("RoleToUser")
-  feedbacks   Feedback[]
-  pole        Pole?      @relation(fields: [poleId], references: [id])
-  poleId      Int?
+  id             Int           @id @default(autoincrement())
+  email          String        @unique
+  name           String
+  password       String?
+  phoneNumber    String?
+  address        String?
+  token          String?
+  googleImage    String?
+  profile        String?
+  createdAt      DateTime?     @default(now())
+  updatedAt      DateTime?     @updatedAt
+  solutions      Solution[]
+  roles          Role[]        @relation("RoleToUser")
+  feedbacks      Feedback[]
+  pole           Pole?         @relation(fields: [poleId], references: [id])
+  poleId         Int?
+  organisation   Organisation? @relation(fields: [organisationId], references: [id])
+  organisationId Int?
+}
+
+model Organisation {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  users     User[]
 }
 
 model Role {

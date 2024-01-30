@@ -17,6 +17,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { LabelsModule } from './labels/labels.module';
 import { FeedbacksModule } from './feedbacks/feedbacks.module';
 import { PolesModule } from './poles/poles.module';
+import { OrganisationsModule } from './organisations/organisations.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { PolesModule } from './poles/poles.module';
     LabelsModule,
     FeedbacksModule,
     PolesModule,
+    OrganisationsModule,
   ],
   providers: [
     {

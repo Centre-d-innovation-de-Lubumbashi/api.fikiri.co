@@ -33,6 +33,11 @@ export class UsersService {
       data: {
         ...dto,
         password: hash,
+        organisation: {
+          connect: {
+            id: dto.organisation
+          }
+        },
         pole: {
           connect: {
             id: dto.pole
@@ -132,6 +137,11 @@ export class UsersService {
       where: { id },
       data: {
         ...dto,
+        organisation: {
+          connect: {
+            id: dto.organisation
+          }
+        },
         pole: {
           connect: {
             id: dto.pole

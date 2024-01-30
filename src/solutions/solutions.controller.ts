@@ -78,6 +78,11 @@ export class SolutionsController {
     return this.solutionsService.uploadImages(+id, files);
   }
 
+  @Get('pole/:id')
+  getByPole(@Param('id') id: string) {
+    return this.solutionsService.solutionsByPole(+id);
+  }
+
   @Delete(':id/image/delete')
   removeImage(@Param('id') id: string) {
     return this.solutionsService.deleteImage(+id);
@@ -96,10 +101,5 @@ export class SolutionsController {
   @Delete('feddback/:id')
   deleteFeedback(@Param('id') id: string) {
     return this.solutionsService.deleteFeedback(+id);
-  }
-
-  @Get('pole/:id')
-  getByPole(@Param('id') id: string) {
-    return this.solutionsService.solutionsByPole(+id);
   }
 }

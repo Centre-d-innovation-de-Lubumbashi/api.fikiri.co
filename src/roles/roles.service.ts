@@ -8,8 +8,7 @@ import { Role } from '@prisma/client';
 export class RolesService {
   constructor(
     private readonly prismaService: PrismaService,
-  ) {
-  }
+  ) { }
 
   async create(dto: CreateRoleDto) {
     const name: string = dto.name
@@ -23,7 +22,7 @@ export class RolesService {
   }
 
   async findAll() {
-    const data: Role[] = await this.prismaService.role.findMany({});
+    const data: Role[] = await this.prismaService.role.findMany();
     return { data };
   }
 
