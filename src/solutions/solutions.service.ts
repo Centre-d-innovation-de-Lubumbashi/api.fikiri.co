@@ -85,6 +85,7 @@ export class SolutionsService {
         user: true,
         status: true,
         images: true,
+        feedbacks: true
       },
     });
     if (!data) throw new NotFoundException('La solution n\'a pas été trouvé');
