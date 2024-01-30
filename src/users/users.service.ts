@@ -14,13 +14,15 @@ import { CreateWithGoogleDto } from './dto/create-with-google.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import UpdateProfileDto from '../auth/dto/update-profile.dto';
 import { User } from '@prisma/client';
+import { UsersPasswordService } from './users-password.service';
 
 const unlinkAsync = promisify(fs.unlink);
 
 @Injectable()
 export class UsersService {
   constructor(
-    private readonly prismaService: PrismaService
+    private readonly prismaService: PrismaService,
+    private readonly passwordService: UsersPasswordService
   ) { }
 
   async create(dto: CreateUserDto) {
@@ -143,13 +145,24 @@ export class UsersService {
     return { data };
   }
 
+  async passwordMatch(password: string, hash: string) {
+    if (!hash) throw new BadRequestException('Les identifiants saisis sont invalides');
+    return await bcrypt.compare(password, hash);
+  }
+
   async updateProfile(id: number, dto: UpdateProfileDto) {
     const data: User = await this.prismaService.user.update({
       where: { id },
       data: dto,
     });
+    const isMatch = dto.oldPassword && dto.password && await this.passwordMatch(dto.oldPassword, data.password);
+    if (isMatch) {
+      await this.passwordService.updatePassword(id, dto.password)
+    }
     return { data };
   }
+
+
 
   async remove(id: number) {
     await this.findOne(id)
