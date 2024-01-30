@@ -16,6 +16,7 @@ import { AuthGuard } from './auth/guards/auth.guard';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { LabelsModule } from './labels/labels.module';
 import { FeedbacksModule } from './feedbacks/feedbacks.module';
+import { PolesModule } from './poles/poles.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { FeedbacksModule } from './feedbacks/feedbacks.module';
     StatusModule,
     LabelsModule,
     FeedbacksModule,
+    PolesModule,
   ],
   providers: [
     {
