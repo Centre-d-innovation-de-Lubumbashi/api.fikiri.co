@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { CurrentUser } from './decorators/user.decorator';
 import { UpdatePasswordDto } from './dto/update-password.dto';
@@ -8,6 +8,7 @@ import { randomPassword } from '../helpers/random-password';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import { User } from '@prisma/client';
+import { UsersPasswordService } from 'src/users/users-password.service';
 
 @Injectable()
 export class PasswordService {
@@ -15,16 +16,12 @@ export class PasswordService {
     private readonly userService: UsersService,
     private readonly mailService: MailerService,
     private readonly configService: ConfigService,
-  ) {
-  }
+    private readonly usersPasswordService: UsersPasswordService
+  ) { }
 
   async updatePassword(@CurrentUser() user: User, dto: UpdatePasswordDto) {
     const { password } = dto;
-    await this.userService.updatePassword(user.id, password);
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Mot de passe mis à jour',
-    };
+    await this.usersPasswordService.updatePassword(user.id, password);
   }
 
   async resetPasswordEmail(to: User, token: string) {
@@ -49,24 +46,16 @@ L'équipe Fikiri.`,
 
   async resetPasswordRequest(dto: ResetPasswordRequestDto) {
     const { email } = dto;
-    const user = await this.userService.findByEmail(email);
+    const user = await this.userService.findBy(email);
     const token = randomPassword()
-    await this.userService.saveResetToken(user.id, token);
+    await this.usersPasswordService.saveResetToken(user.id, token);
     await this.resetPasswordEmail(user, token)
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Code envoyé avec succès',
-    };
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<any> {
     const { token, password } = resetPasswordDto;
-    const user = await this.userService.findByResetToken(token);
-    await this.userService.removeResetToken(user.id);
-    await this.userService.updatePassword(user.id, password);
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Password changed successfully',
-    };
+    const user = await this.usersPasswordService.findByResetToken(token);
+    await this.usersPasswordService.removeResetToken(user.id);
+    await this.usersPasswordService.updatePassword(user.id, password);
   }
 }
