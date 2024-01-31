@@ -1,14 +1,19 @@
 import { Body, Controller, Delete, Get, Param, Patch } from '@nestjs/common';
 import { StatusService } from './status.service';
 import { UpdateStatusDto } from './dto/update-status.dto';
+import { CreateStatusDto } from './dto/create-status.dto';
 
 @Controller('status')
 export class StatusController {
   constructor(
     private statusService: StatusService,
-  ) {
-  }
+  ) { }
 
+  @Post()
+  create(@Body() dto: CreateStatusDto) {
+    return this.statusService.create(dto)
+  }
+  
   @Get()
   findAll() {
     return this.statusService.findAll();
@@ -20,8 +25,8 @@ export class StatusController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() data: UpdateStatusDto) {
-    return this.statusService.update(+id, data);
+  update(@Param('id') id: string, @Body() dto: UpdateStatusDto) {
+    return this.statusService.update(+id, dto);
   }
 
   @Delete('id')
