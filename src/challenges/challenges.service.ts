@@ -32,19 +32,22 @@ export class ChallengesService {
   async findOne(id: number) {
     const data = await this.prismaService.challenge.findUnique({
       where: { id },
+      include: {
+        thematics: true
+      }
     });
     if (!data) throw new NotFoundException('Le défi n\'a pas été trouvé');
     return { data };
   }
 
   async update(id: number, dto: UpdateChallengeDto) {
-    await this.findOne(id)
+    const { data: challenge } = await this.findOne(id)
     const data = await this.prismaService.challenge.update({
       where: { id },
       data: {
         ...dto,
         thematics: {
-          connect: dto.thematics.map((id) => ({ id })),
+          connect: dto?.thematics?.map((id) => ({ id })) || challenge.thematics,
         },
       },
     });

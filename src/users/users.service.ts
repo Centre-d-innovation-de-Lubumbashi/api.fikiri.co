@@ -91,7 +91,7 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    const data: User = await this.prismaService.user.findUnique({
+    const data = await this.prismaService.user.findUnique({
       where: { id },
       include: {
         roles: true
@@ -132,23 +132,23 @@ export class UsersService {
   }
 
   async update(id: number, dto: UpdateUserDto) {
-    await this.findOne(id)
+    const { data: user } = await this.findOne(id)
     const data: User = await this.prismaService.user.update({
       where: { id },
       data: {
         ...dto,
         organisation: {
           connect: {
-            id: dto.organisation
+            id: dto.organisation || user.organisationId
           }
         },
         pole: {
           connect: {
-            id: dto.pole
+            id: dto.pole || user.poleId
           }
         },
         roles: {
-          connect: dto.roles.map((id) => ({ id })),
+          connect: dto?.roles?.map((id) => ({ id })) || user.roles,
         },
       },
     });

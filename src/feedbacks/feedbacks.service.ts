@@ -7,11 +7,11 @@ import { PrismaService } from 'src/database/prisma.service';
 @Injectable()
 export class FeedbacksService {
   constructor(
-    private readonly prisma: PrismaService
+    private readonly prismaService: PrismaService
   ) { }
 
   async create(dto: CreateFeedbackDto) {
-    const data: Feedback = await this.prisma.feedback.create({
+    const data: Feedback = await this.prismaService.feedback.create({
       data: {
         ...dto,
         user: {
@@ -20,9 +20,7 @@ export class FeedbacksService {
           }
         },
         labels: {
-          connect: {
-            id: dto.label
-          }
+          connect: dto.labels.map(id => ({ id }))
         }
       }
     })
@@ -30,33 +28,35 @@ export class FeedbacksService {
   }
 
   async findAll() {
-    const data = await this.prisma.feedback.findMany()
+    const data = await this.prismaService.feedback.findMany()
     return { data };
   }
 
   async findOne(id: number) {
-    const data = await this.prisma.feedback.findUnique({
-      where: { id }
+    const data = await this.prismaService.feedback.findUnique({
+      where: { id },
+      include: {
+        user: true,
+        labels: true
+      }
     })
     if (!data) throw new NotFoundException(`Ce feedback n'existe pas`);
     return { data };
   }
 
   async update(id: number, dto: UpdateFeedbackDto) {
-    await this.findOne(id);
-    const data = await this.prisma.feedback.update({
+    const { data: feedback } = await this.findOne(id);
+    const data = await this.prismaService.feedback.update({
       where: { id },
       data: {
         ...dto,
         user: {
           connect: {
-            email: dto.user
+            email: dto.user || feedback.user.email
           }
         },
         labels: {
-          connect: {
-            id: dto.label
-          }
+          connect: dto?.labels?.map(id => ({ id })) || feedback.labels
         }
       }
     })
@@ -65,7 +65,7 @@ export class FeedbacksService {
 
   async remove(id: number) {
     await this.findOne(id);
-    await this.prisma.feedback.delete({
+    await this.prismaService.feedback.delete({
       where: { id }
     })
   }
