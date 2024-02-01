@@ -22,7 +22,7 @@ async function bootstrap() {
       saveUninitialized: Boolean(process.env.SESSION_SAVE_UNINITIALIZED),
       cookie: {
         maxAge: +process.env.SESSION_COOKIE_MAX_AGE,
-        secure: true
+        secure: false
       },
     }),
   );
