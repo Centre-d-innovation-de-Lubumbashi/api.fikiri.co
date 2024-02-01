@@ -27,6 +27,9 @@ export class AuthService {
     return user;
   }
 
+  async isAutheticated(@Req() req: Request) {
+    return req.isAuthenticated();
+  }
 
   async passwordMatch(password: string, hash: string) {
     if (!hash) throw new BadRequestException('Les identifiants saisis sont invalides');
