@@ -136,7 +136,7 @@ export class SolutionsService {
         ...dto,
         pole: {
           connect: {
-            id: dto.pole || solution.poleId
+            id: dto.pole || 1
           }
         },
         thematic: {
