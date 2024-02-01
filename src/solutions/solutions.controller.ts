@@ -23,13 +23,13 @@ export class SolutionsController {
 
   @Public()
   @Get('approved')
-  findApproved() {
-    return this.solutionsService.findApproved();
+  findApproved(@Param('page') page: string) {
+    return this.solutionsService.findApproved(+page);
   }
 
   @Get()
-  findAll() {
-    return this.solutionsService.findAll();
+  findAll(@Param('page') page: string) {
+    return this.solutionsService.findAll(+page);
   }
 
   @Get(':id')

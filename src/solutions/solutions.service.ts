@@ -1,5 +1,4 @@
-import { CreateFeedbackDto } from './../feedbacks/dto/create-feedback.dto';
-import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import * as fs from 'fs';
 import { promisify } from 'util';
@@ -11,6 +10,8 @@ import { ConfigService } from '@nestjs/config';
 import { FeedbacksService } from 'src/feedbacks/feedbacks.service';
 import { Solution, User } from '@prisma/client';
 import { UpdateFeedbackDto } from 'src/feedbacks/dto/update-feedback.dto';
+import { CreateFeedbackDto } from '../feedbacks/dto/create-feedback.dto';
+import { paginate } from 'src/helpers/paginate';
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -21,7 +22,8 @@ export class SolutionsService {
     private readonly mailService: MailerService,
     private readonly configService: ConfigService,
     private readonly feddbacksService: FeedbacksService,
-  ) { }
+  ) {
+  }
 
   async create(dto: CreateSolutionDto) {
     const data: Solution = await this.prismaService.solution.create({
@@ -55,7 +57,8 @@ export class SolutionsService {
     return { data };
   }
 
-  async findApproved() {
+  async findApproved(page: number) {
+    const { offset, limit } = paginate(page, 30);
     const solutions = await this.prismaService.solution.findMany({
       include: {
         thematic: true,
@@ -66,8 +69,11 @@ export class SolutionsService {
     return { data };
   }
 
-  async findAll() {
+  async findAll(page: number) {
+    const { offset, limit } = paginate(page, 30);
     const data: Solution[] = await this.prismaService.solution.findMany({
+      skip: offset,
+      take: limit,
       include: {
         thematic: true,
         status: true,
@@ -86,7 +92,7 @@ export class SolutionsService {
         status: true,
         images: true,
         feedbacks: true,
-        challenges: true
+        challenges: true,
       },
     });
     if (!data) throw new NotFoundException('La solution n\'a pas été trouvé');
@@ -118,7 +124,7 @@ export class SolutionsService {
   }
 
   async updateUserSolution(id: number, dto: UpdateUserSolutionDto) {
-    await this.findOne(id)
+    await this.findOne(id);
     const data = await this.prismaService.solution.update({
       where: { id },
       data: {
@@ -129,15 +135,15 @@ export class SolutionsService {
   }
 
   async update(id: number, dto: UpdateSolutionDto) {
-    const { data: solution } = await this.findOne(id)
+    const { data: solution } = await this.findOne(id);
     const data = await this.prismaService.solution.update({
       where: { id },
       data: {
         ...dto,
         pole: {
           connect: {
-            id: dto.pole || 1
-          }
+            id: dto.pole || 1,
+          },
         },
         thematic: {
           connect: {
@@ -247,7 +253,7 @@ Cordialement.
       include: {
         thematic: true,
         status: true,
-      }
+      },
     });
     return { data };
   }
