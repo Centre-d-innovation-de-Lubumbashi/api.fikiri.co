@@ -85,7 +85,8 @@ export class SolutionsService {
         user: true,
         status: true,
         images: true,
-        feedbacks: true
+        feedbacks: true,
+        challenges: true
       },
     });
     if (!data) throw new NotFoundException('La solution n\'a pas été trouvé');
@@ -128,38 +129,38 @@ export class SolutionsService {
   }
 
   async update(id: number, dto: UpdateSolutionDto) {
-    await this.findOne(id)
+    const { data: solution } = await this.findOne(id)
     const data = await this.prismaService.solution.update({
       where: { id },
       data: {
         ...dto,
         pole: {
           connect: {
-            id: dto.pole
+            id: dto.pole || solution.poleId
           }
         },
         thematic: {
           connect: {
-            id: dto.thematic,
+            id: dto.thematic || solution.thematicId,
           },
         },
         user: {
           connect: {
-            email: dto.user,
+            email: dto.user || solution.user.email,
           },
         },
         call: {
           connect: {
-            id: dto.call,
+            id: dto.call || solution.callId,
           },
         },
         status: {
           connect: {
-            id: dto.status,
+            id: dto.status || solution.statusId,
           },
         },
         challenges: {
-          connect: dto.challenges.map((id: number) => ({ id })),
+          connect: dto?.challenges?.map((id: number) => ({ id })) || solution.challenges,
         },
       },
     });

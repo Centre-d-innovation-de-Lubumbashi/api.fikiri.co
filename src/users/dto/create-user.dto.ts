@@ -19,6 +19,6 @@ export default class CreateUserDto {
   @IsNotEmpty({ message: "Le pôle est obligatoire" })
   pole: number
 
-  @IsNotEmpty({ message: "Le département est obligatoire" })
+  @IsNotEmpty({ message: "L'organisation est obligatoire" })
   organisation: number
 }
