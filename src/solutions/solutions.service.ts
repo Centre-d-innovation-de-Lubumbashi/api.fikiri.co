@@ -244,6 +244,10 @@ Cordialement.
   async solutionsByPole(pole: number) {
     const data = await this.prismaService.solution.findMany({
       where: { poleId: pole },
+      include: {
+        thematic: true,
+        status: true,
+      }
     });
     return { data };
   }
