@@ -60,6 +60,8 @@ export class SolutionsService {
   async findApproved(page: number) {
     const { offset, limit } = paginate(page, 30);
     const solutions = await this.prismaService.solution.findMany({
+      skip: offset,
+      take: limit,
       include: {
         thematic: true,
         status: true,
@@ -256,5 +258,24 @@ Cordialement.
       },
     });
     return { data };
+  }
+
+  async stats() {
+    const solutions = await this.prismaService.solution.findMany({
+      include: {
+        user: true,
+        images: true,
+      },
+    });
+    const solutionsWithImages = solutions.filter((solution) => solution.images.length > 0 || solution.imageLink);
+    const solutionsWithVideos = solutions.filter((solution) => solution.videoLink && !solutionsWithImages.includes(solution));
+    const videosAndImages = solutions.filter((solution) => solution.videoLink && (solution.images.length > 0 || solution.imageLink));
+
+    return {
+      total: solutions.length,
+      withImages: solutionsWithImages.length,
+      withVideos: solutionsWithVideos.length,
+      withVideosAndImages: videosAndImages.length,
+    };
   }
 }

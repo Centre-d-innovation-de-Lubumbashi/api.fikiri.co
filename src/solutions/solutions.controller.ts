@@ -102,4 +102,10 @@ export class SolutionsController {
   deleteFeedback(@Param('id') id: string) {
     return this.solutionsService.deleteFeedback(+id);
   }
+
+  @Public()
+  @Get('stats')
+  stats() {
+    return this.solutionsService.stats();
+  }
 }
