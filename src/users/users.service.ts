@@ -148,7 +148,7 @@ export class UsersService {
           }
         },
         roles: {
-          connect: dto?.roles?.map((id) => ({ id })) || user.roles,
+          set: dto?.roles?.map((id) => ({ id })) || user.roles,
         },
       },
     });
