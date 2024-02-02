@@ -104,7 +104,7 @@ export class SolutionsController {
   }
 
   @Public()
-  @Get('stats')
+  @Get('stats/proofs')
   stats() {
     return this.solutionsService.stats();
   }
