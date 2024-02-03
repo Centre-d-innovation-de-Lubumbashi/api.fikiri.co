@@ -108,8 +108,8 @@ model Label {
 
 model Feedback {
   id           Int        @id @default(autoincrement())
-  adminComment String
-  userComment  String
+  adminComment String?
+  userComment  String?
   createdAt    DateTime?  @default(now())
   updatedAt    DateTime?  @updatedAt
   labels       Label[]
