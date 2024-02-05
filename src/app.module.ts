@@ -18,6 +18,7 @@ import { LabelsModule } from './labels/labels.module';
 import { FeedbacksModule } from './feedbacks/feedbacks.module';
 import { PolesModule } from './poles/poles.module';
 import { OrganisationsModule } from './organisations/organisations.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { OrganisationsModule } from './organisations/organisations.module';
     FeedbacksModule,
     PolesModule,
     OrganisationsModule,
+    DashboardModule,
   ],
   providers: [
     {

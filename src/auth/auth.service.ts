@@ -1,3 +1,7 @@
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ResetPasswordRequestDto } from './dto/reset-password-request.dto';
+import { randomPassword } from './../helpers/random-password';
 import { BadRequestException, Injectable, Req, Res } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
@@ -7,12 +11,14 @@ import { SignupDto } from './dto/register.dto';
 import { ConfigService } from '@nestjs/config';
 import UpdateProfileDto from './dto/update-profile.dto';
 import { User } from '@prisma/client';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly configService: ConfigService,
-    private readonly usersService: UsersService
+    private readonly usersService: UsersService,
+    private readonly mailService: MailerService
   ) { }
 
   async validateUser(email: string, password: string) {
@@ -61,4 +67,45 @@ export class AuthService {
   register(registerDto: SignupDto) {
     return this.usersService.register(registerDto);
   }
+
+  async updatePassword(@CurrentUser() user: User, dto: UpdatePasswordDto) {
+    const { password } = dto;
+    await this.usersService.updatePassword(user.id, password);
+  }
+
+  async resetPasswordEmail(to: User, token: string) {
+    let from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`
+    await this.mailService.sendMail({
+      to: to.email,
+      from,
+      subject: 'Objet : Code de Réinitialisation de Mot de Passe Fikiri',
+      text: `
+Cher(e) ${to.name},
+
+Pour réinitialiser votre mot de passe, utilisez le code suivant : ${token}.
+          
+Veuillez vous rendre sur la page de réinitialisation et suivre les instructions pour finaliser le processus.
+      
+Si vous n'avez pas initié cette demande, veuillez contacter notre équipe de support dès que possible.
+          
+Merci,
+L'équipe Fikiri.`,
+    });
+  }
+
+  async resetPasswordRequest(dto: ResetPasswordRequestDto) {
+    const { email } = dto;
+    const user = await this.usersService.findBy(email);
+    const token = randomPassword()
+    await this.usersService.saveResetToken(email, token);
+    await this.resetPasswordEmail(user, token)
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    const { token, password } = resetPasswordDto;
+    const user = await this.usersService.findByResetToken(token);
+    await this.usersService.removeResetToken(user.id);
+    await this.usersService.updatePassword(user.id, password);
+  }
+
 }

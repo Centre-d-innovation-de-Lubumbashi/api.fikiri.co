@@ -14,15 +14,13 @@ import { CreateWithGoogleDto } from './dto/create-with-google.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import UpdateProfileDto from '../auth/dto/update-profile.dto';
 import { User } from '@prisma/client';
-import { UsersPasswordService } from './users-password.service';
 
 const unlinkAsync = promisify(fs.unlink);
 
 @Injectable()
 export class UsersService {
   constructor(
-    private readonly prismaService: PrismaService,
-    private readonly passwordService: UsersPasswordService
+    private readonly prismaService: PrismaService
   ) { }
 
   async create(dto: CreateUserDto) {
@@ -167,7 +165,7 @@ export class UsersService {
     });
     const isMatch = dto.oldPassword && dto.password && await this.passwordMatch(dto.oldPassword, data.password);
     if (isMatch) {
-      await this.passwordService.updatePassword(id, dto.password)
+      await this.updatePassword(id, dto.password)
     }
     return { data };
   }
@@ -201,6 +199,37 @@ export class UsersService {
     await this.prismaService.user.update({
       where: { id },
       data: { profile: null },
+    });
+  }
+
+  async updatePassword(id: number, password: string) {
+    const salt = await bcrypt.genSalt(10)
+    const passwordHash: string = await bcrypt.hash(password, salt);
+    await this.prismaService.user.update({
+      where: { id },
+      data: { password: passwordHash },
+    });
+  }
+
+  async saveResetToken(email: string, token: string) {
+    await this.prismaService.user.update({
+      where: { email },
+      data: { token },
+    });
+  }
+
+  async findByResetToken(token: string) {
+    const user = await this.prismaService.user.findFirst({
+      where: { token },
+    });
+    if (!user) throw new NotFoundException('le code fourni est invalide');
+    return user;
+  }
+
+  async removeResetToken(id: number) {
+    await this.prismaService.user.update({
+      where: { id },
+      data: { token: null },
     });
   }
 }

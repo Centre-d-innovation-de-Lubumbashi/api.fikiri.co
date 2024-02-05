@@ -7,7 +7,6 @@ import { CurrentUser } from './decorators/user.decorator';
 import { GoogleGuard } from './guards/google.guard';
 import { SignupDto } from './dto/register.dto';
 import UpdateProfileDto from './dto/update-profile.dto';
-import { PasswordService } from './password.service';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { ResetPasswordRequestDto } from './dto/reset-password-request.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
@@ -16,10 +15,8 @@ import { User } from '@prisma/client';
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly authService: AuthService,
-    private readonly authPasswordService: PasswordService,
-  ) {
-  }
+    private readonly authService: AuthService
+  ) { }
 
   @Post('logout')
   logout(@Req() request: Request): Promise<any> {
@@ -64,19 +61,19 @@ export class AuthController {
 
   @Patch('update-password')
   updatePassword(@CurrentUser() user: User, @Body() dto: UpdatePasswordDto) {
-    return this.authPasswordService.updatePassword(user, dto);
+    return this.authService.updatePassword(user, dto);
   }
 
   @Public()
   @Post('reset-password-request')
   resetPasswordRequest(@Body() dto: ResetPasswordRequestDto): Promise<any> {
-    return this.authPasswordService.resetPasswordRequest(dto);
+    return this.authService.resetPasswordRequest(dto);
   }
 
   @Public()
   @Post('reset-password')
   resetPassword(@Body() dto: ResetPasswordDto) {
-    return this.authPasswordService.resetPassword(dto);
+    return this.authService.resetPassword(dto);
   }
 
   @Public()

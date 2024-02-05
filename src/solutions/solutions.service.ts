@@ -168,7 +168,7 @@ export class SolutionsService {
           },
         },
         challenges: {
-          connect: dto?.challenges?.map((id: number) => ({ id })) || solution.challenges,
+          set: dto?.challenges?.map((id: number) => ({ id })) || solution.challenges,
         },
       },
     });
