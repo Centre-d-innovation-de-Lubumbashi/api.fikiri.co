@@ -93,7 +93,12 @@ export class SolutionsService {
         user: true,
         status: true,
         images: true,
-        feedbacks: true,
+        feedbacks: {
+          include: {
+            labels: true,
+            user: true
+          }
+        },
         challenges: true,
       },
     });
