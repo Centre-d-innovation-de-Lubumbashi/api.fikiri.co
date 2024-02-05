@@ -21,7 +21,7 @@ export class SolutionsService {
     private readonly prismaService: PrismaService,
     private readonly mailService: MailerService,
     private readonly configService: ConfigService,
-    private readonly feddbacksService: FeedbacksService,
+    private readonly feedbacksService: FeedbacksService,
   ) {
   }
 
@@ -67,15 +67,15 @@ export class SolutionsService {
         status: true,
       },
     });
-    const data = solutions.filter((solution) => solution.status.id > 1);
+    const data = solutions.filter((solution) => solution.status.id > 1 && solution.status.id < 5);
     return { data };
   }
 
   async findAll(page: number) {
     const { offset, limit } = paginate(page, 30);
     const data: Solution[] = await this.prismaService.solution.findMany({
-      skip: offset,
-      take: limit,
+      // skip: offset,
+      // take: limit,
       include: {
         thematic: true,
         status: true,
@@ -228,7 +228,7 @@ Cordialement.
 
   async addFeedback(id: number, dto: CreateFeedbackDto) {
     const { data: solution } = await this.findOne(id);
-    const { data } = await this.feddbacksService.create(dto);
+    const { data } = await this.feedbacksService.create(dto);
     await this.prismaService.solution.update({
       where: { id },
       data: {
@@ -244,14 +244,14 @@ Cordialement.
   }
 
   async updateFeedback(id: number, dto: UpdateFeedbackDto) {
-    await this.feddbacksService.findOne(id);
-    const { data } = await this.feddbacksService.update(id, dto);
+    await this.feedbacksService.findOne(id);
+    const { data } = await this.feedbacksService.update(id, dto);
     return { data };
   }
 
   async deleteFeedback(id: number) {
-    await this.feddbacksService.findOne(id);
-    await this.feddbacksService.remove(id);
+    await this.feedbacksService.findOne(id);
+    await this.feedbacksService.remove(id);
   }
 
   async solutionsByPole(pole: number) {
