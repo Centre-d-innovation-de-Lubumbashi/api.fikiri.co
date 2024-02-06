@@ -26,15 +26,16 @@ export class UsersService {
     private readonly prismaService: PrismaService,
     private readonly mailerService: MailerService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {
+  }
 
   async registerEmail(to: string, password: string) {
-    let from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`
+    let from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
     await this.mailerService.sendMail({
       to,
       from,
       subject: 'Code currateur par défaut',
-      template: `
+      text: `
 Cher(e) ${to},
 
 Vous avez été ajouté(e) en tant que currateur sur la plateforme Fikiri.
@@ -61,13 +62,13 @@ L'équipe Fikiri.`,
         password: hash,
         organisation: {
           connect: {
-            id: dto.organisation
-          }
+            id: dto.organisation,
+          },
         },
         pole: {
           connect: {
-            id: dto.pole
-          }
+            id: dto.pole,
+          },
         },
         roles: {
           connect: dto.roles.map((id) => ({ id })),
@@ -120,7 +121,7 @@ L'équipe Fikiri.`,
     const data = await this.prismaService.user.findUnique({
       where: { id },
       include: {
-        roles: true
+        roles: true,
       },
     });
     if (!data) throw new NotFoundException('L\'utilisateur n\'a pas été trouvé');
@@ -137,7 +138,7 @@ L'équipe Fikiri.`,
           ...dto,
           roles: {
             connect: {
-              id: 3
+              id: 3,
             },
           },
         },
@@ -158,20 +159,20 @@ L'équipe Fikiri.`,
   }
 
   async update(id: number, dto: UpdateUserDto) {
-    const { data: user } = await this.findOne(id)
+    const { data: user } = await this.findOne(id);
     const data: User = await this.prismaService.user.update({
       where: { id },
       data: {
         ...dto,
         organisation: {
           connect: {
-            id: dto.organisation || user.organisationId
-          }
+            id: dto.organisation || user.organisationId,
+          },
         },
         pole: {
           connect: {
-            id: dto.pole || user.poleId
-          }
+            id: dto.pole || user.poleId,
+          },
         },
         roles: {
           set: dto?.roles?.map((id) => ({ id })) || user.roles,
@@ -193,15 +194,14 @@ L'équipe Fikiri.`,
     });
     const isMatch = dto.oldPassword && dto.password && await this.passwordMatch(dto.oldPassword, data.password);
     if (isMatch) {
-      await this.updatePassword(id, dto.password)
+      await this.updatePassword(id, dto.password);
     }
     return { data };
   }
 
 
-
   async remove(id: number) {
-    await this.findOne(id)
+    await this.findOne(id);
     await this.prismaService.user.delete({
       where: { id },
     });
@@ -231,7 +231,7 @@ L'équipe Fikiri.`,
   }
 
   async updatePassword(id: number, password: string) {
-    const salt = await bcrypt.genSalt(10)
+    const salt = await bcrypt.genSalt(10);
     const passwordHash: string = await bcrypt.hash(password, salt);
     await this.prismaService.user.update({
       where: { id },
