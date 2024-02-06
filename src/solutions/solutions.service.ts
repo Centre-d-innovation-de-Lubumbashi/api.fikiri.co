@@ -239,7 +239,7 @@ Cordialement.
         },
       },
     });
-    if (dto.userComment) await this.sendComment(solution.user, data.userComment);
+    if (dto?.userComment) await this.sendComment(solution.user, data.userComment);
     return { data };
   }
 

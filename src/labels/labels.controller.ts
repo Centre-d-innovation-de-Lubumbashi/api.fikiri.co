@@ -3,9 +3,9 @@ import { LabelsService } from './labels.service';
 import { CreateLableDto } from './dto/create-lable.dto';
 import { UpdateLableDto } from './dto/update-lable.dto';
 
-@Controller('lables')
+@Controller('labels')
 export class LabelsController {
-  constructor(private readonly lablesService: LabelsService) {}
+  constructor(private readonly lablesService: LabelsService) { }
 
   @Post()
   create(@Body() createLableDto: CreateLableDto) {

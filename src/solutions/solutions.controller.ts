@@ -88,7 +88,7 @@ export class SolutionsController {
     return this.solutionsService.deleteImage(+id);
   }
 
-  @Post('feddback/:id')
+  @Post('feedback/:id')
   addFeedback(@Param('id') id: string, @Body() dto: CreateFeedbackDto) {
     return this.solutionsService.addFeedback(+id, dto);
   }
