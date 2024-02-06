@@ -44,7 +44,7 @@ Voici votre mot de passe par défaut: ${password}
 
 Vous pouvez le modifier une fois connecté(e).
 
-Connectez-vous à l'adresse suivante: <a href="https://admin.fikiri.co">admin.fikiri.co</a>
+Connectez-vous à l'adresse suivante: https://admin.fikiri.co
 
 Merci,
 L'équipe Fikiri.`,
