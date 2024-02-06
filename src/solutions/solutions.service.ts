@@ -76,12 +76,19 @@ export class SolutionsService {
     const data = await this.prismaService.solution.findMany({
       // skip: offset,
       // take: limit,
-      include: {
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        videoLink: true,
+        imageLink: true,
         thematic: true,
         status: true,
         images: true,
       },
     });
+
+
 
     const videosAndImages = data.filter((solution) => solution.videoLink || (solution.images.length > 0 || solution.imageLink));
 
