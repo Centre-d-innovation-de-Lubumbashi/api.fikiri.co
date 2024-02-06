@@ -78,7 +78,7 @@ export class AuthService {
     await this.mailService.sendMail({
       to: to.email,
       from,
-      subject: 'Objet : Code de Réinitialisation de Mot de Passe Fikiri',
+      subject: 'Code de Réinitialisation de Mot de Passe Fikiri',
       text: `
 Cher(e) ${to.name},
 

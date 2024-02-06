@@ -74,8 +74,8 @@ export class SolutionsService {
   async findAll(page: number) {
     const { offset, limit } = paginate(page, 30);
     const data: Solution[] = await this.prismaService.solution.findMany({
-      skip: offset,
-      take: limit,
+      // skip: offset,
+      // take: limit,
       include: {
         thematic: true,
         status: true,

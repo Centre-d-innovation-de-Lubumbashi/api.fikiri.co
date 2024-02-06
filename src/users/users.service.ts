@@ -14,20 +14,48 @@ import { CreateWithGoogleDto } from './dto/create-with-google.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import UpdateProfileDto from '../auth/dto/update-profile.dto';
 import { User } from '@prisma/client';
+import { randomPassword } from 'src/helpers/random-password';
+import { MailerService } from '@nestjs-modules/mailer';
+import { ConfigService } from '@nestjs/config';
 
 const unlinkAsync = promisify(fs.unlink);
 
 @Injectable()
 export class UsersService {
   constructor(
-    private readonly prismaService: PrismaService
+    private readonly prismaService: PrismaService,
+    private readonly mailerService: MailerService,
+    private readonly configService: ConfigService,
   ) { }
+
+  async registerEmail(to: string, password: string) {
+    let from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`
+    await this.mailerService.sendMail({
+      to,
+      from,
+      subject: 'Code currateur par défaut',
+      template: `
+Cher(e) ${to},
+
+Vous avez été ajouté(e) en tant que currateur sur la plateforme Fikiri.
+
+Voici votre mot de passe par défaut: ${password}
+
+Vous pouvez le modifier une fois connecté(e).
+
+Connectez-vous à l'adresse suivante: <a href="https://admin.fikiri.co">admin.fikiri.co</a>
+
+Merci,
+L'équipe Fikiri.`,
+    });
+  }
+
 
   async create(dto: CreateUserDto) {
     await this.userExist(dto.email);
-    const password: string = 'admin1234';
+    const password: string = randomPassword();
     const hash = await this.hashPassword(password);
-    const data = await this.prismaService.user.create({
+    await this.prismaService.user.create({
       data: {
         ...dto,
         password: hash,
@@ -46,7 +74,7 @@ export class UsersService {
         },
       },
     });
-    return { data };
+    await this.registerEmail(dto.email, password);
   }
 
   async hashPassword(password: string) {
