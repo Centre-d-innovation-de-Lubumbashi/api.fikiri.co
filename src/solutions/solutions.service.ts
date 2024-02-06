@@ -73,7 +73,7 @@ export class SolutionsService {
 
   async findAll(page: number) {
     const { offset, limit } = paginate(page, 30);
-    const data: Solution[] = await this.prismaService.solution.findMany({
+    const data = await this.prismaService.solution.findMany({
       // skip: offset,
       // take: limit,
       include: {
@@ -82,7 +82,10 @@ export class SolutionsService {
         images: true,
       },
     });
-    return { data };
+
+    const videosAndImages = data.filter((solution) => solution.videoLink || (solution.images.length > 0 || solution.imageLink));
+
+    return { data: videosAndImages };
   }
 
   async findOne(id: number) {
