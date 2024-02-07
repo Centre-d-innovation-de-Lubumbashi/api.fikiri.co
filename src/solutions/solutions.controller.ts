@@ -93,12 +93,12 @@ export class SolutionsController {
     return this.solutionsService.addFeedback(+id, dto);
   }
 
-  @Patch('feddback/:id')
+  @Patch('feedback/:id')
   updateFeedback(@Param('id') id: string, @Body() dto: UpdateFeedbackDto) {
     return this.solutionsService.updateFeedback(+id, dto);
   }
 
-  @Delete('feddback/:id')
+  @Delete('feedback/:id')
   deleteFeedback(@Param('id') id: string) {
     return this.solutionsService.deleteFeedback(+id);
   }
