@@ -87,12 +87,8 @@ export class SolutionsService {
         images: true,
       },
     });
-
-
-
     const videosAndImages = data.filter((solution) => solution.videoLink || (solution.images.length > 0 || solution.imageLink));
-
-    return { data: videosAndImages };
+    return { data, conforms: videosAndImages };
   }
 
   async findOne(id: number) {
