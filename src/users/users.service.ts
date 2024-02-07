@@ -190,12 +190,15 @@ L'équipe Fikiri.`,
   async updateProfile(id: number, dto: UpdateProfileDto) {
     const data: User = await this.prismaService.user.update({
       where: { id },
-      data: dto,
+      data: {
+        name: dto.name,
+        address: dto.address,
+        phoneNumber: dto.phoneNumber,
+      },
     });
     const isMatch = dto.oldPassword && dto.password && await this.passwordMatch(dto.oldPassword, data.password);
-    if (isMatch) {
-      await this.updatePassword(id, dto.password);
-    }
+    if (!isMatch) throw new BadRequestException('L\'ancien mot de passe saisi est invalide');
+    await this.updatePassword(id, dto.password);
     return { data };
   }
 
