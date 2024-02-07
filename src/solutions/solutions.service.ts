@@ -79,6 +79,8 @@ export class SolutionsService {
       select: {
         id: true,
         name: true,
+        user: true,
+        userId: true,
         description: true,
         videoLink: true,
         imageLink: true,
