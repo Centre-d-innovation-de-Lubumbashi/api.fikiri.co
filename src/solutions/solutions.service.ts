@@ -67,7 +67,7 @@ export class SolutionsService {
         status: true,
       },
     });
-    const data = solutions.filter((solution) => solution.status.id > 1);
+    const data = solutions.filter((solution) => solution.status.id > 1 && solution.status.id < 5);
     return { data };
   }
 
