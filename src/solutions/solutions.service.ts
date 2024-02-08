@@ -58,7 +58,10 @@ export class SolutionsService {
   }
 
   async findMapped(page: number) {
+    const { offset, limit } = paginate(page, 12);
     const solutions = await this.prismaService.solution.findMany({
+      skip: limit,
+      take: limit,
       include: {
         thematic: true,
         status: true,
@@ -71,8 +74,8 @@ export class SolutionsService {
   async findAll(page: number) {
     const { offset, limit } = paginate(page, 30);
     const data = await this.prismaService.solution.findMany({
-      // skip: offset,
-      // take: limit,
+      // skip: limit,
+      // take: offset,
       select: {
         id: true,
         name: true,

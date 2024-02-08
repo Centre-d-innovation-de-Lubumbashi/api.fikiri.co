@@ -13,7 +13,7 @@ export class DashboardService {
         const totalSolutions = await this.prismaService.solution.count();
         const groupStatus = await this.prismaService.solution.groupBy({
             by: ['statusId'],
-            _count: true
+            _count: true,
         });
         const groupPole = await this.prismaService.solution.groupBy({
             by: ['poleId'],
