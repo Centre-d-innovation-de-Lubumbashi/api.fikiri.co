@@ -22,9 +22,9 @@ export class SolutionsController {
   }
 
   @Public()
-  @Get('approved')
-  findApproved(@Param('page') page: string) {
-    return this.solutionsService.findApproved(+page);
+  @Get('mapped')
+  findMapped(@Param('page') page: string) {
+    return this.solutionsService.findMapped(+page);
   }
 
   @Get()
@@ -32,6 +32,7 @@ export class SolutionsController {
     return this.solutionsService.findAll(+page);
   }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.solutionsService.findOne(+id);

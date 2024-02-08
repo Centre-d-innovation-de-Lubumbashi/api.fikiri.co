@@ -57,7 +57,7 @@ export class SolutionsService {
     return { data };
   }
 
-  async findApproved(page: number) {
+  async findMapped(page: number) {
     const { offset, limit } = paginate(page, 30);
     const solutions = await this.prismaService.solution.findMany({
       skip: offset,
