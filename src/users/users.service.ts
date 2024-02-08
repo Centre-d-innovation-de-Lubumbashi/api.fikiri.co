@@ -200,7 +200,6 @@ L'équipe Fikiri.`,
     if (isMatch) {
       await this.updatePassword(id, dto.password);
     } else if (dto.oldPassword && dto.password) throw new BadRequestException('Les identifiants saisis sont invalides');
-
     return { data };
   }
 
