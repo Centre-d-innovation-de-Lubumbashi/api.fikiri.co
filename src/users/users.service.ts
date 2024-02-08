@@ -197,8 +197,10 @@ L'équipe Fikiri.`,
       },
     });
     const isMatch = dto.oldPassword && dto.password && await this.passwordMatch(dto.oldPassword, data.password);
-    if (!isMatch) throw new BadRequestException('L\'ancien mot de passe saisi est invalide');
-    await this.updatePassword(id, dto.password);
+    if (isMatch) {
+      await this.updatePassword(id, dto.password);
+    } else if (dto.oldPassword && dto.password) throw new BadRequestException('Les identifiants saisis sont invalides');
+
     return { data };
   }
 
