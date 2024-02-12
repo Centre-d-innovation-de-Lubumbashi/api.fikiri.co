@@ -87,11 +87,13 @@ export class SolutionsService {
         thematic: true,
         status: true,
         images: true,
+        feedbacks: true
       },
     });
+    const conforms = data.filter((solution) => solution.videoLink || (solution.images.length > 0 || solution.imageLink));
+    const curated = conforms.filter((solution) => solution.feedbacks.length < 0)
 
-    const videosAndImages = data.filter((solution) => solution.videoLink || (solution.images.length > 0 || solution.imageLink));
-    return { data, conforms: videosAndImages };
+    return { data, conforms, curated };
   }
 
   async findOne(id: number) {
