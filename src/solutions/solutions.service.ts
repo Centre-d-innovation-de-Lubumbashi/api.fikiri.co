@@ -91,7 +91,7 @@ export class SolutionsService {
       },
     });
     const conforms = data.filter((solution) => solution.videoLink || (solution.images.length > 0 || solution.imageLink));
-    const curated = conforms.filter((solution) => solution.feedbacks.length < 0)
+    const curated = conforms.filter((solution) => solution.feedbacks.length > 0)
 
     return { data, conforms, curated };
   }
@@ -268,12 +268,23 @@ Cordialement.
   async solutionsByPole(pole: number) {
     const data = await this.prismaService.solution.findMany({
       where: { poleId: pole },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        user: true,
+        userId: true,
+        description: true,
+        videoLink: true,
+        imageLink: true,
         thematic: true,
         status: true,
+        images: true,
+        feedbacks: true
       },
     });
-    return { data };
+    const conforms = data.filter((solution) => solution.videoLink || (solution.images.length > 0 || solution.imageLink));
+    const curated = conforms.filter((solution) => solution.feedbacks.length > 0)
+    return { data, conforms, curated };
   }
 
   async stats() {
