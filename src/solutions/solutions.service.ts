@@ -90,21 +90,6 @@ export class SolutionsService {
       },
     });
 
-    //  Affect 70 solutions to pole sud
-
-    for (let i = 0; i < 70; i++) {
-      await this.prismaService.solution.update({
-        where: { id: data[i].id },
-        data: {
-          pole: {
-            connect: {
-              id: 3,
-            },
-          },
-        },
-      });
-    }
-
     const videosAndImages = data.filter((solution) => solution.videoLink || (solution.images.length > 0 || solution.imageLink));
     return { data, conforms: videosAndImages };
   }
