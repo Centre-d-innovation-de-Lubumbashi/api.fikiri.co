@@ -92,8 +92,8 @@ export class SolutionsService {
     });
     const conforms = data.filter((solution) => solution.videoLink || (solution.images.length > 0 || solution.imageLink));
     const curated = conforms.filter((solution) => solution.feedbacks.length > 0)
-
-    return { data, conforms, curated };
+    const notConforms = data.filter((solution) => !solution.videoLink && !(solution.images.length > 0 || solution.imageLink));
+    return { data, conforms, curated, notConforms };
   }
 
   async findOne(id: number) {
