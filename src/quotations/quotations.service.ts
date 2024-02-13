@@ -12,9 +12,9 @@ export class QuotationsService {
 
   async create(dto: CreateLableDto) {
     let data: Quotation | null = null;
-    const { name } = dto;
+    const { mention } = dto;
     const label = await this.prismaService.quotation.findFirst({
-      where: { name },
+      where: { mention },
     });
     if (label)
       throw new ConflictException('La quotation existe déjà');

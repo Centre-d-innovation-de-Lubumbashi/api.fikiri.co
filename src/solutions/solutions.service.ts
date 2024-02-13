@@ -106,7 +106,7 @@ export class SolutionsService {
         images: true,
         feedbacks: {
           include: {
-            labels: true,
+            quotations: true,
             user: true
           }
         },

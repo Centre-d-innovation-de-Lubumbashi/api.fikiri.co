@@ -19,7 +19,7 @@ export class FeedbacksService {
             email: dto.user
           }
         },
-        labels: {
+        quotations: {
           connect: dto.labels.map(id => ({ id }))
         }
       }
@@ -37,7 +37,7 @@ export class FeedbacksService {
       where: { id },
       include: {
         user: true,
-        labels: true
+        quotations: true
       }
     })
     if (!data) throw new NotFoundException(`Ce feedback n'existe pas`);
@@ -55,8 +55,8 @@ export class FeedbacksService {
             email: dto.user || feedback.user.email
           }
         },
-        labels: {
-          connect: dto?.labels?.map(id => ({ id })) || feedback.labels
+        quotations: {
+          connect: dto?.labels?.map(id => ({ id })) || feedback.quotations
         }
       }
     })

@@ -4,7 +4,7 @@ export class CreateLableDto {
   @IsNotEmpty({
     message: "Le nom est obligatoire"
   })
-  name: string;
+  mention: string;
 
   @IsNotEmpty({ message: "La quotation est obligatoire" })
   average: number;
