@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { LabelsService } from './labels.service';
-import { CreateLableDto } from './dto/create-lable.dto';
-import { UpdateLableDto } from './dto/update-lable.dto';
+import { QuotationsService } from './quotations.service';
+import { CreateLableDto } from './dto/create-quotation.dto';
+import { UpdateLableDto } from './dto/update-quotation.dto';
 
-@Controller('labels')
-export class LabelsController {
-  constructor(private readonly lablesService: LabelsService) { }
+@Controller('quotations')
+export class QuotationsController {
+  constructor(private readonly lablesService: QuotationsService) { }
 
   @Post()
   create(@Body() createLableDto: CreateLableDto) {

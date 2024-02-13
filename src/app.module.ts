@@ -14,7 +14,7 @@ import { join } from 'path';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { LabelsModule } from './labels/labels.module';
+import { QuotationsModule } from './quotations/quotations.module';
 import { FeedbacksModule } from './feedbacks/feedbacks.module';
 import { PolesModule } from './poles/poles.module';
 import { OrganisationsModule } from './organisations/organisations.module';
@@ -52,7 +52,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     CallsModule,
     ChallengesModule,
     StatusModule,
-    LabelsModule,
+    QuotationsModule,
     FeedbacksModule,
     PolesModule,
     OrganisationsModule,

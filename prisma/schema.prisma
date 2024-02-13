@@ -100,21 +100,24 @@ model Pole {
   User      User[]
 }
 
-model Label {
+model Quotation {
   id        Int        @id @default(autoincrement())
-  name      String     @unique
+  mention   String     @unique
+  average   Float?
+  createdAt DateTime?  @default(now())
+  updatedAt DateTime?  @updatedAt
   feedbacks Feedback[]
 }
 
 model Feedback {
-  id           Int        @id @default(autoincrement())
-  adminComment String
-  userComment  String
-  createdAt    DateTime?  @default(now())
-  updatedAt    DateTime?  @updatedAt
-  labels       Label[]
+  id           Int         @id @default(autoincrement())
+  adminComment String?
+  userComment  String?
+  createdAt    DateTime?   @default(now())
+  updatedAt    DateTime?   @updatedAt
+  quotations   Quotation[]
   solutions    Solution[]
-  user         User?      @relation(fields: [userId], references: [id])
+  user         User?       @relation(fields: [userId], references: [id])
   userId       Int?
 }
 
