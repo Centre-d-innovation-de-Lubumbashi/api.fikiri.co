@@ -103,16 +103,13 @@ model Pole {
 model Label {
   id        Int        @id @default(autoincrement())
   name      String     @unique
-  average   Int?
-  createdAt DateTime?  @default(now())
-  updatedAt DateTime?  @updatedAt
   feedbacks Feedback[]
 }
 
 model Feedback {
   id           Int        @id @default(autoincrement())
-  adminComment String?
-  userComment  String?
+  adminComment String
+  userComment  String
   createdAt    DateTime?  @default(now())
   updatedAt    DateTime?  @updatedAt
   labels       Label[]

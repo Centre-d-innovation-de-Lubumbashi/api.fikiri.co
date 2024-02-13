@@ -98,9 +98,6 @@ CREATE TABLE `Pole` (
 CREATE TABLE `Label` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
-    `average` INTEGER NULL,
-    `createdAt` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updatedAt` DATETIME(3) NULL,
 
     UNIQUE INDEX `Label_name_key`(`name`),
     PRIMARY KEY (`id`)
@@ -109,8 +106,8 @@ CREATE TABLE `Label` (
 -- CreateTable
 CREATE TABLE `Feedback` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `adminComment` VARCHAR(191) NULL,
-    `userComment` VARCHAR(191) NULL,
+    `adminComment` VARCHAR(191) NOT NULL,
+    `userComment` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NULL,
     `userId` INTEGER NULL,
