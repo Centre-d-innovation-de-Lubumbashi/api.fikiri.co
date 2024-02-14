@@ -135,6 +135,8 @@ L'équipe Fikiri.`,
       },
       include: {
         roles: true,
+        pole: true,
+        organisation: true
       },
     });
     return { data };
