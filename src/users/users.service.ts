@@ -17,6 +17,7 @@ import { User } from '@prisma/client';
 import { randomPassword } from 'src/helpers/random-password';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
+import { paginate } from 'src/helpers/paginate';
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -108,8 +109,30 @@ L'équipe Fikiri.`,
     return { data };
   }
 
-  async findAll() {
+  async findAll(page: number) {
+    const { limit, offset } = paginate(page, 10);
     const data: User[] = await this.prismaService.user.findMany({
+      // skip: offset,
+      // take: limit,
+      include: {
+        roles: true,
+      },
+    });
+    return { data };
+  }
+
+  async findAllCurators(page: number) {
+    const { limit, offset } = paginate(page, 10);
+    const data = await this.prismaService.user.findMany({
+      // skip: offset,
+      // take: limit,
+      where: {
+        roles: {
+          some: {
+            id: 1,
+          },
+        },
+      },
       include: {
         roles: true,
       },

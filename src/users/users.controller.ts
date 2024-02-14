@@ -28,7 +28,12 @@ export class UsersController {
 
   @Get()
   findAll(@Query('page') page: string = '1') {
-    return this.userService.findAll();
+    return this.userService.findAll(+page);
+  }
+
+  @Get('curators')
+  findAllCurators(@Query('page') page: string = '1') {
+    return this.userService.findAllCurators(+page);
   }
 
   @Get(':id')
