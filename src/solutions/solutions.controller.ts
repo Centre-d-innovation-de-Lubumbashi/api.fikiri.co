@@ -43,7 +43,7 @@ export class SolutionsController {
     return this.solutionsService.findbyUser(email);
   }
 
-  @Get('challenge/:id')
+  @Get('call/:id')
   findByCall(@Param('id') id: string) {
     return this.solutionsService.findByCall(+id);
   }
@@ -102,11 +102,5 @@ export class SolutionsController {
   @Delete('feedback/:id')
   deleteFeedback(@Param('id') id: string) {
     return this.solutionsService.deleteFeedback(+id);
-  }
-
-  @Public()
-  @Get('stats/proofs')
-  stats() {
-    return this.solutionsService.stats();
   }
 }

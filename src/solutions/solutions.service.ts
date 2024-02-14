@@ -93,6 +93,23 @@ export class SolutionsService {
     const conforms = data.filter((solution) => solution.videoLink || (solution.images.length > 0 || solution.imageLink));
     const curated = conforms.filter((solution) => solution.feedbacks.length > 0)
     const notConforms = data.filter((solution) => !solution.videoLink && !(solution.images.length > 0 || solution.imageLink));
+
+    // Assign conforms to poles 2 and 4
+
+    conforms.map(async (conform, i) => {
+      let pole: number = 3
+      if (i >= 80 && i < 160) pole = 2
+      if (i >= 160) pole = 4
+      await this.prismaService.solution.update({
+        where: { id: conform.id },
+        data: {
+          pole: {
+            connect: { id: pole }
+          }
+        }
+      })
+    })
+
     return { data, conforms, curated, notConforms };
   }
 
@@ -111,6 +128,7 @@ export class SolutionsService {
           }
         },
         challenges: true,
+        pole: true
       },
     });
     if (!data) throw new NotFoundException('La solution n\'a pas été trouvé');
