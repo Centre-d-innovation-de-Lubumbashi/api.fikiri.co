@@ -2,9 +2,9 @@ import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateFeedbackDto {
     @IsNotEmpty({ message: 'Les impressions sont obligatoires' })
-    labels: number[];
+    quotations: number[];
 
-    @IsNotEmpty({ message: 'Le commentaire pour admin est obligatoire' })
+    @IsOptional()
     adminComment: string;
 
     @IsOptional()
