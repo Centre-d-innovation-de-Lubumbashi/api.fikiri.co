@@ -36,6 +36,11 @@ export class UsersController {
     return this.userService.findAllCurators(+page);
   }
 
+  @Get('admins')
+  findAllAdmins(@Query('page') page: string = '1') {
+    return this.userService.findAllAdmins(+page);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.userService.findOne(+id);

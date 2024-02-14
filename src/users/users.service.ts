@@ -140,6 +140,25 @@ L'équipe Fikiri.`,
     return { data };
   }
 
+  async findAllAdmins(page: number) {
+    const { limit, offset } = paginate(page, 10);
+    const data = await this.prismaService.user.findMany({
+      // skip: offset,
+      // take: limit,
+      where: {
+        roles: {
+          some: {
+            id: 4,
+          },
+        },
+      },
+      include: {
+        roles: true,
+      },
+    });
+    return { data };
+  }
+
   async findOne(id: number) {
     const data = await this.prismaService.user.findUnique({
       where: { id },
