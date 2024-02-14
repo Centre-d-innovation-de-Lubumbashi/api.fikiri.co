@@ -56,7 +56,7 @@ export class FeedbacksService {
           }
         },
         quotations: {
-          connect: dto?.quotations?.map(id => ({ id })) || feedback.quotations
+          set: dto?.quotations?.map(id => ({ id })) || feedback.quotations
         }
       }
     })
