@@ -20,7 +20,7 @@ export class FeedbacksService {
           }
         },
         quotations: {
-          connect: dto.labels.map(id => ({ id }))
+          connect: dto.quotations.map(id => ({ id }))
         }
       }
     })
@@ -56,7 +56,7 @@ export class FeedbacksService {
           }
         },
         quotations: {
-          connect: dto?.labels?.map(id => ({ id })) || feedback.quotations
+          connect: dto?.quotations?.map(id => ({ id })) || feedback.quotations
         }
       }
     })
