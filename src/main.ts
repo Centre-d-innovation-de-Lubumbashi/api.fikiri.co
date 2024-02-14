@@ -1,8 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import { join } from 'path';
 import * as passport from 'passport';
 import * as session from 'express-session';
+import * as express from 'express';
 
 const port = Number(process.env.PORT) as number;
 
@@ -15,6 +17,7 @@ async function bootstrap() {
     credentials: true,
     optionsSuccessStatus: 204
   });
+  app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
   app.use(
     session({
       secret: process.env.SESSION_SECRET,
@@ -36,5 +39,4 @@ async function bootstrap() {
   }));
   await app.listen(port);
 }
-
 bootstrap().then(() => console.log(`🚀 Application is running on: localhost:${port}`));

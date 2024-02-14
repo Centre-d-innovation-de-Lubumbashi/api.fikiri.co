@@ -9,8 +9,6 @@ import { PrismaModule } from './database/prisma.module';
 import { CallsModule } from './calls/calls.module';
 import { ChallengesModule } from './challenges/challenges.module';
 import { StatusModule } from './status/status.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { MailerModule } from '@nestjs-modules/mailer';
@@ -38,10 +36,6 @@ import { DashboardModule } from './dashboard/dashboard.module';
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-    }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '../../'),
-      renderPath: '/uploads',
     }),
     AuthModule,
     UsersModule,
