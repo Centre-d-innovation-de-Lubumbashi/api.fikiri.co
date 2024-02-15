@@ -3,28 +3,64 @@ import { PrismaService } from 'src/database/prisma.service';
 
 @Injectable()
 export class DashboardService {
-    constructor(
-        private readonly prismaService: PrismaService
-    ) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
-    async getDashboardData() {
-        const totalUsers = await this.prismaService.user.count();
-        const totolsCalls = await this.prismaService.call.count();
-        const totalSolutions = await this.prismaService.solution.count();
-        const groupStatus = await this.prismaService.solution.groupBy({
-            by: ['statusId'],
-            _count: true,
-        });
-        const groupPole = await this.prismaService.solution.groupBy({
-            by: ['poleId'],
-            _count: true
-        });
-        return {
-            totalUsers,
-            totolsCalls,
-            totalSolutions,
-            groupStatus,
-            groupPole
-        }
-    }
+  async getCounts() {
+    const totalUsers = await this.prismaService.user.count();
+    const totalSolutions = await this.prismaService.solution.count();
+    return {
+      totalUsers,
+      totalSolutions,
+    };
+  }
+
+  async getUsers() {
+    const data = await this.prismaService.user.findMany({
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    return { data };
+  }
+
+  async getSolutionStatus() {
+    const data = await this.prismaService.solution.groupBy({
+      by: ['statusId'],
+      _count: true,
+    });
+    const status = await this.prismaService.status.findMany();
+    const statusMap = status.reduce((acc, curr) => {
+      acc[curr.id] = curr.name;
+      return acc;
+    }, {});
+    const formattedData = data.map((item) => {
+      return {
+        status: statusMap[item.statusId],
+        count: item._count,
+      };
+    });
+    return { data: formattedData };
+  }
+
+  async getSolutions() {
+    const data = await this.prismaService.solution.findMany({
+      select: {
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    return { data };
+  }
+
+  async getSolutionsAndThematics() {
+    const data = await this.prismaService.solution.findMany({
+      select: {
+        thematic: true,
+      },
+    });
+    return { data };
+  }
 }
