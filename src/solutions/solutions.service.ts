@@ -22,8 +22,7 @@ export class SolutionsService {
     private readonly mailService: MailerService,
     private readonly configService: ConfigService,
     private readonly feedbacksService: FeedbacksService,
-  ) {
-  }
+  ) {}
 
   async create(dto: CreateSolutionDto) {
     const data: Solution = await this.prismaService.solution.create({
@@ -67,15 +66,17 @@ export class SolutionsService {
         status: true,
       },
     });
-    const data = solutions.filter((solution) => solution.status.id > 1 && solution.status.id < 5);
+    const data = solutions.filter(
+      (solution) => solution.status.id > 1 && solution.status.id < 5,
+    );
     return { data };
   }
 
   async findAll(page: number) {
     const { offset, limit } = paginate(page, 30);
     const data = await this.prismaService.solution.findMany({
-      // skip: limit,
-      // take: offset,
+      skip: limit,
+      take: offset,
       select: {
         id: true,
         name: true,
@@ -87,29 +88,29 @@ export class SolutionsService {
         thematic: true,
         status: true,
         images: true,
-        feedbacks: true
+        feedbacks: {
+          include: {
+            quotations: true,
+          },
+        },
       },
     });
-    const conforms = data.filter((solution) => solution.videoLink || (solution.images.length > 0 || solution.imageLink));
-    const curated = conforms.filter((solution) => solution.feedbacks.length > 0)
-    const notConforms = data.filter((solution) => !solution.videoLink && !(solution.images.length > 0 || solution.imageLink));
-
-    // Assign conforms to poles 2 and 4
-
-    conforms.map(async (conform, i) => {
-      let pole: number = 3
-      if (i >= 80 && i < 160) pole = 2
-      if (i >= 160) pole = 4
-      await this.prismaService.solution.update({
-        where: { id: conform.id },
-        data: {
-          pole: {
-            connect: { id: pole }
-          }
-        }
-      })
-    })
-
+    const conforms = data.filter(
+      (solution) =>
+        solution.videoLink || solution.images.length > 0 || solution.imageLink,
+    );
+    const curated = conforms
+      .filter((solution) => solution.feedbacks.length > 0)
+      .map((cur) =>
+        cur.feedbacks.map((feedback) => {
+          feedback.quotations.sort((a, b) => (a.average < b.average ? 0 : -1));
+        }),
+      );
+    const notConforms = data.filter(
+      (solution) =>
+        !solution.videoLink &&
+        !(solution.images.length > 0 || solution.imageLink),
+    );
     return { data, conforms, curated, notConforms };
   }
 
@@ -124,14 +125,14 @@ export class SolutionsService {
         feedbacks: {
           include: {
             quotations: true,
-            user: true
-          }
+            user: true,
+          },
         },
         challenges: true,
-        pole: true
+        pole: true,
       },
     });
-    if (!data) throw new NotFoundException('La solution n\'a pas été trouvé');
+    if (!data) throw new NotFoundException("La solution n'a pas été trouvé");
     return { data };
   }
 
@@ -202,7 +203,9 @@ export class SolutionsService {
           },
         },
         challenges: {
-          set: dto?.challenges?.map((id: number) => ({ id })) || solution.challenges,
+          set:
+            dto?.challenges?.map((id: number) => ({ id })) ||
+            solution.challenges,
         },
       },
     });
@@ -231,7 +234,7 @@ export class SolutionsService {
     const image = await this.prismaService.solutionImages.findUnique({
       where: { id },
     });
-    if (!image) throw new NotFoundException('L\'image n\'a pas été trouvée');
+    if (!image) throw new NotFoundException("L'image n'a pas été trouvée");
     await unlinkAsync(`./uploads/${image.imageLink}`);
     await this.prismaService.solutionImages.delete({
       where: { id },
@@ -243,7 +246,7 @@ export class SolutionsService {
     await this.mailService.sendMail({
       to: user.email,
       from,
-      subject: 'Objet : Commentaire sur votre solution soumise sur fikiri',
+      subject: 'Commentaire sur votre solution soumise sur fikiri',
       text: `
 Bonjour ${user.name},
 
@@ -268,7 +271,8 @@ Cordialement.
         },
       },
     });
-    if (dto?.userComment) await this.sendComment(solution.user, data.userComment);
+    if (dto?.userComment)
+      await this.sendComment(solution.user, data.userComment);
     return { data };
   }
 
@@ -297,11 +301,16 @@ Cordialement.
         thematic: true,
         status: true,
         images: true,
-        feedbacks: true
+        feedbacks: true,
       },
     });
-    const conforms = data.filter((solution) => solution.videoLink || (solution.images.length > 0 || solution.imageLink));
-    const curated = conforms.filter((solution) => solution.feedbacks.length > 0)
+    const conforms = data.filter(
+      (solution) =>
+        solution.videoLink || solution.images.length > 0 || solution.imageLink,
+    );
+    const curated = conforms.filter(
+      (solution) => solution.feedbacks.length > 0,
+    );
     return { data, conforms, curated };
   }
 
@@ -312,9 +321,18 @@ Cordialement.
         images: true,
       },
     });
-    const solutionsWithImages = solutions.filter((solution) => solution.images.length > 0 || solution.imageLink);
-    const solutionsWithVideos = solutions.filter((solution) => solution.videoLink && !solutionsWithImages.includes(solution));
-    const videosAndImages = solutions.filter((solution) => solution.videoLink && (solution.images.length > 0 || solution.imageLink));
+    const solutionsWithImages = solutions.filter(
+      (solution) => solution.images.length > 0 || solution.imageLink,
+    );
+    const solutionsWithVideos = solutions.filter(
+      (solution) =>
+        solution.videoLink && !solutionsWithImages.includes(solution),
+    );
+    const videosAndImages = solutions.filter(
+      (solution) =>
+        solution.videoLink &&
+        (solution.images.length > 0 || solution.imageLink),
+    );
 
     return {
       total: solutions.length,
