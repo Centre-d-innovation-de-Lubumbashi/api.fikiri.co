@@ -1,5 +1,15 @@
 import { CreateFeedbackDto } from './../feedbacks/dto/create-feedback.dto';
-import { Body, Controller, Delete, Get, Param, Patch, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UploadedFiles,
+  UseInterceptors,
+} from '@nestjs/common';
 import { SolutionsService } from './solutions.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -12,9 +22,7 @@ import { UpdateFeedbackDto } from 'src/feedbacks/dto/update-feedback.dto';
 
 @Controller('solutions')
 export class SolutionsController {
-  constructor(
-    private readonly solutionsService: SolutionsService
-  ) { }
+  constructor(private readonly solutionsService: SolutionsService) {}
 
   @Post()
   create(@Body() data: CreateSolutionDto) {
@@ -58,7 +66,6 @@ export class SolutionsController {
     return this.solutionsService.remove(+id);
   }
 
-
   @Patch(':id/user')
   updateUser(@Param('id') id: string, @Body() data: UpdateUserSolutionDto) {
     return this.solutionsService.updateUserSolution(+id, data);
@@ -75,7 +82,10 @@ export class SolutionsController {
     }),
   )
   @Post(':id/images')
-  uploadImages(@Param('id') id: string, @UploadedFiles() files: Express.Multer.File[]) {
+  uploadImages(
+    @Param('id') id: string,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
     return this.solutionsService.uploadImages(+id, files);
   }
 
@@ -102,5 +112,20 @@ export class SolutionsController {
   @Delete('feedback/:id')
   deleteFeedback(@Param('id') id: string) {
     return this.solutionsService.deleteFeedback(+id);
+  }
+
+  @Get('conforms')
+  findConforms(@Param('page') page: string) {
+    return this.solutionsService.findConforms(+page);
+  }
+
+  @Get('non-conforms')
+  findNonConforms(@Param('page') page: string) {
+    return this.solutionsService.findNonConforms(+page);
+  }
+
+  @Get('curated')
+  findCurated(@Param('page') page: string) {
+    return this.solutionsService.findCurated(+page);
   }
 }
