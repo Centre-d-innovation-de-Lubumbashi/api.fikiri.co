@@ -57,36 +57,28 @@ export class SolutionsService {
   }
 
   async findMapped(page: number) {
-    // const { offset, limit } = paginate(page, 12);
-    const solutions = await this.prismaService.solution.findMany({
-      // skip: limit,
-      // take: limit,
-      include: {
-        thematic: true,
-        status: true,
-      },
-    });
+    const solutions = await this.getSolutions(page);
     const data = solutions.filter(
       (solution) => solution.status.id > 1 && solution.status.id < 5,
     );
     return { data };
   }
 
-  async findAll(page: number) {
+  async getSolutions(page: number) {
     const { offset, limit } = paginate(page, 30);
-    const data = await this.prismaService.solution.findMany({
-      skip: limit,
-      take: offset,
+    return await this.prismaService.solution.findMany({
+      // skip: offset,
+      // take: limit,
       select: {
         id: true,
         name: true,
-        user: true,
         userId: true,
         description: true,
         videoLink: true,
         imageLink: true,
         thematic: true,
         status: true,
+        user: true,
         images: true,
         feedbacks: {
           include: {
@@ -95,23 +87,36 @@ export class SolutionsService {
         },
       },
     });
-    const conforms = data.filter(
+  }
+
+  async findConforms(page: number) {
+    const solutions = await this.getSolutions(page);
+    const data = solutions.filter(
       (solution) =>
         solution.videoLink || solution.images.length > 0 || solution.imageLink,
     );
-    const curated = conforms
-      .filter((solution) => solution.feedbacks.length > 0)
-      .map((cur) =>
-        cur.feedbacks.map((feedback) => {
-          feedback.quotations.sort((a, b) => (a.average < b.average ? 0 : -1));
-        }),
-      );
-    const notConforms = data.filter(
+    return { data };
+  }
+
+  async findCurated(page: number) {
+    const solutions = await this.getSolutions(page);
+    const data = solutions.filter((solution) => solution.feedbacks.length > 0);
+    return { data };
+  }
+
+  async findNonConforms(page: number) {
+    const solutions = await this.getSolutions(page);
+    const data = solutions.filter(
       (solution) =>
         !solution.videoLink &&
         !(solution.images.length > 0 || solution.imageLink),
     );
-    return { data, conforms, curated, notConforms };
+    return { data };
+  }
+
+  async findAll(page: number) {
+    const data = await this.getSolutions(page);
+    return { data };
   }
 
   async findOne(id: number) {

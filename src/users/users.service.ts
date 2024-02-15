@@ -27,8 +27,7 @@ export class UsersService {
     private readonly prismaService: PrismaService,
     private readonly mailerService: MailerService,
     private readonly configService: ConfigService,
-  ) {
-  }
+  ) {}
 
   async registerEmail(to: string, password: string) {
     let from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
@@ -51,7 +50,6 @@ Merci,
 L'équipe Fikiri.`,
     });
   }
-
 
   async create(dto: CreateUserDto) {
     await this.userExist(dto.email);
@@ -88,7 +86,7 @@ L'équipe Fikiri.`,
     const user = await this.prismaService.user.findUnique({
       where: { email },
     });
-    if (user) throw new ConflictException('L\'utilisateur existe déjà');
+    if (user) throw new ConflictException("L'utilisateur existe déjà");
   }
 
   async register(registerDto: SignupDto) {
@@ -136,7 +134,7 @@ L'équipe Fikiri.`,
       include: {
         roles: true,
         pole: true,
-        organisation: true
+        organisation: true,
       },
     });
     return { data };
@@ -168,7 +166,7 @@ L'équipe Fikiri.`,
         roles: true,
       },
     });
-    if (!data) throw new NotFoundException('L\'utilisateur n\'a pas été trouvé');
+    if (!data) throw new NotFoundException("L'utilisateur n'a pas été trouvé");
     return { data };
   }
 
@@ -198,7 +196,7 @@ L'équipe Fikiri.`,
         roles: true,
       },
     });
-    if (!user) throw new NotFoundException('L\'utilisateur n\'a pas été trouvé');
+    if (!user) throw new NotFoundException("L'utilisateur n'a pas été trouvé");
     return user;
   }
 
@@ -227,7 +225,8 @@ L'équipe Fikiri.`,
   }
 
   async passwordMatch(password: string, hash: string) {
-    if (!hash) throw new BadRequestException('Les identifiants saisis sont invalides');
+    if (!hash)
+      throw new BadRequestException('Les identifiants saisis sont invalides');
     return await bcrypt.compare(password, hash);
   }
 
@@ -240,13 +239,17 @@ L'équipe Fikiri.`,
         phoneNumber: dto.phoneNumber,
       },
     });
-    const isMatch = dto.oldPassword && dto.password && await this.passwordMatch(dto.oldPassword, data.password);
+    const isMatch =
+      dto.oldPassword &&
+      dto.password &&
+      (await this.passwordMatch(dto.oldPassword, data.password));
     if (isMatch) {
       await this.updatePassword(id, dto.password);
-    } else if (dto.oldPassword && dto.password) throw new BadRequestException('Les identifiants saisis sont invalides');
+    } else if (dto.oldPassword && dto.password) {
+      throw new BadRequestException('Les identifiants saisis sont invalides');
+    }
     return { data };
   }
-
 
   async remove(id: number) {
     await this.findOne(id);
@@ -254,7 +257,6 @@ L'équipe Fikiri.`,
       where: { id },
     });
   }
-
 
   async uploadImage(id: number, image: Express.Multer.File): Promise<any> {
     const user = await this.prismaService.user.findUnique({
