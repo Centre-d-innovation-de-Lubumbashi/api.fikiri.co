@@ -6,13 +6,11 @@ import { Thematic } from '@prisma/client';
 
 @Injectable()
 export class ThematicsService {
-  constructor(
-    private readonly prismaService: PrismaService,
-  ) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async create(dto: CreateThematicDto) {
     const data: Thematic = await this.prismaService.thematic.create({
-      data: dto
+      data: dto,
     });
     return { data };
   }
@@ -29,12 +27,19 @@ export class ThematicsService {
         challenges: true,
       },
     });
-    if (!data) throw new NotFoundException('La thématique n\'a pas été trouvé');
+    if (!data) throw new NotFoundException("La thématique n'a pas été trouvé");
+    return { data };
+  }
+
+  async findByCall(callId: number) {
+    const data: Thematic[] = await this.prismaService.thematic.findMany({
+      where: { calls: { some: { id: callId } } },
+    });
     return { data };
   }
 
   async update(id: number, dto: UpdateThematicDto) {
-    await this.findOne(id)
+    await this.findOne(id);
     const data: Thematic = await this.prismaService.thematic.update({
       data: dto,
       where: { id },
@@ -43,7 +48,7 @@ export class ThematicsService {
   }
 
   async remove(id: number) {
-    await this.findOne(id)
+    await this.findOne(id);
     await this.prismaService.thematic.delete({
       where: { id },
     });
