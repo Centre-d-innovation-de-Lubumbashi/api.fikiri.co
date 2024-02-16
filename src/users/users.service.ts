@@ -91,6 +91,7 @@ L'équipe Fikiri.`,
 
   async register(registerDto: SignupDto) {
     await this.userExist(registerDto.email);
+    delete registerDto.passwordConfirm;
     const password: string = registerDto.password as string;
     const hash = await this.hashPassword(password);
     const data = await this.prismaService.user.create({

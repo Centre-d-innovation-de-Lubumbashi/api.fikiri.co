@@ -18,8 +18,8 @@ export class AuthService {
   constructor(
     private readonly configService: ConfigService,
     private readonly usersService: UsersService,
-    private readonly mailService: MailerService
-  ) { }
+    private readonly mailService: MailerService,
+  ) {}
 
   async validateUser(email: string, password: string) {
     const user = await this.usersService.findBy(email);
@@ -28,7 +28,8 @@ export class AuthService {
         password,
         user.password,
       );
-      if (!passwordMatch) throw new BadRequestException('Les identifiants saisis sont invalides');
+      if (!passwordMatch)
+        throw new BadRequestException('Les identifiants saisis sont invalides');
     }
     return user;
   }
@@ -38,7 +39,8 @@ export class AuthService {
   }
 
   async passwordMatch(password: string, hash: string) {
-    if (!hash) throw new BadRequestException('Les identifiants saisis sont invalides');
+    if (!hash)
+      throw new BadRequestException('Les identifiants saisis sont invalides');
     return await bcrypt.compare(password, hash);
   }
 
@@ -46,14 +48,13 @@ export class AuthService {
     return res.redirect(this.configService.get('FRONTEND_URI'));
   }
 
-
   async login(@Req() req: Request) {
-    const data = req.user
-    return { data }
+    const data = req.user;
+    return { data };
   }
 
   async logout(@Req() request: Request) {
-    request.session.destroy(() => { });
+    request.session.destroy(() => {});
   }
 
   async profile(@CurrentUser() data: User) {
@@ -74,7 +75,7 @@ export class AuthService {
   }
 
   async resetPasswordEmail(to: User, token: string) {
-    let from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`
+    let from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
     await this.mailService.sendMail({
       to: to.email,
       from,
@@ -96,9 +97,9 @@ L'équipe Fikiri.`,
   async resetPasswordRequest(dto: ResetPasswordRequestDto) {
     const { email } = dto;
     const user = await this.usersService.findBy(email);
-    const token = randomPassword()
+    const token = randomPassword();
     await this.usersService.saveResetToken(email, token);
-    await this.resetPasswordEmail(user, token)
+    await this.resetPasswordEmail(user, token);
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
@@ -107,5 +108,4 @@ L'équipe Fikiri.`,
     await this.usersService.removeResetToken(user.id);
     await this.usersService.updatePassword(user.id, password);
   }
-
 }
