@@ -157,6 +157,24 @@ export class SolutionsService {
     }
   }
 
+  async findMappedByCall(callId: number, loadMore: boolean) {
+    let tobeLoaded = 4;
+    if (loadMore) tobeLoaded = 10;
+    const solutions = await this.prismaService.solution.findMany({
+      where: { callId },
+      take: tobeLoaded,
+      include: {
+        thematic: true,
+        status: true,
+        user: true,
+      },
+    });
+    const data = solutions.filter(
+      (solution) => solution.status.id > 1 && solution.status.id < 5,
+    );
+    return { data };
+  }
+
   async findByCall(callId: number) {
     const data = await this.prismaService.solution.findMany({
       where: { callId },
