@@ -114,17 +114,17 @@ export class SolutionsController {
     return this.solutionsService.deleteFeedback(+id);
   }
 
-  @Get('conforms')
+  @Get('conforms/all')
   findConforms(@Param('page') page: string) {
     return this.solutionsService.findConforms(+page);
   }
 
-  @Get('non-conforms')
+  @Get('non-conforms/all')
   findNonConforms(@Param('page') page: string) {
     return this.solutionsService.findNonConforms(+page);
   }
 
-  @Get('curated')
+  @Get('curated/all')
   findCurated(@Param('page') page: string) {
     return this.solutionsService.findCurated(+page);
   }
