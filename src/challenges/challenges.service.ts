@@ -6,9 +6,7 @@ import { Challenge } from '@prisma/client';
 
 @Injectable()
 export class ChallengesService {
-  constructor(
-    private readonly prismaService: PrismaService,
-  ) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async create(dto: CreateChallengeDto) {
     const data: Challenge = await this.prismaService.challenge.create({
@@ -29,19 +27,26 @@ export class ChallengesService {
     };
   }
 
+  async findByThematic(thematicId: number) {
+    const data = await this.prismaService.challenge.findMany({
+      where: { thematics: { some: { id: thematicId } } },
+    });
+    return { data };
+  }
+
   async findOne(id: number) {
     const data = await this.prismaService.challenge.findUnique({
       where: { id },
       include: {
-        thematics: true
-      }
+        thematics: true,
+      },
     });
-    if (!data) throw new NotFoundException('Le défi n\'a pas été trouvé');
+    if (!data) throw new NotFoundException("Le défi n'a pas été trouvé");
     return { data };
   }
 
   async update(id: number, dto: UpdateChallengeDto) {
-    const { data: challenge } = await this.findOne(id)
+    const { data: challenge } = await this.findOne(id);
     const data = await this.prismaService.challenge.update({
       where: { id },
       data: {
@@ -55,7 +60,7 @@ export class ChallengesService {
   }
 
   async remove(id: number) {
-    await this.findOne(id)
+    await this.findOne(id);
     await this.prismaService.challenge.delete({
       where: { id },
     });

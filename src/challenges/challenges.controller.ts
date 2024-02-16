@@ -4,7 +4,7 @@ import { UpdateChallengeDto } from './dto/update-challenge.dto';
 
 @Controller('challenges')
 export class ChallengesController {
-  constructor(private readonly ChallengesService: ChallengesService) { }
+  constructor(private readonly ChallengesService: ChallengesService) {}
 
   @Get()
   findAll() {
@@ -16,8 +16,16 @@ export class ChallengesController {
     return this.ChallengesService.findOne(+id);
   }
 
+  @Get('thematic/:id')
+  findByThematic(@Param('id') id: string) {
+    return this.ChallengesService.findByThematic(+id);
+  }
+
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateChallengeDto: UpdateChallengeDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateChallengeDto: UpdateChallengeDto,
+  ) {
     return this.ChallengesService.update(+id, updateChallengeDto);
   }
 
@@ -25,5 +33,4 @@ export class ChallengesController {
   remove(@Param('id') id: string) {
     return this.ChallengesService.remove(+id);
   }
-
 }
