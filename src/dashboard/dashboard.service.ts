@@ -41,7 +41,7 @@ export class DashboardService {
         count: item._count,
       };
     });
-    return { data: formattedData };
+    return { data: formattedData, status, statusMap };
   }
 
   async getSolutions() {
