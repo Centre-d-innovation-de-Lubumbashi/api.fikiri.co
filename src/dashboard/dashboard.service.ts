@@ -25,23 +25,24 @@ export class DashboardService {
     return { data };
   }
 
-  async getSolutionStatus() {
+  async countByStatus() {
     const data = await this.prismaService.solution.groupBy({
       by: ['statusId'],
       _count: true,
     });
     const status = await this.prismaService.status.findMany();
     const statusMap = status.reduce((acc, curr) => {
-      acc[curr.id] = curr.name;
+      acc.push({ id: curr.id, name: curr.name });
       return acc;
-    }, {});
-    const formattedData = data.map((item) => {
+    }, []);
+    const formattedData = statusMap.map((item) => {
+      const count = data.find((d) => d.statusId === item.id)?._count ?? 0;
       return {
-        status: statusMap[item.statusId],
-        count: item._count,
+        status: item.name,
+        count,
       };
     });
-    return { data: formattedData, status, statusMap };
+    return { data: formattedData };
   }
 
   async getSolutions() {

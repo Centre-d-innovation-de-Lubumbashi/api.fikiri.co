@@ -15,9 +15,9 @@ export class DashboardController {
     return this.dashboardService.getUsers();
   }
 
-  @Get('solution-status')
-  async getSolutionStatus() {
-    return this.dashboardService.getSolutionStatus();
+  @Get('solutions-status')
+  async countByStatus() {
+    return this.dashboardService.countByStatus();
   }
 
   @Get('solutions')
