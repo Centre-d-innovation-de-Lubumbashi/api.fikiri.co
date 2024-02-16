@@ -60,6 +60,7 @@ export class DashboardService {
   async getSolutionsAndThematics() {
     const data = await this.prismaService.solution.findMany({
       select: {
+        id: true,
         thematic: true,
       },
     });
