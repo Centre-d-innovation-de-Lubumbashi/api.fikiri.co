@@ -61,6 +61,8 @@ export class DashboardService {
     const data = await this.prismaService.solution.findMany({
       select: {
         id: true,
+        createdAt: true,
+        updatedAt: true,
         thematic: true,
       },
     });
