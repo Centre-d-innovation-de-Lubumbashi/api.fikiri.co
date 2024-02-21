@@ -76,11 +76,12 @@ export class AuthService {
 
   async resetPasswordEmail(to: User, token: string) {
     let from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
-    await this.mailService.sendMail({
-      to: to.email,
-      from,
-      subject: 'Code de Réinitialisation de Mot de Passe Fikiri',
-      text: `
+    try {
+      await this.mailService.sendMail({
+        to: to.email,
+        from,
+        subject: 'Code de Réinitialisation de Mot de Passe Fikiri',
+        text: `
 Cher(e) ${to.name},
 
 Pour réinitialiser votre mot de passe, utilisez le code suivant : ${token}.
@@ -91,7 +92,10 @@ Si vous n'avez pas initié cette demande, veuillez contacter notre équipe de su
           
 Merci,
 L'équipe Fikiri.`,
-    });
+      });
+    } catch {
+      throw new BadRequestException("Erreur lors de l'envoi du mail");
+    }
   }
 
   async resetPasswordRequest(dto: ResetPasswordRequestDto) {
@@ -105,7 +109,13 @@ L'équipe Fikiri.`,
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
     const { token, password } = resetPasswordDto;
     const user = await this.usersService.findByResetToken(token);
-    await this.usersService.removeResetToken(user.id);
-    await this.usersService.updatePassword(user.id, password);
+    try {
+      await this.usersService.removeResetToken(user.id);
+      await this.usersService.updatePassword(user.id, password);
+    } catch {
+      throw new BadRequestException(
+        'Erreur lors de la réinitialisation du mot de passe',
+      );
+    }
   }
 }

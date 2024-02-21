@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import * as fs from 'fs';
 import { promisify } from 'util';
@@ -25,35 +29,40 @@ export class SolutionsService {
   ) {}
 
   async create(dto: CreateSolutionDto) {
-    const data: Solution = await this.prismaService.solution.create({
-      data: {
-        ...dto,
-        thematic: {
-          connect: {
-            id: dto.thematic,
+    try {
+      await this.prismaService.solution.create({
+        data: {
+          ...dto,
+          thematic: {
+            connect: {
+              id: dto.thematic,
+            },
+          },
+          user: {
+            connect: {
+              email: dto.user,
+            },
+          },
+          call: {
+            connect: {
+              id: dto.call,
+            },
+          },
+          status: {
+            connect: {
+              id: 1,
+            },
+          },
+          challenges: {
+            connect: dto.challenges.map((id) => ({ id })),
           },
         },
-        user: {
-          connect: {
-            email: dto.user,
-          },
-        },
-        call: {
-          connect: {
-            id: dto.call,
-          },
-        },
-        status: {
-          connect: {
-            id: 1,
-          },
-        },
-        challenges: {
-          connect: dto.challenges.map((id) => ({ id })),
-        },
-      },
-    });
-    return { data };
+      });
+    } catch {
+      throw new BadRequestException(
+        'Erreur lors de la création de la solution',
+      );
+    }
   }
 
   async findMapped(page: number) {
@@ -120,40 +129,52 @@ export class SolutionsService {
   }
 
   async findOne(id: number) {
-    const data = await this.prismaService.solution.findUnique({
-      where: { id },
-      include: {
-        thematic: true,
-        user: true,
-        status: true,
-        images: true,
-        feedbacks: {
-          include: {
-            quotations: true,
-            user: true,
+    try {
+      const data = await this.prismaService.solution.findUnique({
+        where: { id },
+        include: {
+          thematic: true,
+          user: true,
+          status: true,
+          images: true,
+          feedbacks: {
+            include: {
+              quotations: true,
+              user: true,
+            },
           },
+          challenges: true,
+          pole: true,
         },
-        challenges: true,
-        pole: true,
-      },
-    });
-    if (!data) throw new NotFoundException("La solution n'a pas été trouvé");
-    return { data };
+      });
+      if (!data) throw new NotFoundException("La solution n'a pas été trouvé");
+      return { data };
+    } catch {
+      throw new BadRequestException(
+        'Erreur lors de la récupération de la solution',
+      );
+    }
   }
 
   async findbyUser(email: string) {
-    const user = await this.prismaService.user.findUnique({
-      where: { email },
-    });
-    if (user) {
-      const data = await this.prismaService.solution.findMany({
-        where: { userId: user.id },
-        include: {
-          status: true,
-          images: true,
-        },
+    try {
+      const user = await this.prismaService.user.findUnique({
+        where: { email },
       });
-      return { data };
+      if (user) {
+        const data = await this.prismaService.solution.findMany({
+          where: { userId: user.id },
+          include: {
+            status: true,
+            images: true,
+          },
+        });
+        return { data };
+      }
+    } catch {
+      throw new BadRequestException(
+        'Erreur lors de la récupération de la solution',
+      );
     }
   }
 
@@ -176,101 +197,136 @@ export class SolutionsService {
   }
 
   async findByCall(callId: number) {
-    const data = await this.prismaService.solution.findMany({
-      where: { callId },
-      include: { thematic: true },
-    });
-    return { data };
+    try {
+      const data = await this.prismaService.solution.findMany({
+        where: { callId },
+        include: { thematic: true },
+      });
+      return { data };
+    } catch {
+      throw new BadRequestException(
+        'Erreur lors de la récupération des solutions',
+      );
+    }
   }
 
   async updateUserSolution(id: number, dto: UpdateUserSolutionDto) {
-    await this.findOne(id);
-    const data = await this.prismaService.solution.update({
-      where: { id },
-      data: {
-        ...dto,
-      },
-    });
-    return { data };
+    try {
+      await this.findOne(id);
+      const data = await this.prismaService.solution.update({
+        where: { id },
+        data: {
+          ...dto,
+        },
+      });
+      return { data };
+    } catch {
+      throw new BadRequestException(
+        'Erreur lors de la mise à jour de la solution',
+      );
+    }
   }
 
   async update(id: number, dto: UpdateSolutionDto) {
-    const { data: solution } = await this.findOne(id);
-    const data = await this.prismaService.solution.update({
-      where: { id },
-      data: {
-        ...dto,
-        pole: {
-          connect: {
-            id: dto.pole || solution.poleId,
+    try {
+      const { data: solution } = await this.findOne(id);
+      const data = await this.prismaService.solution.update({
+        where: { id },
+        data: {
+          ...dto,
+          pole: {
+            connect: {
+              id: dto.pole ?? solution.poleId,
+            },
+          },
+          thematic: {
+            connect: {
+              id: dto.thematic ?? solution.thematicId,
+            },
+          },
+          user: {
+            connect: {
+              email: dto.user ?? solution.user.email,
+            },
+          },
+          call: {
+            connect: {
+              id: dto.call ?? solution.callId,
+            },
+          },
+          status: {
+            connect: {
+              id: dto.status ?? solution.statusId,
+            },
+          },
+          challenges: {
+            set:
+              dto?.challenges?.map((id: number) => ({ id })) ??
+              solution.challenges,
           },
         },
-        thematic: {
-          connect: {
-            id: dto.thematic || solution.thematicId,
-          },
-        },
-        user: {
-          connect: {
-            email: dto.user || solution.user.email,
-          },
-        },
-        call: {
-          connect: {
-            id: dto.call || solution.callId,
-          },
-        },
-        status: {
-          connect: {
-            id: dto.status || solution.statusId,
-          },
-        },
-        challenges: {
-          set:
-            dto?.challenges?.map((id: number) => ({ id })) ||
-            solution.challenges,
-        },
-      },
-    });
-    return { data };
+      });
+      return { data };
+    } catch {
+      throw new BadRequestException(
+        'Erreur lors de la mise à jour de la solution',
+      );
+    }
   }
 
   async remove(id: number) {
-    await this.findOne(id);
-    await this.prismaService.solution.delete({
-      where: { id },
-    });
+    try {
+      await this.findOne(id);
+      await this.prismaService.solution.delete({
+        where: { id },
+      });
+    } catch {
+      throw new BadRequestException(
+        'Erreur lors de la suppression de la solution',
+      );
+    }
   }
 
   async uploadImages(id: number, images: Express.Multer.File[]) {
-    await this.prismaService.solution.update({
-      where: { id },
-      data: {
-        images: {
-          create: images.map((image) => ({ imageLink: image.filename })),
+    try {
+      await this.prismaService.solution.update({
+        where: { id },
+        data: {
+          images: {
+            create: images.map((image) => ({ imageLink: image.filename })),
+          },
         },
-      },
-    });
+      });
+    } catch {
+      throw new BadRequestException(
+        "Erreur lors de l'ajout des images à la solution",
+      );
+    }
   }
 
   async deleteImage(id: number): Promise<any> {
-    const image = await this.prismaService.solutionImages.findUnique({
-      where: { id },
-    });
-    if (!image) throw new NotFoundException("L'image n'a pas été trouvée");
-    await unlinkAsync(`./uploads/${image.imageLink}`);
-    await this.prismaService.solutionImages.delete({
-      where: { id },
-    });
+    try {
+      const image = await this.prismaService.solutionImages.findUnique({
+        where: { id },
+      });
+      if (!image) throw new NotFoundException("L'image n'a pas été trouvée");
+      await unlinkAsync(`./uploads/${image.imageLink}`);
+      await this.prismaService.solutionImages.delete({
+        where: { id },
+      });
+    } catch {
+      throw new BadRequestException("Erreur lors de la suppression de l'image");
+    }
   }
 
   async sendComment(user: User, comment: string) {
     let from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
-    await this.mailService.sendMail({
-      to: user.email,
-      from,
-      subject: 'Commentaire sur votre solution soumise sur fikiri',
-      text: `
+    try {
+      await this.mailService.sendMail({
+        to: user.email,
+        from,
+        subject: 'Commentaire sur votre solution soumise sur fikiri',
+        text: `
 Bonjour ${user.name},
 
 ${comment}
@@ -278,90 +334,91 @@ ${comment}
 L'équipe Fikiri,
 Cordialement.
       `,
-    });
+      });
+    } catch {
+      throw new BadRequestException("Erreur lors de l'envoi du commentaire");
+    }
   }
 
   async addFeedback(id: number, dto: CreateFeedbackDto) {
-    const { data: solution } = await this.findOne(id);
-    const { data } = await this.feedbacksService.create(dto);
-    await this.prismaService.solution.update({
-      where: { id },
-      data: {
-        feedbacks: {
-          connect: {
-            id: data.id,
+    try {
+      const { data: solution } = await this.findOne(id);
+      const { data } = await this.feedbacksService.create(dto);
+      await this.prismaService.solution.update({
+        where: { id },
+        data: {
+          feedbacks: {
+            connect: {
+              id: data.id,
+            },
           },
         },
-      },
-    });
-    if (dto?.userComment)
-      await this.sendComment(solution.user, data.userComment);
-    return { data };
+      });
+      if (dto?.userComment)
+        await this.sendComment(solution.user, data.userComment);
+      return { data };
+    } catch {
+      throw new BadRequestException(
+        "Erreur lors de l'ajout du feedback à la solution",
+      );
+    }
   }
 
   async updateFeedback(id: number, dto: UpdateFeedbackDto) {
-    await this.feedbacksService.findOne(id);
-    const { data } = await this.feedbacksService.update(id, dto);
-    return { data };
+    try {
+      await this.feedbacksService.findOne(id);
+      const { data } = await this.feedbacksService.update(id, dto);
+      return { data };
+    } catch {
+      await this.feedbacksService.findOne(id);
+      const { data } = await this.feedbacksService.update(id, dto);
+      return { data };
+    }
   }
 
   async deleteFeedback(id: number) {
-    await this.feedbacksService.findOne(id);
-    await this.feedbacksService.remove(id);
+    try {
+      await this.feedbacksService.findOne(id);
+      await this.feedbacksService.remove(id);
+    } catch {
+      throw new BadRequestException(
+        'Erreur lors de la suppression du feedback à la solution',
+      );
+    }
   }
 
   async solutionsByPole(pole: number) {
-    const data = await this.prismaService.solution.findMany({
-      where: { poleId: pole },
-      select: {
-        id: true,
-        name: true,
-        user: true,
-        userId: true,
-        description: true,
-        videoLink: true,
-        imageLink: true,
-        thematic: true,
-        status: true,
-        images: true,
-        feedbacks: true,
-      },
-    });
-    const conforms = data.filter(
-      (solution) =>
-        solution.videoLink || solution.images.length > 0 || solution.imageLink,
-    );
-    const curated = conforms.filter(
-      (solution) => solution.feedbacks.length > 0,
-    );
-    return { data, conforms, curated };
-  }
-
-  async stats() {
-    const solutions = await this.prismaService.solution.findMany({
-      include: {
-        user: true,
-        images: true,
-      },
-    });
-    const solutionsWithImages = solutions.filter(
-      (solution) => solution.images.length > 0 || solution.imageLink,
-    );
-    const solutionsWithVideos = solutions.filter(
-      (solution) =>
-        solution.videoLink && !solutionsWithImages.includes(solution),
-    );
-    const videosAndImages = solutions.filter(
-      (solution) =>
-        solution.videoLink &&
-        (solution.images.length > 0 || solution.imageLink),
-    );
-
-    return {
-      total: solutions.length,
-      withImages: solutionsWithImages.length,
-      withVideos: solutionsWithVideos.length,
-      withVideosAndImages: videosAndImages.length,
-    };
+    try {
+      const data = await this.prismaService.solution.findMany({
+        where: { poleId: pole },
+        select: {
+          id: true,
+          name: true,
+          user: true,
+          userId: true,
+          description: true,
+          videoLink: true,
+          imageLink: true,
+          thematic: true,
+          status: true,
+          images: true,
+          feedbacks: true,
+        },
+      });
+      const conforms = data.filter(
+        (solution) =>
+          solution.videoLink ||
+          solution.images.length > 0 ||
+          solution.imageLink,
+      );
+      const curated = conforms.filter(
+        (solution) => solution.feedbacks.length > 0,
+      );
+      return { data, conforms, curated };
+    } catch {
+      throw new BadRequestException(
+        'Erreur lors de la récupération des solutions par pôle',
+      );
+    }
   }
 }

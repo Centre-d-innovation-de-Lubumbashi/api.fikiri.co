@@ -6,67 +6,81 @@ import { PrismaService } from 'src/database/prisma.service';
 
 @Injectable()
 export class FeedbacksService {
-  constructor(
-    private readonly prismaService: PrismaService
-  ) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async create(dto: CreateFeedbackDto) {
-    const data: Feedback = await this.prismaService.feedback.create({
-      data: {
-        ...dto,
-        user: {
-          connect: {
-            email: dto.user
-          }
+    try {
+      const data: Feedback = await this.prismaService.feedback.create({
+        data: {
+          ...dto,
+          user: {
+            connect: {
+              email: dto.user,
+            },
+          },
+          quotations: {
+            connect: dto.quotations.map((id) => ({ id })),
+          },
         },
-        quotations: {
-          connect: dto.quotations.map(id => ({ id }))
-        }
-      }
-    })
-    return { data };
+      });
+      return { data };
+    } catch {
+      throw new NotFoundException('Impossible de créer le feedback');
+    }
   }
 
   async findAll() {
-    const data = await this.prismaService.feedback.findMany()
+    const data = await this.prismaService.feedback.findMany();
     return { data };
   }
 
   async findOne(id: number) {
-    const data = await this.prismaService.feedback.findUnique({
-      where: { id },
-      include: {
-        user: true,
-        quotations: true
-      }
-    })
-    if (!data) throw new NotFoundException(`Ce feedback n'existe pas`);
-    return { data };
+    try {
+      const data = await this.prismaService.feedback.findUnique({
+        where: { id },
+        include: {
+          user: true,
+          quotations: true,
+        },
+      });
+      if (!data) throw new NotFoundException(`Ce feedback n'existe pas`);
+      return { data };
+    } catch {
+      throw new NotFoundException('Impossible de récupérer le feedback');
+    }
   }
 
   async update(id: number, dto: UpdateFeedbackDto) {
-    const { data: feedback } = await this.findOne(id);
-    const data = await this.prismaService.feedback.update({
-      where: { id },
-      data: {
-        ...dto,
-        user: {
-          connect: {
-            email: dto.user || feedback.user.email
-          }
+    try {
+      const { data: feedback } = await this.findOne(id);
+      const data = await this.prismaService.feedback.update({
+        where: { id },
+        data: {
+          ...dto,
+          user: {
+            connect: {
+              email: dto.user ?? feedback.user.email,
+            },
+          },
+          quotations: {
+            set: dto?.quotations?.map((id) => ({ id })) ?? feedback.quotations,
+          },
         },
-        quotations: {
-          set: dto?.quotations?.map(id => ({ id })) || feedback.quotations
-        }
-      }
-    })
-    return { data };
+      });
+      return { data };
+    } catch {
+      throw new NotFoundException('Impossible de mettre à jour le feedback');
+    }
   }
 
   async remove(id: number) {
-    await this.findOne(id);
-    await this.prismaService.feedback.delete({
-      where: { id }
-    })
+    try {
+      await this.findOne(id);
+      await this.prismaService.feedback.delete({
+        where: { id },
+      });
+    } catch {
+      throw new NotFoundException('Impossible de supprimer le feedback');
+    }
   }
 }
