@@ -1,17 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { CallsService } from './calls.service';
 import { CreateCallDto } from './dto/create-call.dto';
 import { UpdateCallDto } from './dto/update-call.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('calls')
 export class CallsController {
-  constructor(private readonly callsService: CallsService) { }  
+  constructor(private readonly callsService: CallsService) {}
 
   @Post()
   create(@Body() createCallsDto: CreateCallDto) {
     return this.callsService.create(createCallsDto);
   }
 
+  @Public()
   @Get()
   findAll() {
     return this.callsService.findAll();
