@@ -124,7 +124,7 @@ model Feedback {
 model SolutionImages {
   id         Int       @id @default(autoincrement())
   imageLink  String
-  solution   Solution  @relation(fields: [solutionId], references: [id])
+  solution   Solution  @relation(fields: [solutionId], references: [id], onDelete: Cascade)
   solutionId Int
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @updatedAt
