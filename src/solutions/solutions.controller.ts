@@ -128,4 +128,10 @@ export class SolutionsController {
   findCurated(@Param('page') page: string) {
     return this.solutionsService.findCurated(+page);
   }
+
+  @Public()
+  @Get('mapped/call/:id')
+  findMappedByCall(@Param('id') id: string) {
+    return this.solutionsService.findMappedByCall(+id);
+  }
 }

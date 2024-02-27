@@ -178,12 +178,9 @@ export class SolutionsService {
     }
   }
 
-  async findMappedByCall(callId: number, loadMore: boolean) {
-    let tobeLoaded = 4;
-    if (loadMore) tobeLoaded = 10;
+  async findMappedByCall(callId: number) {
     const solutions = await this.prismaService.solution.findMany({
       where: { callId },
-      take: tobeLoaded,
       include: {
         thematic: true,
         status: true,
@@ -387,10 +384,10 @@ Cordialement.
     }
   }
 
-  async solutionsByPole(pole: number) {
+  async solutionsByPole(poleId: number) {
     try {
       const data = await this.prismaService.solution.findMany({
-        where: { poleId: pole },
+        where: { poleId },
         select: {
           id: true,
           name: true,
@@ -405,16 +402,7 @@ Cordialement.
           feedbacks: true,
         },
       });
-      const conforms = data.filter(
-        (solution) =>
-          solution.videoLink ||
-          solution.images.length > 0 ||
-          solution.imageLink,
-      );
-      const curated = conforms.filter(
-        (solution) => solution.feedbacks.length > 0,
-      );
-      return { data, conforms, curated };
+      return { data };
     } catch {
       throw new BadRequestException(
         'Erreur lors de la récupération des solutions par pôle',
