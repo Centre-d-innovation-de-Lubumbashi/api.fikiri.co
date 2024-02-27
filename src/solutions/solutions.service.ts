@@ -104,6 +104,27 @@ export class SolutionsService {
       (solution) =>
         solution.videoLink || solution.images.length > 0 || solution.imageLink,
     );
+    // Udpdate solutions to poles and calculate the number of solutions per pole(PoleId = [1, 2, 3, 4])
+
+    const average = Math.ceil(data.length / 4);
+
+    for (let i = 0; i < 4; i++) {
+      const poleId = i + 1;
+      const poleSolutions = data.slice(i * average, (i + 1) * average);
+      for (const solution of poleSolutions) {
+        await this.prismaService.solution.update({
+          where: { id: solution.id },
+          data: {
+            pole: {
+              connect: {
+                id: poleId,
+              },
+            },
+          },
+        });
+      }
+    }
+
     return { data };
   }
 
