@@ -59,5 +59,4 @@ import { DashboardModule } from './dashboard/dashboard.module';
     },
   ],
 })
-export class AppModule {
-}
+export class AppModule {}
