@@ -31,8 +31,13 @@ export class SolutionsController {
 
   @Public()
   @Get('mapped')
-  findMapped(@Param('page') page: string) {
-    return this.solutionsService.findMapped(+page);
+  findMapped() {
+    return this.solutionsService.findMapped();
+  }
+
+  @Get('feedbacks/quotations/:id')
+  findFeedbacksQuotations(@Param('id') id: string) {
+    return this.solutionsService.findFeedbacksQuotations(+id);
   }
 
   @Get()

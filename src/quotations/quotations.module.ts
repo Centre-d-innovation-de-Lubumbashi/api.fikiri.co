@@ -6,4 +6,4 @@ import { QuotationsController } from './quotations.controller';
   controllers: [QuotationsController],
   providers: [QuotationsService],
 })
-export class QuotationsModule { }
+export class QuotationsModule {}

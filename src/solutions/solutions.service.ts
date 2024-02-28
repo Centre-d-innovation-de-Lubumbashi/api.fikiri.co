@@ -12,10 +12,10 @@ import { UpdateUserSolutionDto } from './dto/update-user-solution.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import { FeedbacksService } from 'src/feedbacks/feedbacks.service';
-import { Solution, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { UpdateFeedbackDto } from 'src/feedbacks/dto/update-feedback.dto';
 import { CreateFeedbackDto } from '../feedbacks/dto/create-feedback.dto';
-import { paginate } from 'src/helpers/paginate';
+import { QuotationsService } from 'src/quotations/quotations.service';
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -65,16 +65,13 @@ export class SolutionsService {
     }
   }
 
-  async findMapped(page: number) {
-    const solutions = await this.getSolutions(page);
-    const data = solutions.filter(
-      (solution) => solution.status.id > 1 && solution.status.id < 5,
-    );
+  async findMapped() {
+    const solutions = await this.getSolutions();
+    const data = solutions.filter((solution) => solution.status.id > 1);
     return { data };
   }
 
-  async getSolutions(page: number) {
-    const { offset, limit } = paginate(page, 30);
+  async getSolutions() {
     return await this.prismaService.solution.findMany({
       // skip: offset,
       // take: limit,
@@ -86,56 +83,32 @@ export class SolutionsService {
         videoLink: true,
         imageLink: true,
         thematic: true,
+        challenges: true,
         status: true,
         user: true,
         images: true,
-        feedbacks: {
-          include: {
-            quotations: true,
-          },
-        },
+        feedbacks: true,
       },
     });
   }
 
   async findConforms(page: number) {
-    const solutions = await this.getSolutions(page);
+    const solutions = await this.getSolutions();
     const data = solutions.filter(
       (solution) =>
         solution.videoLink || solution.images.length > 0 || solution.imageLink,
     );
-    // Udpdate solutions to poles and calculate the number of solutions per pole(PoleId = [1, 2, 3, 4])
-
-    const average = Math.ceil(data.length / 4);
-
-    for (let i = 0; i < 4; i++) {
-      const poleId = i + 1;
-      const poleSolutions = data.slice(i * average, (i + 1) * average);
-      for (const solution of poleSolutions) {
-        await this.prismaService.solution.update({
-          where: { id: solution.id },
-          data: {
-            pole: {
-              connect: {
-                id: poleId,
-              },
-            },
-          },
-        });
-      }
-    }
-
     return { data };
   }
 
   async findCurated(page: number) {
-    const solutions = await this.getSolutions(page);
+    const solutions = await this.getSolutions();
     const data = solutions.filter((solution) => solution.feedbacks.length > 0);
     return { data };
   }
 
   async findNonConforms(page: number) {
-    const solutions = await this.getSolutions(page);
+    const solutions = await this.getSolutions();
     const data = solutions.filter(
       (solution) =>
         !solution.videoLink &&
@@ -145,7 +118,7 @@ export class SolutionsService {
   }
 
   async findAll(page: number) {
-    const data = await this.getSolutions(page);
+    const data = await this.getSolutions();
     return { data };
   }
 
@@ -160,7 +133,6 @@ export class SolutionsService {
           images: true,
           feedbacks: {
             include: {
-              quotations: true,
               user: true,
             },
           },
@@ -401,6 +373,39 @@ Cordialement.
     } catch {
       throw new BadRequestException(
         'Erreur lors de la suppression du feedback à la solution',
+      );
+    }
+  }
+
+  async findFeedbacksQuotations(id: number) {
+    try {
+      const { data: solution } = await this.findOne(id);
+
+      const quotations = solution.feedbacks.map((feedback) =>
+        feedback.quotations.split(',').map((quotation) => parseInt(quotation)),
+      );
+
+      const data = await Promise.all(
+        quotations.map(async (quotation) => {
+          const promises = quotation.map(async (id) => {
+            const data = await this.prismaService.quotation.findUnique({
+              where: { id },
+              select: {
+                id: true,
+                mention: true,
+                average: true,
+              },
+            });
+            return data;
+          });
+          return await Promise.all(promises);
+        }),
+      );
+
+      return { data };
+    } catch {
+      throw new BadRequestException(
+        'Erreur lors de la récupération des citations du feedback',
       );
     }
   }
