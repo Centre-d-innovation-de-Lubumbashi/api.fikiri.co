@@ -19,7 +19,6 @@ export class FeedbacksService {
               email: dto.user,
             },
           },
-          // quotations: dto.quotations.join((id) => ({ id })),
         },
       });
       return { data };
