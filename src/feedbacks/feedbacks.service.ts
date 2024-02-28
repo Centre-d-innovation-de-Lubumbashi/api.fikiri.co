@@ -13,14 +13,13 @@ export class FeedbacksService {
       const data: Feedback = await this.prismaService.feedback.create({
         data: {
           ...dto,
+          quotations: dto.quotations.join(', '),
           user: {
             connect: {
               email: dto.user,
             },
           },
-          quotations: {
-            connect: dto.quotations.map((id) => ({ id })),
-          },
+          // quotations: dto.quotations.join((id) => ({ id })),
         },
       });
       return { data };
@@ -30,7 +29,11 @@ export class FeedbacksService {
   }
 
   async findAll() {
-    const data = await this.prismaService.feedback.findMany();
+    const data = await this.prismaService.feedback.findMany({
+      include: {
+        user: true,
+      },
+    });
     return { data };
   }
 
@@ -40,7 +43,6 @@ export class FeedbacksService {
         where: { id },
         include: {
           user: true,
-          quotations: true,
         },
       });
       if (!data) throw new NotFoundException(`Ce feedback n'existe pas`);
@@ -57,13 +59,11 @@ export class FeedbacksService {
         where: { id },
         data: {
           ...dto,
+          quotations: dto.quotations.join(', '),
           user: {
             connect: {
               email: dto.user ?? feedback.user.email,
             },
-          },
-          quotations: {
-            set: dto?.quotations?.map((id) => ({ id })) ?? feedback.quotations,
           },
         },
       });
