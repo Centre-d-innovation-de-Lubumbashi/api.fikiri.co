@@ -15,7 +15,6 @@ import { FeedbacksService } from 'src/feedbacks/feedbacks.service';
 import { User } from '@prisma/client';
 import { UpdateFeedbackDto } from 'src/feedbacks/dto/update-feedback.dto';
 import { CreateFeedbackDto } from '../feedbacks/dto/create-feedback.dto';
-import { QuotationsService } from 'src/quotations/quotations.service';
 
 const unlinkAsync = promisify(fs.unlink);
 
