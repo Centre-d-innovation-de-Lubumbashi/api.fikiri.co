@@ -106,7 +106,6 @@ model Quotation {
   average   Float?
   createdAt DateTime?  @default(now())
   updatedAt DateTime?  @updatedAt
-  feedbacks Feedback[]
 }
 
 model Feedback {
@@ -115,9 +114,9 @@ model Feedback {
   userComment  String?
   createdAt    DateTime?   @default(now())
   updatedAt    DateTime?   @updatedAt
-  quotations   Quotation[]
+  quotations   String
   solutions    Solution[]
-  user         User?       @relation(fields: [userId], references: [id])
+  user         User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId       Int?
 }
 
