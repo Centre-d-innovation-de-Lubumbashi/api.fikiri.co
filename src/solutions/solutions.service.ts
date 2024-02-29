@@ -162,16 +162,12 @@ export class SolutionsService {
         i * average,
         Math.min((i + 1) * average, data.length),
       );
-
       for (const solution of poleSolutions) {
         await this.prismaService.solution.update({
           where: { id: solution.id },
           data: {
-            pole: {
-              connect: {
-                id: conforms.includes(solution) ? poleId : null,
-              },
-            },
+            name: solution.name,
+            poleId: conforms.includes(solution) ? poleId : null,
           },
         });
       }
