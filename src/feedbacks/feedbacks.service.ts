@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import { Feedback } from '@prisma/client';
@@ -23,7 +27,7 @@ export class FeedbacksService {
       });
       return { data };
     } catch {
-      throw new NotFoundException('Impossible de créer le feedback');
+      throw new BadRequestException('Impossible de créer le feedback');
     }
   }
 
