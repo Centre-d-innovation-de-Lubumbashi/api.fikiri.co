@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
@@ -33,6 +34,12 @@ export class SolutionsController {
   @Get('mapped')
   findMapped() {
     return this.solutionsService.findMapped();
+  }
+
+  @Public()
+  @Get('mapped/paginated')
+  async getPaginatedData(@Query('page') page: string) {
+    return this.solutionsService.getPaginatedData(+page);
   }
 
   @Get('feedbacks/quotations/:id')

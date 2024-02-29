@@ -70,6 +70,37 @@ export class SolutionsService {
     return { data };
   }
 
+  sleep(ms: number) {
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
+  }
+
+  async getPaginatedData(page: number) {
+    // await this.sleep(1000);
+    if (isNaN(page) || page < 0) page = 1;
+    const take = page * 12;
+    const data = await this.prismaService.solution.findMany({
+      take,
+      select: {
+        id: true,
+        name: true,
+        userId: true,
+        description: true,
+        videoLink: true,
+        imageLink: true,
+        thematic: true,
+        challenges: true,
+        status: true,
+        user: true,
+        images: true,
+        feedbacks: true,
+      },
+      // Add other conditions or sorting if needed
+    });
+    return { data };
+  }
+
   async getSolutions() {
     return await this.prismaService.solution.findMany({
       // skip: offset,
@@ -118,6 +149,34 @@ export class SolutionsService {
 
   async findAll(page: number) {
     const data = await this.getSolutions();
+
+    const conforms = data.filter(
+      (solution) =>
+        solution.videoLink || solution.images.length > 0 || solution.imageLink,
+    );
+
+    const average = Math.ceil(data.length / 3); // Update the division by 3 since there are 3 poles.
+    for (let i = 0; i < 3; i++) {
+      const poleId = [1, 3, 4][i]; // Update the poleId according to the array [1, 3, 4].
+      const poleSolutions = data.slice(
+        i * average,
+        Math.min((i + 1) * average, data.length),
+      );
+
+      for (const solution of poleSolutions) {
+        await this.prismaService.solution.update({
+          where: { id: solution.id },
+          data: {
+            pole: {
+              connect: {
+                id: conforms.includes(solution) ? poleId : null,
+              },
+            },
+          },
+        });
+      }
+    }
+
     return { data };
   }
 
