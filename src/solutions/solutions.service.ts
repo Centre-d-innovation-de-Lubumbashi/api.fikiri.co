@@ -150,28 +150,28 @@ export class SolutionsService {
   async findAll(page: number) {
     const data = await this.getSolutions();
 
-    const conforms = data.filter(
-      (solution) =>
-        solution.videoLink || solution.images.length > 0 || solution.imageLink,
-    );
+    // const conforms = data.filter(
+    //   (solution) =>
+    //     solution.videoLink || solution.images.length > 0 || solution.imageLink,
+    // );
 
-    const average = Math.ceil(data.length / 3); // Update the division by 3 since there are 3 poles.
-    for (let i = 0; i < 3; i++) {
-      const poleId = [1, 3, 4][i]; // Update the poleId according to the array [1, 3, 4].
-      const poleSolutions = data.slice(
-        i * average,
-        Math.min((i + 1) * average, data.length),
-      );
-      for (const solution of poleSolutions) {
-        await this.prismaService.solution.update({
-          where: { id: solution.id },
-          data: {
-            name: solution.name,
-            poleId: conforms.includes(solution) ? poleId : null,
-          },
-        });
-      }
-    }
+    // const average = Math.ceil(data.length / 3); // Update the division by 3 since there are 3 poles.
+    // for (let i = 0; i < 3; i++) {
+    //   const poleId = [1, 3, 4][i]; // Update the poleId according to the array [1, 3, 4].
+    //   const poleSolutions = data.slice(
+    //     i * average,
+    //     Math.min((i + 1) * average, data.length),
+    //   );
+    //   for (const solution of poleSolutions) {
+    //     await this.prismaService.solution.update({
+    //       where: { id: solution.id },
+    //       data: {
+    //         name: solution.name,
+    //         poleId: conforms.includes(solution) ? poleId : null,
+    //       },
+    //     });
+    //   }
+    // }
 
     return { data };
   }
