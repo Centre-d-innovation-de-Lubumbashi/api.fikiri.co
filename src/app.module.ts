@@ -24,6 +24,9 @@ import { DashboardModule } from './dashboard/dashboard.module';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         transport: {
+          defaults: {
+            from: `Support fikiri <${config.get('MAIL_USERNAME')}>`,
+          },
           host: config.get('MAIL_HOST'),
           port: config.get('MAIL_PORT'),
           secure: true,
