@@ -26,15 +26,12 @@ export class UsersService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly mailerService: MailerService,
-    private readonly configService: ConfigService,
   ) {}
 
   async registerEmail(to: string, password: string) {
     try {
-      let from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
       await this.mailerService.sendMail({
         to,
-        from,
         subject: 'Code currateur par défaut',
         text: `
 Cher(e) ${to},
@@ -126,11 +123,8 @@ L'équipe Fikiri.`,
     }
   }
 
-  async findAll(page: number) {
-    const { limit, offset } = paginate(page, 10);
+  async findAll() {
     const data: User[] = await this.prismaService.user.findMany({
-      // skip: offset,
-      // take: limit,
       include: {
         roles: true,
       },
@@ -138,11 +132,8 @@ L'équipe Fikiri.`,
     return { data };
   }
 
-  async findAllCurators(page: number) {
-    const { limit, offset } = paginate(page, 10);
+  async findAllCurators() {
     const data = await this.prismaService.user.findMany({
-      // skip: offset,
-      // take: limit,
       where: {
         roles: {
           some: {
@@ -159,11 +150,8 @@ L'équipe Fikiri.`,
     return { data };
   }
 
-  async findAllAdmins(page: number) {
-    const { limit, offset } = paginate(page, 10);
+  async findAllAdmins() {
     const data = await this.prismaService.user.findMany({
-      // skip: offset,
-      // take: limit,
       where: {
         roles: {
           some: {

@@ -5,7 +5,8 @@ import {
   Get,
   Param,
   Patch,
-  Post, Query,
+  Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -18,8 +19,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly userService: UsersService) {
-  }
+  constructor(private readonly userService: UsersService) {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -27,18 +27,18 @@ export class UsersController {
   }
 
   @Get()
-  findAll(@Query('page') page: string = '1') {
-    return this.userService.findAll(+page);
+  findAll() {
+    return this.userService.findAll();
   }
 
   @Get('curators')
-  findAllCurators(@Query('page') page: string = '1') {
-    return this.userService.findAllCurators(+page);
+  findAllCurators() {
+    return this.userService.findAllCurators();
   }
 
   @Get('admins')
-  findAllAdmins(@Query('page') page: string = '1') {
-    return this.userService.findAllAdmins(+page);
+  findAllAdmins() {
+    return this.userService.findAllAdmins();
   }
 
   @Get(':id')
