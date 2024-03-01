@@ -1,4 +1,3 @@
-import { CreateFeedbackDto } from './../feedbacks/dto/create-feedback.dto';
 import {
   Body,
   Controller,
@@ -19,7 +18,6 @@ import { CreateSolutionDto } from './dto/create-solution.dto';
 import { UpdateSolutionDto } from './dto/update-solution.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { UpdateUserSolutionDto } from './dto/update-user-solution.dto';
-import { UpdateFeedbackDto } from 'src/feedbacks/dto/update-feedback.dto';
 
 @Controller('solutions')
 export class SolutionsController {
@@ -28,23 +26,6 @@ export class SolutionsController {
   @Post()
   create(@Body() data: CreateSolutionDto) {
     return this.solutionsService.create(data);
-  }
-
-  @Public()
-  @Get('mapped')
-  findMapped() {
-    return this.solutionsService.findMapped();
-  }
-
-  @Public()
-  @Get('mapped/paginated')
-  async getPaginatedData(@Query('page') page: string) {
-    return this.solutionsService.getPaginatedData(+page);
-  }
-
-  @Get('feedbacks/quotations/:id')
-  findFeedbacksQuotations(@Param('id') id: string) {
-    return this.solutionsService.findFeedbacksQuotations(+id);
   }
 
   @Get()
@@ -61,11 +42,6 @@ export class SolutionsController {
   @Get('user/:email')
   findByUser(@Param('email') email: string) {
     return this.solutionsService.findbyUser(email);
-  }
-
-  @Get('call/:id')
-  findByCall(@Param('id') id: string) {
-    return this.solutionsService.findByCall(+id);
   }
 
   @Patch(':id')
@@ -101,49 +77,8 @@ export class SolutionsController {
     return this.solutionsService.uploadImages(+id, files);
   }
 
-  @Get('pole/:id')
-  getByPole(@Param('id') id: string) {
-    return this.solutionsService.solutionsByPole(+id);
-  }
-
   @Delete(':id/image/delete')
   removeImage(@Param('id') id: string) {
     return this.solutionsService.deleteImage(+id);
-  }
-
-  @Post('feedback/:id')
-  addFeedback(@Param('id') id: string, @Body() dto: CreateFeedbackDto) {
-    return this.solutionsService.addFeedback(+id, dto);
-  }
-
-  @Patch('feedback/:id')
-  updateFeedback(@Param('id') id: string, @Body() dto: UpdateFeedbackDto) {
-    return this.solutionsService.updateFeedback(+id, dto);
-  }
-
-  @Delete('feedback/:id')
-  deleteFeedback(@Param('id') id: string) {
-    return this.solutionsService.deleteFeedback(+id);
-  }
-
-  @Get('conforms/all')
-  findConforms(@Param('page') page: string) {
-    return this.solutionsService.findConforms(+page);
-  }
-
-  @Get('non-conforms/all')
-  findNonConforms(@Param('page') page: string) {
-    return this.solutionsService.findNonConforms(+page);
-  }
-
-  @Get('curated/all')
-  findCurated(@Param('page') page: string) {
-    return this.solutionsService.findCurated(+page);
-  }
-
-  @Public()
-  @Get('mapped/call/:id')
-  findMappedByCall(@Param('id') id: string) {
-    return this.solutionsService.findMappedByCall(+id);
   }
 }
