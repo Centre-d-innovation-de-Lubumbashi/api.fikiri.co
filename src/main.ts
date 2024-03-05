@@ -12,10 +12,16 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
     origin: true,
-    allowedHeaders: ['Content-Type', 'Origin', 'X-Requested-With', 'Accept', 'Authorization'],
+    allowedHeaders: [
+      'Content-Type',
+      'Origin',
+      'X-Requested-With',
+      'Accept',
+      'Authorization',
+    ],
     exposedHeaders: ['Authorization'],
     credentials: true,
-    optionsSuccessStatus: 204
+    optionsSuccessStatus: 204,
   });
   app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
   app.use(
@@ -28,15 +34,19 @@ async function bootstrap() {
   );
   app.use(passport.initialize());
   app.use(passport.session());
-  app.useGlobalPipes(new ValidationPipe({
-    exceptionFactory: (errors) => {
-      const result = errors.map((error) => ({
-        property: error.property,
-        message: error.constraints[Object.keys(error.constraints)[0]],
-      }));
-      return new BadRequestException(result);
-    },
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      exceptionFactory: (errors) => {
+        const result = errors.map((error) => ({
+          property: error.property,
+          message: error.constraints[Object.keys(error.constraints)[0]],
+        }));
+        return new BadRequestException(result);
+      },
+    }),
+  );
   await app.listen(port);
 }
-bootstrap().then(() => console.log(`🚀 Application is running on: localhost:${port}`));
+bootstrap().then(() =>
+  console.log(`🚀 Application is running on: localhost:${port}`),
+);

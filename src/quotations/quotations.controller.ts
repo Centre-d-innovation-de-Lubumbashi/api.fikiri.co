@@ -1,11 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { QuotationsService } from './quotations.service';
 import { CreateLableDto } from './dto/create-quotation.dto';
 import { UpdateLableDto } from './dto/update-quotation.dto';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @Controller('quotations')
 export class QuotationsController {
-  constructor(private readonly lablesService: QuotationsService) { }
+  constructor(private readonly lablesService: QuotationsService) {}
 
   @Post()
   create(@Body() createLableDto: CreateLableDto) {
@@ -28,6 +37,7 @@ export class QuotationsController {
   }
 
   @Delete(':id')
+  @Roles(['ADMIN'])
   remove(@Param('id') id: string) {
     return this.lablesService.remove(+id);
   }

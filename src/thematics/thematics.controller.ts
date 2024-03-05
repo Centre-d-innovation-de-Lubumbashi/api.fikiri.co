@@ -10,6 +10,7 @@ import {
 import { ThematicsService } from './thematics.service';
 import { CreateThematicDto } from './dto/create-thematic.dto';
 import { UpdateThematicDto } from './dto/update-thematic.dto';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @Controller('thematics')
 export class ThematicsController {
@@ -41,6 +42,7 @@ export class ThematicsController {
   }
 
   @Delete(':id')
+  @Roles(['ADMIN'])
   remove(@Param('id') id: string) {
     return this.thematicsService.remove(+id);
   }

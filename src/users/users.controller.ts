@@ -16,6 +16,7 @@ import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import CreateUserDto from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -83,6 +84,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @Roles(['ADMIN'])
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
   }

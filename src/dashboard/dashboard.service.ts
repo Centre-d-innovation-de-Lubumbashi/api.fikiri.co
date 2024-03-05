@@ -9,8 +9,10 @@ export class DashboardService {
     const totalUsers = await this.prismaService.user.count();
     const totalSolutions = await this.prismaService.solution.count();
     return {
-      totalUsers,
-      totalSolutions,
+      data: {
+        totalUsers,
+        totalSolutions,
+      },
     };
   }
 

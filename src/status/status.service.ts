@@ -3,6 +3,7 @@ import { PrismaService } from '../database/prisma.service';
 import { CreateStatusDto } from './dto/create-status.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
 import { Status } from '@prisma/client';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @Injectable()
 export class StatusService {
@@ -34,6 +35,7 @@ export class StatusService {
     }
   }
 
+  @Roles(['ADMIN'])
   async update(id: number, dto: UpdateStatusDto) {
     try {
       await this.findOne(id);
@@ -47,6 +49,7 @@ export class StatusService {
     }
   }
 
+  @Roles(['ADMIN'])
   async delete(id: number) {
     try {
       await this.findOne(id);

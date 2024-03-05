@@ -10,6 +10,7 @@ import {
 import { SolutionsFeedbacksService } from './solutions-feebacks.service';
 import { CreateFeedbackDto } from 'src/feedbacks/dto/create-feedback.dto';
 import { UpdateFeedbackDto } from 'src/feedbacks/dto/update-feedback.dto';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @Controller('solutions')
 export class SolutionsFeedbacksController {
@@ -28,6 +29,7 @@ export class SolutionsFeedbacksController {
   }
 
   @Delete('feedback/:id')
+  @Roles(['ADMIN'])
   deleteFeedback(@Param('id') id: string) {
     return this.solutionsFeedbacksService.deleteFeedback(+id);
   }

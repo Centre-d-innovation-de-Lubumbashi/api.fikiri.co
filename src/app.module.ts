@@ -17,6 +17,7 @@ import { FeedbacksModule } from './feedbacks/feedbacks.module';
 import { PolesModule } from './poles/poles.module';
 import { OrganisationsModule } from './organisations/organisations.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { RolesGuard } from './auth/guards/roles.guard';
 
 @Module({
   imports: [
@@ -59,6 +60,10 @@ import { DashboardModule } from './dashboard/dashboard.module';
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })

@@ -18,6 +18,7 @@ import { CreateSolutionDto } from './dto/create-solution.dto';
 import { UpdateSolutionDto } from './dto/update-solution.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { UpdateUserSolutionDto } from './dto/update-user-solution.dto';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @Controller('solutions')
 export class SolutionsController {
@@ -50,6 +51,7 @@ export class SolutionsController {
   }
 
   @Delete(':id')
+  @Roles(['ADMIN'])
   remove(@Param('id') id: string) {
     return this.solutionsService.remove(+id);
   }
@@ -78,6 +80,7 @@ export class SolutionsController {
   }
 
   @Delete(':id/image/delete')
+  @Roles(['ADMIN'])
   removeImage(@Param('id') id: string) {
     return this.solutionsService.deleteImage(+id);
   }

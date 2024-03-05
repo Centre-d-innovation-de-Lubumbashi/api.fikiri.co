@@ -72,12 +72,17 @@ export class SolutionsFiltersService {
     });
   }
 
-  async getPaginatedData(page: number) {
-    // await this.sleep(1000);
-    if (isNaN(page) || page < 0) page = 1;
-    const take = page * 12;
+  async getPaginatedData(cursor: number) {
+    await this.sleep(1000);
+    if (isNaN(cursor) || cursor < 0) cursor = 1;
+    const take = cursor * 8;
     const data = await this.prismaService.solution.findMany({
       take,
+      where: {
+        statusId: {
+          in: [2, 3, 4],
+        },
+      },
       select: {
         id: true,
         name: true,
@@ -92,7 +97,6 @@ export class SolutionsFiltersService {
         images: true,
         feedbacks: true,
       },
-      // Add other conditions or sorting if needed
     });
     return { data };
   }

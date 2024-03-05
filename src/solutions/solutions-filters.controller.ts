@@ -9,15 +9,9 @@ export class SolutionsFiltersController {
   ) {}
 
   @Public()
-  @Get('mapped')
-  findMapped() {
-    return this.solutionsFiltersService.findMapped();
-  }
-
-  @Public()
-  @Get('mapped/paginated')
-  async getPaginatedData(@Query('page') page: string) {
-    return this.solutionsFiltersService.getPaginatedData(+page);
+  @Get('mapped/all')
+  findMapped(@Query('cursor') cursor: string) {
+    return this.solutionsFiltersService.getPaginatedData(+cursor);
   }
 
   @Get('call/:id')

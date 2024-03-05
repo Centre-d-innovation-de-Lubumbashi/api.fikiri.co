@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch } from '@nestjs/common';
 import { ChallengesService } from './challenges.service';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @Controller('challenges')
 export class ChallengesController {
@@ -30,6 +31,7 @@ export class ChallengesController {
   }
 
   @Delete(':id')
+  @Roles(['ADMIN'])
   remove(@Param('id') id: string) {
     return this.ChallengesService.remove(+id);
   }
