@@ -1,11 +1,27 @@
-import { Body, Controller, Delete, Get, Param, Patch } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ChallengesService } from './challenges.service';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
+import { RoleEnum } from 'src/auth/enums/role.enum';
+import { CreateChallengeDto } from './dto/create-challenge.dto';
 
 @Controller('challenges')
 export class ChallengesController {
   constructor(private readonly ChallengesService: ChallengesService) {}
+
+  @Post()
+  @Roles(RoleEnum.Admin)
+  create(@Body() createChallengeDto: CreateChallengeDto) {
+    return this.ChallengesService.create(createChallengeDto);
+  }
 
   @Get()
   findAll() {
@@ -23,6 +39,7 @@ export class ChallengesController {
   }
 
   @Patch(':id')
+  @Roles(RoleEnum.Admin)
   update(
     @Param('id') id: string,
     @Body() updateChallengeDto: UpdateChallengeDto,
@@ -31,7 +48,7 @@ export class ChallengesController {
   }
 
   @Delete(':id')
-  @Roles(['ADMIN'])
+  @Roles(RoleEnum.Admin)
   remove(@Param('id') id: string) {
     return this.ChallengesService.remove(+id);
   }

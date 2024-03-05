@@ -1,9 +1,10 @@
 import { Controller, Get } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
 import { Roles } from 'src/auth/decorators/roles.decorator';
+import { RoleEnum } from 'src/auth/enums/role.enum';
 
 @Controller('dashboard')
-@Roles(['ADMIN'])
+@Roles(RoleEnum.Admin, RoleEnum.Curator)
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
 
@@ -28,7 +29,6 @@ export class DashboardController {
   }
 
   @Get('solutions-thematics')
-  @Roles(['ADMIN'])
   async getSolutionsAndThematics() {
     return this.dashboardService.getSolutionsAndThematics();
   }

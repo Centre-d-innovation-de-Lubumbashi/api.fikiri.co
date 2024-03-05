@@ -19,6 +19,7 @@ import { UpdateSolutionDto } from './dto/update-solution.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { UpdateUserSolutionDto } from './dto/update-user-solution.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
+import { RoleEnum } from 'src/auth/enums/role.enum';
 
 @Controller('solutions')
 export class SolutionsController {
@@ -46,18 +47,22 @@ export class SolutionsController {
   }
 
   @Patch(':id')
+  @Roles(RoleEnum.Admin)
   update(@Param('id') id: string, @Body() data: UpdateSolutionDto) {
     return this.solutionsService.update(+id, data);
   }
 
   @Delete(':id')
-  @Roles(['ADMIN'])
+  @Roles(RoleEnum.Admin)
   remove(@Param('id') id: string) {
     return this.solutionsService.remove(+id);
   }
 
   @Patch(':id/user')
-  updateUser(@Param('id') id: string, @Body() data: UpdateUserSolutionDto) {
+  updateUserSolution(
+    @Param('id') id: string,
+    @Body() data: UpdateUserSolutionDto,
+  ) {
     return this.solutionsService.updateUserSolution(+id, data);
   }
 
@@ -80,7 +85,7 @@ export class SolutionsController {
   }
 
   @Delete(':id/image/delete')
-  @Roles(['ADMIN'])
+  @Roles(RoleEnum.Admin)
   removeImage(@Param('id') id: string) {
     return this.solutionsService.deleteImage(+id);
   }

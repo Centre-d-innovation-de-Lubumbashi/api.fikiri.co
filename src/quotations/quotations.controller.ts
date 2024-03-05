@@ -11,12 +11,14 @@ import { QuotationsService } from './quotations.service';
 import { CreateLableDto } from './dto/create-quotation.dto';
 import { UpdateLableDto } from './dto/update-quotation.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
+import { RoleEnum } from 'src/auth/enums/role.enum';
 
 @Controller('quotations')
 export class QuotationsController {
   constructor(private readonly lablesService: QuotationsService) {}
 
   @Post()
+  @Roles(RoleEnum.Admin, RoleEnum.Curator)
   create(@Body() createLableDto: CreateLableDto) {
     return this.lablesService.create(createLableDto);
   }
@@ -37,7 +39,7 @@ export class QuotationsController {
   }
 
   @Delete(':id')
-  @Roles(['ADMIN'])
+  @Roles(RoleEnum.Admin)
   remove(@Param('id') id: string) {
     return this.lablesService.remove(+id);
   }

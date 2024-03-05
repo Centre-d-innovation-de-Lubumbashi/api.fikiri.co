@@ -11,12 +11,14 @@ import { ThematicsService } from './thematics.service';
 import { CreateThematicDto } from './dto/create-thematic.dto';
 import { UpdateThematicDto } from './dto/update-thematic.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
+import { RoleEnum } from 'src/auth/enums/role.enum';
 
 @Controller('thematics')
 export class ThematicsController {
   constructor(private readonly thematicsService: ThematicsService) {}
 
   @Post()
+  @Roles(RoleEnum.Admin)
   create(@Body() createThematicDto: CreateThematicDto) {
     return this.thematicsService.create(createThematicDto);
   }
@@ -37,12 +39,13 @@ export class ThematicsController {
   }
 
   @Patch(':id')
+  @Roles(RoleEnum.Admin)
   update(@Param('id') id: string, @Body() data: UpdateThematicDto) {
     return this.thematicsService.update(+id, data);
   }
 
   @Delete(':id')
-  @Roles(['ADMIN'])
+  @Roles(RoleEnum.Admin)
   remove(@Param('id') id: string) {
     return this.thematicsService.remove(+id);
   }
