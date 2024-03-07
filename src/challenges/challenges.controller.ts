@@ -12,6 +12,7 @@ import { UpdateChallengeDto } from './dto/update-challenge.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RoleEnum } from 'src/auth/enums/role.enum';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('challenges')
 export class ChallengesController {
@@ -23,6 +24,7 @@ export class ChallengesController {
     return this.ChallengesService.create(createChallengeDto);
   }
 
+  @Public()
   @Get()
   findAll() {
     return this.ChallengesService.findAll();
