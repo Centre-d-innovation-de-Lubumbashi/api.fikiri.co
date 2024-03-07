@@ -73,15 +73,20 @@ export class SolutionsFiltersService {
   }
 
   async getPaginatedData(cursor: number) {
-    await this.sleep(1000);
+    await this.sleep(2000);
     if (isNaN(cursor) || cursor < 0) cursor = 1;
-    const take = cursor * 8;
+    const take = cursor * 9;
     const data = await this.prismaService.solution.findMany({
       take,
       where: {
-        statusId: {
-          in: [2, 3, 4],
-        },
+        OR: [
+          {
+            statusId: {
+              in: [2, 3, 4],
+            },
+          },
+          {},
+        ],
       },
       select: {
         id: true,
