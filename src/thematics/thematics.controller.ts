@@ -12,6 +12,7 @@ import { CreateThematicDto } from './dto/create-thematic.dto';
 import { UpdateThematicDto } from './dto/update-thematic.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RoleEnum } from 'src/auth/enums/role.enum';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('thematics')
 export class ThematicsController {
@@ -23,6 +24,7 @@ export class ThematicsController {
     return this.thematicsService.create(createThematicDto);
   }
 
+  @Public()
   @Get()
   findAll() {
     return this.thematicsService.findAll();
