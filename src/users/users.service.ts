@@ -47,7 +47,8 @@ Connectez-vous à l'adresse suivante: https://admin.fikiri.co
 Merci,
 L'équipe Fikiri.`,
       });
-    } catch {
+    } catch (e) {
+      console.log(e);
       throw new BadRequestException(
         "Erreur lors de l'envoi du mail de confirmation",
       );
@@ -79,8 +80,7 @@ L'équipe Fikiri.`,
         },
       });
       await this.registerEmail(dto.email, password);
-    } catch (e) {
-      console.log(e);
+    } catch {
       throw new BadRequestException(
         "Erreur lors de la création de l'utilisateur",
       );
