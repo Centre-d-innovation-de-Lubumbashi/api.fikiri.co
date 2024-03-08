@@ -26,12 +26,16 @@ export class UsersService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly mailerService: MailerService,
+    private readonly configService: ConfigService,
   ) {}
 
   async registerEmail(to: string, password: string) {
+    const from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
+
     try {
       await this.mailerService.sendMail({
         to,
+        from,
         subject: 'Code currateur par défaut',
         text: `
 Cher(e) ${to},
@@ -47,8 +51,7 @@ Connectez-vous à l'adresse suivante: https://admin.fikiri.co
 Merci,
 L'équipe Fikiri.`,
       });
-    } catch (e) {
-      console.log(e);
+    } catch {
       throw new BadRequestException(
         "Erreur lors de l'envoi du mail de confirmation",
       );
