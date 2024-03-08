@@ -79,7 +79,8 @@ L'équipe Fikiri.`,
         },
       });
       await this.registerEmail(dto.email, password);
-    } catch {
+    } catch (e) {
+      console.log(e);
       throw new BadRequestException(
         "Erreur lors de la création de l'utilisateur",
       );
