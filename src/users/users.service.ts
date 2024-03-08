@@ -16,8 +16,6 @@ import UpdateProfileDto from '../auth/dto/update-profile.dto';
 import { User } from '@prisma/client';
 import { randomPassword } from 'src/helpers/random-password';
 import { MailerService } from '@nestjs-modules/mailer';
-import { ConfigService } from '@nestjs/config';
-import { paginate } from 'src/helpers/paginate';
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -26,16 +24,12 @@ export class UsersService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly mailerService: MailerService,
-    private readonly configService: ConfigService,
   ) {}
 
   async registerEmail(to: string, password: string) {
-    const from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
-
     try {
       await this.mailerService.sendMail({
         to,
-        from,
         subject: 'Code currateur par défaut',
         text: `
 Cher(e) ${to},
