@@ -1,18 +1,18 @@
 {
-  "name": "api.fikiri.co",
+  "name": "api",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "A Restful API for clean-area.com",
+  "author": "Wilfried Musanzi",
   "private": true,
   "license": "PRIVATE",
   "scripts": {
     "build": "nest build",
-    "format": "prettier --write \"src//*.ts\" \"test//*.ts\"",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "lint": "eslint \"{src,apps,libs,test}//*.ts\" --fix",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -24,22 +24,25 @@
     "@nestjs/common": "^10.3.3",
     "@nestjs/config": "^3.2.0",
     "@nestjs/core": "^10.3.3",
+    "@nestjs/event-emitter": "^2.0.4",
     "@nestjs/mapped-types": "^2.0.5",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.3.3",
     "@prisma/client": "^5.10.2",
-    "add": "^2.0.6",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "express-session": "^1.18.0",
     "mysql2": "^3.9.2",
+    "nest-access-control": "^3.1.0",
     "nodemailer": "^6.9.11",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0",
     "reflect-metadata": "^0.2.1",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "uuid": "^9.0.1",
+    "webpack": "^5.90.3"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.4.1",
@@ -52,6 +55,7 @@
     "@types/jest": "^29.5.12",
     "@types/multer": "^1.4.11",
     "@types/node": "^20.11.25",
+    "@types/nodemailer": "^6.4.14",
     "@types/passport": "^1.0.16",
     "@types/passport-google-oauth20": "^2.0.14",
     "@types/passport-local": "^1.0.38",
@@ -71,8 +75,7 @@
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.4.2",
-    "uuid": "^9.0.1"
+    "typescript": "^5.4.2"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -86,7 +89,7 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "/*.(t|j)s"
+      "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
