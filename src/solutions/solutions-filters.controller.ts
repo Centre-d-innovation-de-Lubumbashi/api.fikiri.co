@@ -11,7 +11,7 @@ export class SolutionsFiltersController {
   @Public()
   @Get('mapped/all')
   findMapped(@Query('cursor') cursor: string) {
-    return this.solutionsFiltersService.getPaginatedData(+cursor);
+    return this.solutionsFiltersService.findMapped(+cursor);
   }
 
   @Get('call/:id')
