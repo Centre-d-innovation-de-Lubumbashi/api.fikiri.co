@@ -60,20 +60,7 @@ export class SolutionsFiltersService {
     }
   }
 
-  async findMapped() {
-    const solutions = await this.getSolutions();
-    const data = solutions.filter((solution) => solution.status.id > 1);
-    return { data };
-  }
-
-  sleep(ms: number) {
-    return new Promise((resolve) => {
-      setTimeout(resolve, ms);
-    });
-  }
-
-  async getPaginatedData(cursor: number) {
-    await this.sleep(2000);
+  async findMapped(cursor: number) {
     if (isNaN(cursor) || cursor < 0) cursor = 1;
     const take = cursor * 9;
     const data = await this.prismaService.solution.findMany({
