@@ -23,17 +23,19 @@ import { RolesGuard } from './auth/guards/roles.guard';
   imports: [
     MailerModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        transport: {
-          host: config.get('MAIL_HOST'),
-          port: config.get('MAIL_PORT'),
-          secure: true,
-          auth: {
-            user: config.get('MAIL_USERNAME'),
-            pass: config.get('MAIL_PASSWORD'),
+      useFactory: (config: ConfigService) => {
+        return {
+          transport: {
+            host: config.get('MAIL_HOST'),
+            port: config.get('MAIL_PORT'),
+            secure: true,
+            auth: {
+              user: config.get('MAIL_USERNAME'),
+              pass: config.get('MAIL_PASSWORD'),
+            },
           },
-        },
-      }),
+        };
+      },
     }),
     ConfigModule.forRoot({
       isGlobal: true,
