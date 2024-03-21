@@ -212,21 +212,14 @@ L'équipe Fikiri.`,
   }
 
   async findBy(email: string) {
-    try {
-      const user = await this.prismaService.user.findUnique({
-        where: { email },
-        include: {
-          roles: true,
-        },
-      });
-      if (!user)
-        throw new NotFoundException("L'utilisateur n'a pas été trouvé");
-      return user;
-    } catch {
-      throw new BadRequestException(
-        "Erreur lors de la récupération de l'utilisateur",
-      );
-    }
+    const user = await this.prismaService.user.findUnique({
+      where: { email },
+      include: {
+        roles: true,
+      },
+    });
+    if (!user) throw new NotFoundException("L'utilisateur n'a pas été trouvé");
+    return user;
   }
 
   async update(id: number, dto: UpdateUserDto) {
