@@ -35,7 +35,9 @@ export class AuthService {
   }
 
   async isAutheticated(@Req() req: Request) {
-    return req.isAuthenticated();
+    return {
+      data: req.isAuthenticated(),
+    };
   }
 
   async passwordMatch(password: string, hash: string) {

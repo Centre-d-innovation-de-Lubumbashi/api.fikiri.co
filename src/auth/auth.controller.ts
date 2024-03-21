@@ -82,10 +82,4 @@ export class AuthController {
   resetPassword(@Body() dto: ResetPasswordDto) {
     return this.authService.resetPassword(dto);
   }
-
-  @Public()
-  @Get('is-authenticated')
-  isAutheticated(@Req() req: Request) {
-    return this.authService.isAutheticated(req);
-  }
 }
