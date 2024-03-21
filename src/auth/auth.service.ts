@@ -33,7 +33,6 @@ export class AuthService {
     }
     return user;
   }
-
   async passwordMatch(password: string, hash: string) {
     if (!hash)
       throw new BadRequestException('Les identifiants saisis sont invalides');
