@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalGuard } from './guards/local.guard';
 import { Request } from 'express';
@@ -14,9 +24,7 @@ import { User } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService
-  ) { }
+  constructor(private readonly authService: AuthService) {}
 
   @Post('logout')
   logout(@Req() request: Request): Promise<any> {
@@ -24,7 +32,7 @@ export class AuthController {
   }
 
   @Get('profile')
-  profile(@CurrentUser() user: any): Promise<any> {
+  profile(@CurrentUser() user: User): Promise<any> {
     return this.authService.profile(user);
   }
 
@@ -43,8 +51,7 @@ export class AuthController {
   @Public()
   @UseGuards(GoogleGuard)
   @Get('login')
-  loginGoogle() {
-  }
+  loginGoogle() {}
 
   @Public()
   @Post('register')
@@ -81,4 +88,4 @@ export class AuthController {
   isAutheticated(@Req() req: Request) {
     return this.authService.isAutheticated(req);
   }
-}     
+}
