@@ -15,7 +15,14 @@ export class ThematicsService {
   async create(dto: CreateThematicDto) {
     try {
       await this.prismaService.thematic.create({
-        data: dto,
+        data: {
+          ...dto,
+          calls: {
+            connect: {
+              id: dto.call,
+            },
+          },
+        },
       });
     } catch {
       throw new NotFoundException(
