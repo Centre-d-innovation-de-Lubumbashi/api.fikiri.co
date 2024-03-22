@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
+import { paginate } from 'src/helpers/paginate';
 
 @Injectable()
 export class SolutionsFiltersService {
@@ -34,9 +35,12 @@ export class SolutionsFiltersService {
     }
   }
 
-  async solutionsByPole(poleId: number) {
+  async solutionsByPole(page: number, poleId: number) {
+    const { offset, limit } = paginate(page, 10);
     try {
       const data = await this.prismaService.solution.findMany({
+        skip: offset,
+        take: limit,
         where: { poleId },
         select: {
           id: true,
@@ -61,7 +65,7 @@ export class SolutionsFiltersService {
   }
 
   async findMapped(cursor: number) {
-    if (isNaN(cursor) || cursor < 0) cursor = 1;
+    if (isNaN(cursor) || cursor <= 0) cursor = 1;
     const take = cursor * 9;
     const data = await this.prismaService.solution.findMany({
       take,
@@ -93,10 +97,11 @@ export class SolutionsFiltersService {
     return { data };
   }
 
-  async getSolutions() {
+  async getSolutions(page: number) {
+    const { offset, limit } = paginate(page, 10);
     return await this.prismaService.solution.findMany({
-      // skip: offset,
-      // take: limit,
+      skip: offset,
+      take: limit,
       select: {
         id: true,
         name: true,
@@ -115,7 +120,7 @@ export class SolutionsFiltersService {
   }
 
   async findConforms(page: number) {
-    const solutions = await this.getSolutions();
+    const solutions = await this.getSolutions(page);
     const data = solutions.filter(
       (solution) =>
         solution.videoLink || solution.images.length > 0 || solution.imageLink,
@@ -124,13 +129,13 @@ export class SolutionsFiltersService {
   }
 
   async findCurated(page: number) {
-    const solutions = await this.getSolutions();
+    const solutions = await this.getSolutions(page);
     const data = solutions.filter((solution) => solution.feedbacks.length > 0);
     return { data };
   }
 
   async findNonConforms(page: number) {
-    const solutions = await this.getSolutions();
+    const solutions = await this.getSolutions(page);
     const data = solutions.filter(
       (solution) =>
         !solution.videoLink &&

@@ -9,6 +9,7 @@ import { promisify } from 'util';
 import { CreateSolutionDto } from './dto/create-solution.dto';
 import { UpdateSolutionDto } from './dto/update-solution.dto';
 import { UpdateUserSolutionDto } from './dto/update-user-solution.dto';
+import { paginate } from 'src/helpers/paginate';
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -54,7 +55,10 @@ export class SolutionsService {
   }
 
   async findAll(page: number) {
+    const { offset, limit } = paginate(page, 10);
     const data = await this.prismaService.solution.findMany({
+      skip: offset,
+      take: limit,
       select: {
         id: true,
         name: true,

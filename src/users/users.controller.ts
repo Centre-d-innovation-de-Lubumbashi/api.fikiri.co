@@ -30,18 +30,18 @@ export class UsersController {
   }
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  findAll(@Query('page') page: string) {
+    return this.userService.findAll(+page);
   }
 
   @Get('curators')
-  findAllCurators() {
-    return this.userService.findAllCurators();
+  findAllCurators(@Query('page') page: string) {
+    return this.userService.findAllCurators(+page);
   }
 
   @Get('admins')
-  findAllAdmins() {
-    return this.userService.findAllAdmins();
+  findAllAdmins(@Query('page') page: string) {
+    return this.userService.findAllAdmins(+page);
   }
 
   @Get(':id')

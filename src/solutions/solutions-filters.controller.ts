@@ -19,8 +19,8 @@ export class SolutionsFiltersController {
     return this.solutionsFiltersService.findByCall(+id);
   }
   @Get('pole/:id')
-  getByPole(@Param('id') id: string) {
-    return this.solutionsFiltersService.solutionsByPole(+id);
+  getByPole(@Param('id') id: string, @Query('page') page: string) {
+    return this.solutionsFiltersService.solutionsByPole(+id, +page);
   }
 
   @Get('conforms/all')
