@@ -78,30 +78,24 @@ export class SolutionsService {
   }
 
   async findOne(id: number) {
-    try {
-      const data = await this.prismaService.solution.findUnique({
-        where: { id },
-        include: {
-          thematic: true,
-          user: true,
-          status: true,
-          images: true,
-          feedbacks: {
-            include: {
-              user: true,
-            },
+    const data = await this.prismaService.solution.findUnique({
+      where: { id },
+      include: {
+        thematic: true,
+        user: true,
+        status: true,
+        images: true,
+        feedbacks: {
+          include: {
+            user: true,
           },
-          challenges: true,
-          pole: true,
         },
-      });
-      if (!data) throw new NotFoundException("La solution n'a pas été trouvé");
-      return { data };
-    } catch {
-      throw new BadRequestException(
-        'Erreur lors de la récupération de la solution',
-      );
-    }
+        challenges: true,
+        pole: true,
+      },
+    });
+    if (!data) throw new NotFoundException("La solution n'a pas été trouvé");
+    return { data };
   }
 
   async findbyUser(email: string) {

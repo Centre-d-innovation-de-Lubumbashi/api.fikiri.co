@@ -66,7 +66,7 @@ export class SolutionsFiltersService {
 
   async findMapped(cursor: number) {
     if (isNaN(cursor) || cursor <= 0) cursor = 1;
-    const take = cursor * 9;
+    const take = cursor * 4;
     const data = await this.prismaService.solution.findMany({
       take,
       where: {
@@ -84,6 +84,8 @@ export class SolutionsFiltersService {
         name: true,
         userId: true,
         description: true,
+        createdAt: true,
+        updatedAt: true,
         videoLink: true,
         imageLink: true,
         thematic: true,
@@ -111,6 +113,8 @@ export class SolutionsFiltersService {
         imageLink: true,
         thematic: true,
         challenges: true,
+        createdAt: true,
+        updatedAt: true,
         status: true,
         user: true,
         images: true,

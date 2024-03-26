@@ -24,7 +24,7 @@ export class SolutionsFiltersController {
   }
 
   @Get('conforms/all')
-  findConforms(@Param('page') page: string) {
+  findConforms(@Query('page') page: string) {
     return this.solutionsFiltersService.findConforms(+page);
   }
 
