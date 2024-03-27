@@ -112,6 +112,7 @@ export class SolutionsFiltersService {
         name: true,
         userId: true,
         description: true,
+        targetedProblem: true,
         videoLink: true,
         imageLink: true,
         thematic: true,
@@ -125,6 +126,39 @@ export class SolutionsFiltersService {
       },
     });
     return { data };
+  }
+
+  async findPrevAndNext(solutionId: number) {
+    const solutions = await this.prismaService.solution.findMany({
+      where: {
+        statusId: {
+          in: [2, 3, 4],
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        userId: true,
+        description: true,
+        targetedProblem: true,
+        videoLink: true,
+        imageLink: true,
+        thematic: true,
+        challenges: true,
+        createdAt: true,
+        updatedAt: true,
+        status: true,
+        user: true,
+        images: true,
+        feedbacks: true,
+      },
+    });
+    const currentIndex = solutions.findIndex((solution) => {
+      return solution.id === solutionId;
+    });
+    const prevSolution = solutions[currentIndex - 1];
+    const nextSolution = solutions[currentIndex + 1];
+    return { data: { prevSolution, nextSolution } };
   }
 
   async getSolutions(page: number) {
