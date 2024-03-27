@@ -14,6 +14,12 @@ export class SolutionsFiltersController {
     return this.solutionsFiltersService.findMapped(+cursor);
   }
 
+  @Public()
+  @Get('mapped/one/:id')
+  findOneMapped(@Param('id') id: string) {
+    return this.solutionsFiltersService.findOneMapped(+id);
+  }
+
   @Get('call/:id')
   findByCall(@Param('id') id: string) {
     return this.solutionsFiltersService.findByCall(+id);

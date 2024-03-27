@@ -99,6 +99,34 @@ export class SolutionsFiltersService {
     return { data };
   }
 
+  async findOneMapped(solutionId: number) {
+    const data = await this.prismaService.solution.findUnique({
+      where: {
+        id: solutionId,
+        statusId: {
+          in: [2, 3, 4],
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        userId: true,
+        description: true,
+        videoLink: true,
+        imageLink: true,
+        thematic: true,
+        challenges: true,
+        createdAt: true,
+        updatedAt: true,
+        status: true,
+        user: true,
+        images: true,
+        feedbacks: true,
+      },
+    });
+    return { data };
+  }
+
   async getSolutions(page: number) {
     const { offset, limit } = paginate(page, 10);
     return await this.prismaService.solution.findMany({
@@ -159,19 +187,15 @@ export class SolutionsFiltersService {
       },
     });
     const allIds = solutions.map((solution) => solution.id);
-
     const conforms = solutions.filter(
       (solution) =>
         solution.videoLink || solution.imageLink || solution.images.length > 0,
     );
-
     const conformsIds = conforms.map((solution) => solution.id);
-
     const curated = solutions.filter(
       (solution) => solution.feedbacks.length > 0,
     );
     const curatedIds = curated.map((solution) => solution.id);
-
     return { data: { allIds, conformsIds, curatedIds } };
   }
 }
