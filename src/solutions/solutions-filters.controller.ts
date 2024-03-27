@@ -43,4 +43,10 @@ export class SolutionsFiltersController {
   findMappedByCall(@Param('id') id: string) {
     return this.solutionsFiltersService.findMappedByCall(+id);
   }
+
+  @Public()
+  @Get('ids/all')
+  findIds() {
+    return this.solutionsFiltersService.findIds();
+  }
 }

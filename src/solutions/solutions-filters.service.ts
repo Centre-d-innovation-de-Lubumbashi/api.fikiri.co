@@ -66,7 +66,7 @@ export class SolutionsFiltersService {
 
   async findMapped(cursor: number) {
     if (isNaN(cursor) || cursor <= 0) cursor = 1;
-    const take = cursor * 4;
+    const take = cursor * 8;
     const data = await this.prismaService.solution.findMany({
       take,
       where: {
@@ -146,5 +146,32 @@ export class SolutionsFiltersService {
         !(solution.images.length > 0 || solution.imageLink),
     );
     return { data };
+  }
+
+  async findIds() {
+    const solutions = await this.prismaService.solution.findMany({
+      select: {
+        id: true,
+        videoLink: true,
+        imageLink: true,
+        images: true,
+        feedbacks: true,
+      },
+    });
+    const allIds = solutions.map((solution) => solution.id);
+
+    const conforms = solutions.filter(
+      (solution) =>
+        solution.videoLink || solution.imageLink || solution.images.length > 0,
+    );
+
+    const conformsIds = conforms.map((solution) => solution.id);
+
+    const curated = solutions.filter(
+      (solution) => solution.feedbacks.length > 0,
+    );
+    const curatedIds = curated.map((solution) => solution.id);
+
+    return { data: { allIds, conformsIds, curatedIds } };
   }
 }
