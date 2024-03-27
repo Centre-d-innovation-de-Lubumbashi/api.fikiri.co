@@ -156,9 +156,9 @@ export class SolutionsFiltersService {
     const currentIndex = solutions.findIndex((solution) => {
       return solution.id === solutionId;
     });
-    const prevSolution = solutions[currentIndex - 1];
-    const nextSolution = solutions[currentIndex + 1];
-    return { data: { prevSolution, nextSolution } };
+    const prev = solutions[currentIndex - 1];
+    const next = solutions[currentIndex + 1];
+    return { data: { prev, next } };
   }
 
   async getSolutions(page: number) {
