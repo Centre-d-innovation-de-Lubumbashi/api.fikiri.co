@@ -36,12 +36,12 @@ export class SolutionsFiltersController {
   }
 
   @Get('non-conforms/all')
-  findNonConforms(@Param('page') page: string) {
+  findNonConforms(@Query('page') page: string) {
     return this.solutionsFiltersService.findNonConforms(+page);
   }
 
   @Get('curated/all')
-  findCurated(@Param('page') page: string) {
+  findCurated(@Query('page') page: string) {
     return this.solutionsFiltersService.findCurated(+page);
   }
 
