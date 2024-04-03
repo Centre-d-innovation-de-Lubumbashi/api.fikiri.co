@@ -25,11 +25,12 @@ export class CallsController {
   }
 
   @Public()
-  @Get()
+  @Get('')
   findAll() {
     return this.callsService.findAll();
   }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.callsService.findOne(+id);

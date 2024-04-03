@@ -125,7 +125,14 @@ export class SolutionsFiltersService {
         feedbacks: true,
       },
     });
-    return { data };
+    const { prev, next } = await this.findPrevAndNext(solutionId);
+    return {
+      data: {
+        solution: data,
+        prev: prev,
+        next: next,
+      },
+    };
   }
 
   async findPrevAndNext(solutionId: number) {
@@ -156,9 +163,9 @@ export class SolutionsFiltersService {
     const currentIndex = solutions.findIndex((solution) => {
       return solution.id === solutionId;
     });
-    const prev = solutions[currentIndex - 1];
-    const next = solutions[currentIndex + 1];
-    return { data: { prev, next } };
+    const prev = solutions[currentIndex - 1]?.id;
+    const next = solutions[currentIndex + 1]?.id;
+    return { prev, next };
   }
 
   async getSolutions(page: number) {

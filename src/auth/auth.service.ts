@@ -5,7 +5,7 @@ import { randomPassword } from './../helpers/random-password';
 import { BadRequestException, Injectable, Req, Res } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
-import { Request } from 'express';
+import e, { Request, Response } from 'express';
 import { CurrentUser } from './decorators/user.decorator';
 import { SignupDto } from './dto/register.dto';
 import { ConfigService } from '@nestjs/config';
@@ -39,7 +39,7 @@ export class AuthService {
     return await bcrypt.compare(password, hash);
   }
 
-  async loginGoogle(@Res() res: any) {
+  async loginGoogle(@Res() res: Response) {
     return res.redirect(this.configService.get('FRONTEND_URI'));
   }
 
@@ -60,8 +60,9 @@ export class AuthService {
     return await this.usersService.updateProfile(+id, dto);
   }
 
-  register(registerDto: SignupDto) {
-    return this.usersService.register(registerDto);
+  async register(registerDto: SignupDto) {
+    const { data } = await this.usersService.register(registerDto);
+    return { data };
   }
 
   async updatePassword(@CurrentUser() user: User, dto: UpdatePasswordDto) {
@@ -93,8 +94,7 @@ L'équipe Fikiri.`,
     }
   }
 
-  async resetPasswordRequest(dto: ResetPasswordRequestDto) {
-    const { email } = dto;
+  async resetPasswordRequest(email: string) {
     const user = await this.usersService.findBy(email);
     const token = randomPassword();
     await this.usersService.saveResetToken(email, token);
@@ -102,8 +102,12 @@ L'équipe Fikiri.`,
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
-    const { token, password } = resetPasswordDto;
+    const { token, password, email } = resetPasswordDto;
+    const resetToken = randomPassword();
+    await this.usersService.findBy(email);
     const user = await this.usersService.findByResetToken(token);
+    await this.usersService.saveResetToken(email, resetToken);
+    await this.resetPasswordEmail(user, resetToken);
     try {
       await this.usersService.removeResetToken(user.id);
       await this.usersService.updatePassword(user.id, password);

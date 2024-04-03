@@ -19,15 +19,12 @@ export class SolutionsFiltersController {
   findOneMapped(@Param('id') id: string) {
     return this.solutionsFiltersService.findOneMapped(+id);
   }
-  @Public()
-  @Get('mapped/prev-and-next/:id')
-  findPrevAndNext(@Param('id') id: string) {
-    return this.solutionsFiltersService.findPrevAndNext(+id);
-  }
+
   @Get('call/:id')
   findByCall(@Param('id') id: string) {
     return this.solutionsFiltersService.findByCall(+id);
   }
+
   @Get('pole/:id')
   getByPole(@Param('id') id: string, @Query('page') page: string) {
     return this.solutionsFiltersService.solutionsByPole(+id, +page);

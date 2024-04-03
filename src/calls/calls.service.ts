@@ -23,8 +23,49 @@ export class CallsService {
   }
 
   async findAll() {
-    const data: Call[] = await this.prisma.call.findMany({});
+    const data = await this.prisma.call.findMany({
+      include: {
+        thematics: true,
+        _count: {
+          select: {
+            solutions: true,
+          },
+        },
+      },
+    });
     return { data };
+  }
+
+  async findRecent() {
+    const data = await this.prisma.call.findMany({
+      take: 1,
+      include: {
+        thematics: true,
+        _count: {
+          select: {
+            solutions: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    const calls = await this.prisma.call.findMany();
+    const currentIndex = calls.findIndex((call) => call.id === data[0].id);
+    const prevCall = calls.find(
+      (call) => call.id === data[currentIndex]?.id - 1,
+    );
+    const nextCall = calls.find(
+      (call) => call.id === data[currentIndex]?.id + 1,
+    );
+    return {
+      data: {
+        call: data[0],
+        prev: prevCall?.id,
+        nextCall: nextCall?.id,
+      },
+    };
   }
 
   async findOne(id: number) {
@@ -33,10 +74,23 @@ export class CallsService {
         where: { id },
         include: { thematics: true },
       });
-      if (!data) throw new NotFoundException("L'appel à solution introuvable");
-      return { data };
+      const calls = await this.prisma.call.findMany();
+      const currentIndex = calls.findIndex((call) => call.id === id);
+      const prevCall = calls.find(
+        (call) => call.id === data[currentIndex]?.id - 1,
+      );
+      const nextCall = calls.find(
+        (call) => call.id === data[currentIndex]?.id + 1,
+      );
+      return {
+        data: {
+          call: data,
+          prev: prevCall?.id,
+          nextCall: nextCall?.id,
+        },
+      };
     } catch {
-      throw new NotFoundException("Impossible de supprimer l'appel à solution");
+      throw new NotFoundException("Impossible de récupérer l'appel à solution");
     }
   }
 

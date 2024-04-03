@@ -102,28 +102,22 @@ L'équipe Fikiri.`,
   }
 
   async register(registerDto: SignupDto) {
-    try {
-      await this.userExist(registerDto.email);
-      delete registerDto.passwordConfirm;
-      const password: string = registerDto.password as string;
-      const hash = await this.hashPassword(password);
-      const data = await this.prismaService.user.create({
-        data: {
-          ...registerDto,
-          password: hash,
-          roles: {
-            connect: {
-              id: 3,
-            },
+    await this.userExist(registerDto.email);
+    delete registerDto.passwordConfirm;
+    const password: string = registerDto.password as string;
+    const hash = await this.hashPassword(password);
+    const data = await this.prismaService.user.create({
+      data: {
+        ...registerDto,
+        password: hash,
+        roles: {
+          connect: {
+            id: 3,
           },
         },
-      });
-      return { data };
-    } catch {
-      throw new BadRequestException(
-        "Erreur lors de l'inscription de l'utilisateur",
-      );
-    }
+      },
+    });
+    return { data };
   }
 
   async findAll(page: number) {
