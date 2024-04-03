@@ -31,7 +31,7 @@ export class SolutionsController {
   }
 
   @Get()
-  findAll(@Param('page') page: string) {
+  findAll(@Query('page') page: string) {
     return this.solutionsService.findAll(+page);
   }
 

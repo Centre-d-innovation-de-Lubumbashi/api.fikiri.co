@@ -19,6 +19,7 @@ import { OrganisationsModule } from './organisations/organisations.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -27,21 +28,22 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
       useFactory: (config: ConfigService) => ({
         transport: {
           host: config.get('MAIL_HOST'),
-          port: config.get('MAIL_PORT'),
-          secure: false,
-          auth: {
-            user: config.get('MAIL_USERNAME'),
-            pass: config.get('MAIL_PASSWORD'),
+          secure: true,
+          secureConnection: false,
+          requireTLS: true,
+          port: 465,
+          tls: {
+            ciphers: 'SSLv3',
           },
+          auth: {
+            user: 'support@fikiri.co',
+            pass: 'wilfried20022606',
+          },
+          logger: true,
+          debug: true, // include SMTP traffic in the logs
         },
       }),
     }),
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 10,
-      },
-    ]),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -59,6 +61,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     PolesModule,
     OrganisationsModule,
     DashboardModule,
+    EmailModule,
   ],
   providers: [
     {

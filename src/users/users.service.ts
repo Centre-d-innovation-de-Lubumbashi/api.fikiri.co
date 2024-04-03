@@ -18,6 +18,7 @@ import { randomPassword } from 'src/helpers/random-password';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import { paginate } from 'src/helpers/paginate';
+import { EmailService } from 'src/email/email.service';
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -25,44 +26,15 @@ const unlinkAsync = promisify(fs.unlink);
 export class UsersService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly mailerService: MailerService,
-    private readonly configService: ConfigService,
+    private readonly emailService: EmailService,
   ) {}
-
-  async registerEmail(to: string, password: string) {
-    let from = `Support fikiri <${this.configService.get('MAIL_USERNAME')}>`;
-    try {
-      await this.mailerService.sendMail({
-        to,
-        from,
-        subject: 'Code currateur par défaut',
-        text: `
-Cher(e) ${to},
-
-Vous avez été ajouté(e) en tant que currateur sur la plateforme Fikiri.
-
-Voici votre mot de passe par défaut: ${password}
-
-Vous pouvez le modifier une fois connecté(e).
-
-Connectez-vous à l'adresse suivante: https://admin.fikiri.co
-
-Merci,
-L'équipe Fikiri.`,
-      });
-    } catch {
-      throw new BadRequestException(
-        "Erreur lors de l'envoi du mail de confirmation",
-      );
-    }
-  }
 
   async create(dto: CreateUserDto) {
     try {
       await this.userExist(dto.email);
       const password: string = randomPassword();
       const hash = await this.hashPassword(password);
-      await this.prismaService.user.create({
+      const user = await this.prismaService.user.create({
         data: {
           ...dto,
           password: hash,
@@ -81,7 +53,7 @@ L'équipe Fikiri.`,
           },
         },
       });
-      await this.registerEmail(dto.email, password);
+      await this.emailService.sendRegisteringCurator(user, password);
     } catch {
       throw new BadRequestException(
         "Erreur lors de la création de l'utilisateur",

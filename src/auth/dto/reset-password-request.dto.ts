@@ -1,8 +1,6 @@
 import { IsEmail } from 'class-validator';
 
 export class ResetPasswordRequestDto {
-  @IsEmail({}, {
-    message: 'Ce champ ne peut pas être vide'
-  })
+  @IsEmail({}, { message: "L'adresse email saisi est invalide" })
   email: string;
 }
