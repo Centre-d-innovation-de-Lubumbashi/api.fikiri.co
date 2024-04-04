@@ -37,35 +37,17 @@ export class CallsService {
   }
 
   async findRecent() {
-    const data = await this.prisma.call.findMany({
+    const calls = await this.prisma.call.findMany({
       take: 1,
       include: {
         thematics: true,
-        _count: {
-          select: {
-            solutions: true,
-          },
-        },
       },
       orderBy: {
         createdAt: 'desc',
       },
     });
-    const calls = await this.prisma.call.findMany();
-    const currentIndex = calls.findIndex((call) => call.id === data[0].id);
-    const prevCall = calls.find(
-      (call) => call.id === data[currentIndex]?.id - 1,
-    );
-    const nextCall = calls.find(
-      (call) => call.id === data[currentIndex]?.id + 1,
-    );
-    return {
-      data: {
-        call: data[0],
-        prev: prevCall?.id,
-        nextCall: nextCall?.id,
-      },
-    };
+    const data = calls[0];
+    return { data };
   }
 
   async findOne(id: number) {

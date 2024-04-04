@@ -193,22 +193,53 @@ export class SolutionsFiltersService {
   }
 
   async findConforms(page: number) {
-    const solutions = await this.getSolutions(page);
+    const solutions = await this.prismaService.solution.findMany({
+      select: {
+        id: true,
+        name: true,
+        createdAt: true,
+        feedbacks: true,
+        thematic: true,
+        videoLink: true,
+        imageLink: true,
+        images: true,
+      },
+    });
     const data = solutions.filter(
       (solution) =>
         solution.videoLink || solution.images.length > 0 || solution.imageLink,
     );
+
     return { data };
   }
 
   async findCurated(page: number) {
-    const solutions = await this.getSolutions(page);
+    const solutions = await this.prismaService.solution.findMany({
+      select: {
+        id: true,
+        name: true,
+        createdAt: true,
+        feedbacks: true,
+        thematic: true,
+      },
+    });
     const data = solutions.filter((solution) => solution.feedbacks.length > 0);
     return { data };
   }
 
   async findNonConforms(page: number) {
-    const solutions = await this.getSolutions(page);
+    const solutions = await this.prismaService.solution.findMany({
+      select: {
+        id: true,
+        name: true,
+        createdAt: true,
+        feedbacks: true,
+        thematic: true,
+        videoLink: true,
+        imageLink: true,
+        images: true,
+      },
+    });
     const data = solutions.filter(
       (solution) =>
         !solution.videoLink &&

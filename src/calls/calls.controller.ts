@@ -31,6 +31,12 @@ export class CallsController {
   }
 
   @Public()
+  @Get('recent/one')
+  findRecent() {
+    return this.callsService.findRecent();
+  }
+
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.callsService.findOne(+id);
