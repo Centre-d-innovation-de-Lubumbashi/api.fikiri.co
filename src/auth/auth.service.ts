@@ -56,8 +56,8 @@ export class AuthService {
     return { data };
   }
 
-  async updateProfile(id: number, dto: UpdateProfileDto) {
-    return await this.usersService.updateProfile(+id, dto);
+  async updateProfile(@CurrentUser() currentUser: User, dto: UpdateProfileDto) {
+    return await this.usersService.updateProfile(currentUser, dto);
   }
 
   async register(registerDto: SignupDto) {

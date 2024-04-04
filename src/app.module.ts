@@ -28,19 +28,12 @@ import { EmailModule } from './email/email.module';
       useFactory: (config: ConfigService) => ({
         transport: {
           host: config.get('MAIL_HOST'),
-          secure: true,
-          secureConnection: false,
-          requireTLS: true,
-          port: 465,
-          tls: {
-            ciphers: 'SSLv3',
-          },
+          secure: false,
+          port: Number(config.get('MAIL_PORT')),
           auth: {
-            user: 'support@fikiri.co',
-            pass: 'wilfried20022606',
+            user: config.get('MAIL_USERNAME'),
+            pass: config.get('MAIL_PASSWORD'),
           },
-          logger: true,
-          debug: true, // include SMTP traffic in the logs
         },
       }),
     }),

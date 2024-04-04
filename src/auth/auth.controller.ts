@@ -36,9 +36,12 @@ export class AuthController {
     return this.authService.profile(user);
   }
 
-  @Patch('profile/:id')
-  updateProfile(@Param('id') id: string, @Body() data: UpdateProfileDto) {
-    return this.authService.updateProfile(+id, data);
+  @Patch('profile')
+  updateProfile(
+    @CurrentUser() currentUser: User,
+    @Body() data: UpdateProfileDto,
+  ) {
+    return this.authService.updateProfile(currentUser, data);
   }
 
   @Public()

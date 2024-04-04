@@ -19,6 +19,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import { paginate } from 'src/helpers/paginate';
 import { EmailService } from 'src/email/email.service';
+import { CurrentUser } from 'src/auth/decorators/user.decorator';
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -234,10 +235,10 @@ export class UsersService {
     return await bcrypt.compare(password, hash);
   }
 
-  async updateProfile(id: number, dto: UpdateProfileDto) {
+  async updateProfile(@CurrentUser() currentUser: User, dto: UpdateProfileDto) {
     try {
       const data: User = await this.prismaService.user.update({
-        where: { id },
+        where: { id: currentUser.id },
         data: {
           name: dto.name,
           address: dto.address,
@@ -249,7 +250,7 @@ export class UsersService {
         dto.password &&
         (await this.passwordMatch(dto.oldPassword, data.password));
       if (isMatch) {
-        await this.updatePassword(id, dto.password);
+        await this.updatePassword(data.id, dto.password);
       } else if (dto.oldPassword && dto.password) {
         throw new BadRequestException('Les identifiants saisis sont invalides');
       }
