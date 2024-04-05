@@ -1,72 +1,60 @@
-import { PrismaService } from './../database/prisma.service';
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateOrganisationDto } from './dto/create-organisation.dto';
 import { UpdateOrganisationDto } from './dto/update-organisation.dto';
-import { Organisation } from '@prisma/client';
+import { Repository } from 'typeorm';
+import { Organisation } from './entities/organisation.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class OrganisationsService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    @InjectRepository(Organisation)
+    private readonly organisationRepository: Repository<Organisation>,
+  ) {
+  }
 
-  async create(dto: CreateOrganisationDto) {
+  async create(dto: CreateOrganisationDto): Promise<{ data: Organisation }> {
     try {
-      const name: string = dto.name;
-      const organization = await this.prismaService.organisation.findFirst({
-        where: { name },
-      });
-      if (organization)
-        throw new ConflictException('Cette organisation existe déjà');
-      await this.prismaService.organisation.create({ data: dto });
+      const data: Organisation = await this.organisationRepository.save(dto);
+      return { data };
     } catch {
-      throw new ConflictException("Impossible de créer l'organisation");
+      throw new ConflictException('Impossible de créer l\'organisation');
     }
   }
 
-  async findAll() {
-    const data: Organisation[] =
-      await this.prismaService.organisation.findMany();
+  async findAll(): Promise<{ data: Organisation[] }> {
+    const data: Organisation[] = await this.organisationRepository.find();
     return { data };
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<{ data: Organisation }> {
     try {
-      const data: Organisation =
-        await this.prismaService.organisation.findUnique({
-          where: { id },
-        });
-      if (!data)
-        throw new NotFoundException("Cette organisation n'a pas été trouvée");
-      return { data };
-    } catch {
-      throw new NotFoundException("Impossible de récupérer l'organisation");
-    }
-  }
-
-  async update(id: number, dto: UpdateOrganisationDto) {
-    try {
-      await this.findOne(id);
-      const data: Organisation = await this.prismaService.organisation.update({
-        data: dto,
+      const data: Organisation = await this.organisationRepository.findOneOrFail({
         where: { id },
       });
       return { data };
     } catch {
-      throw new ConflictException("Impossible de mettre à jour l'organisation");
+      throw new NotFoundException('Impossible de récupérer l\'organisation');
     }
   }
 
-  async remove(id: number) {
+  async update(id: number, dto: UpdateOrganisationDto): Promise<{ data: Organisation }> {
+    try {
+      const { data: organisation } = await this.findOne(id);
+      const updatedOrganisation: Organisation & UpdateOrganisationDto = Object.assign(organisation, dto);
+      const data: Organisation = await this.organisationRepository.save(updatedOrganisation);
+      return { data };
+    } catch {
+      throw new ConflictException('Impossible de mettre à jour l\'organisation');
+    }
+  }
+
+  async remove(id: number): Promise<void> {
     try {
       await this.findOne(id);
-      await this.prismaService.organisation.delete({
-        where: { id },
-      });
+      await this.organisationRepository.delete(id);
     } catch {
-      throw new ConflictException("Impossible de supprimer l'organisation");
+      throw new ConflictException('Impossible de supprimer l\'organisation');
     }
   }
 }

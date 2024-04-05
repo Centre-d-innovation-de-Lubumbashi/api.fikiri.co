@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
 import { ISendMailOptions, MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class EmailService {
@@ -10,7 +10,8 @@ export class EmailService {
   constructor(
     private readonly mailerSerive: MailerService,
     private configService: ConfigService,
-  ) {}
+  ) {
+  }
 
   async sendResetPasswordRequest(to: User, token: string): Promise<void> {
     const mail: ISendMailOptions = {
@@ -34,14 +35,14 @@ L'équipe Fikiri.`,
     } catch (e) {
       console.log(e);
       throw new BadRequestException(
-        "Une erreur est survenenue lors de l'envoie d'email",
+        'Une erreur est survenenue lors de l\'envoie d\'email',
       );
     }
   }
 
   async sendRegisteringCurator(to: User, password: string): Promise<void> {
     const mail: ISendMailOptions = {
-      to,
+      to: to.email,
       from: this.from,
       subject: 'Code currateur par défaut',
       text: `
@@ -62,7 +63,7 @@ L'équipe Fikiri.`,
       await this.mailerSerive.sendMail(mail);
     } catch {
       throw new BadRequestException(
-        "Une erreur est survenenue lors de l'envoie d'email",
+        'Une erreur est survenenue lors de l\'envoie d\'email',
       );
     }
   }

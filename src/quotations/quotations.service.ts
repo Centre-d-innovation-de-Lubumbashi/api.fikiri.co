@@ -1,70 +1,58 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateLableDto } from './dto/create-quotation.dto';
 import { UpdateLableDto } from './dto/update-quotation.dto';
-import { PrismaService } from '../database/prisma.service';
-import { Quotation } from '@prisma/client';
+import { Repository } from 'typeorm';
+import { Quotation } from './entities/quotation.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class QuotationsService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    @InjectRepository(Quotation)
+    private readonly quotationRepository: Repository<Quotation>,
+  ) {
+  }
 
-  async create(dto: CreateLableDto) {
+  async create(dto: CreateLableDto): Promise<{ data: Quotation }> {
     try {
-      const { mention } = dto;
-      const label = await this.prismaService.quotation.findFirst({
-        where: { mention },
-      });
-      if (label) throw new ConflictException('La quotation existe déjà');
-      await this.prismaService.quotation.create({ data: dto });
+      const data: Quotation = await this.quotationRepository.save(dto);
+      return { data };
     } catch {
       throw new ConflictException('Erreur lors de la création de la quotation');
     }
   }
 
-  async findAll() {
-    const data: Quotation[] = await this.prismaService.quotation.findMany({});
+  async findAll(): Promise<{ data: Quotation[] }> {
+    const data: Quotation[] = await this.quotationRepository.find();
     return { data };
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<{ data: Quotation }> {
     try {
-      const data: Quotation = await this.prismaService.quotation.findUnique({
-        where: { id },
-      });
-      if (!data) throw new NotFoundException("La quotation n'a pas été trouvé");
-      return { data };
-    } catch {
-      throw new NotFoundException(
-        'Erreur lors de la récupération de la quotation',
-      );
-    }
-  }
-
-  async update(id: number, dto: UpdateLableDto) {
-    try {
-      await this.findOne(id);
-      const data: Quotation = await this.prismaService.quotation.update({
-        data: dto,
+      const data: Quotation = await this.quotationRepository.findOneOrFail({
         where: { id },
       });
       return { data };
     } catch {
-      throw new ConflictException(
-        'Erreur lors de la mise à jour de la quotation',
-      );
+      throw new NotFoundException('Erreur lors de la récupération de la quotation');
     }
   }
 
-  async remove(id: number) {
+  async update(id: number, dto: UpdateLableDto): Promise<{ data: Quotation }> {
+    try {
+      const { data: quotation } = await this.findOne(id);
+      const updatedQuotation: Quotation & UpdateLableDto = Object.assign(quotation, dto);
+      const data: Quotation = await this.quotationRepository.save(updatedQuotation);
+      return { data };
+    } catch {
+      throw new ConflictException('Erreur lors de la mise à jour de la quotation');
+    }
+  }
+
+  async remove(id: number): Promise<void> {
     try {
       await this.findOne(id);
-      await this.prismaService.quotation.delete({
-        where: { id },
-      });
+      await this.quotationRepository.delete(id);
     } catch {
       throw new ConflictException(
         'Erreur lors de la suppression de la quotation',

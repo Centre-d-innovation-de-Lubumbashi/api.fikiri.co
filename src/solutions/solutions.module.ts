@@ -2,22 +2,15 @@ import { Module } from '@nestjs/common';
 import { SolutionsService } from './solutions.service';
 import { SolutionsController } from './solutions.controller';
 import { FeedbacksModule } from 'src/feedbacks/feedbacks.module';
-import { SolutionsFeedbacksService } from './solutions-feebacks.service';
-import { SolutionsFeedbacksController } from './solutions-feebacks.controller';
-import { SolutionsFiltersController } from './solutions-filters.controller';
-import { SolutionsFiltersService } from './solutions-filters.service';
+import { QuotationsModule } from '../quotations/quotations.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Solution } from './entities/solution.entity';
+import { ImagesModule } from '../images/images.module';
 
 @Module({
-  imports: [FeedbacksModule],
-  controllers: [
-    SolutionsController,
-    SolutionsFeedbacksController,
-    SolutionsFiltersController,
-  ],
-  providers: [
-    SolutionsService,
-    SolutionsFeedbacksService,
-    SolutionsFiltersService,
-  ],
+  imports: [FeedbacksModule, QuotationsModule, ImagesModule, TypeOrmModule.forFeature([Solution])],
+  controllers: [SolutionsController],
+  providers: [SolutionsService],
 })
-export class SolutionsModule {}
+export class SolutionsModule {
+}

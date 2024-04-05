@@ -1,105 +1,70 @@
-import { Call } from '@prisma/client';
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCallDto } from './dto/create-call.dto';
 import { UpdateCallDto } from './dto/update-call.dto';
-import { PrismaService } from 'src/database/prisma.service';
+import { Repository } from 'typeorm';
+import { Call } from './entities/call.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class CallsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @InjectRepository(Call)
+    private readonly callRepository: Repository<Call>
+  ) {
+  }
 
-  async create(dto: CreateCallDto) {
+  async create(dto: CreateCallDto): Promise<{ data: Call }> {
     try {
-      await this.prisma.call.create({
-        data: dto,
-      });
+      const data: Call = await this.callRepository.save(dto);
+      return { data };
     } catch {
-      throw new BadRequestException("Impossible de créer l'appel à solution");
+      throw new BadRequestException('Impossible de créer l\'appel à solution');
     }
   }
 
-  async findAll() {
-    const data = await this.prisma.call.findMany({
-      include: {
-        thematics: true,
-        _count: {
-          select: {
-            solutions: true,
-          },
-        },
-      },
+  async findAll(): Promise<{ data: [Call[], number] }> {
+    const data: [Call[], number] = await this.callRepository.findAndCount({
+      relations: ['thematics'],
     });
     return { data };
   }
 
-  async findRecent() {
-    const calls = await this.prisma.call.findMany({
-      take: 1,
-      include: {
-        thematics: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
+  async findRecent(): Promise<{ data: Call }> {
+    const data: Call = await this.callRepository.findOne({
+      order: { id: 'DESC' },
     });
-    const data = calls[0];
     return { data };
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<{ data: Call }> {
     try {
-      const data = await this.prisma.call.findUnique({
-        where: { id },
-        include: { thematics: true },
-      });
-      const calls = await this.prisma.call.findMany();
-      const currentIndex = calls.findIndex((call) => call.id === id);
-      const prevCall = calls.find(
-        (call) => call.id === data[currentIndex]?.id - 1,
-      );
-      const nextCall = calls.find(
-        (call) => call.id === data[currentIndex]?.id + 1,
-      );
-      return {
-        data: {
-          call: data,
-          prev: prevCall?.id,
-          nextCall: nextCall?.id,
-        },
-      };
+      const data: Call = await this.callRepository.findOneOrFail({ where: { id } });
+      return { data };
     } catch {
-      throw new NotFoundException("Impossible de récupérer l'appel à solution");
+      throw new NotFoundException('Impossible de récupérer l\'appel à solution');
     }
   }
 
-  async update(id: number, dto: UpdateCallDto) {
+  async update(id: number, dto: UpdateCallDto): Promise<{ data: Call }> {
     try {
-      await this.findOne(id);
-      const data: Call | null = await this.prisma.call.update({
-        data: dto,
-        where: { id },
-      });
+      const { data: call } = await this.findOne(id);
+      const updatedCall: Call & UpdateCallDto = Object.assign(call, dto);
+      const data: Call = await this.callRepository.save(updatedCall);
       return { data };
     } catch {
       throw new BadRequestException(
-        "Impossible de mettre à jour l'appel à solution",
+        'Impossible de mettre à jour l\'appel à solution',
       );
     }
   }
 
-  async remove(id: number) {
+  async remove(id: number): Promise<void> {
     try {
       await this.findOne(id);
-      await this.prisma.call.delete({
-        where: { id },
-      });
+      await this.callRepository.delete(id);
     } catch {
       throw new BadRequestException(
-        "Impossible de supprimer l'appel à solution",
+        'Impossible de supprimer l\'appel à solution',
       );
     }
   }

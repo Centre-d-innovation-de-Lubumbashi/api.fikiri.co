@@ -1,66 +1,60 @@
-import { PrismaService } from '../database/prisma.service';
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
-import { Role } from '@prisma/client';
+import { Repository } from 'typeorm';
+import { Role } from './entities/role.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class RolesService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    @InjectRepository(Role)
+    private readonly roleRepository: Repository<Role>,
+  ) {
+  }
 
-  async create(dto: CreateRoleDto) {
+  async create(dto: CreateRoleDto): Promise<{ data: Role }> {
     try {
-      const role = await this.prismaService.role.findFirst({
-        where: { name: dto.name },
-      });
-      if (role) throw new ConflictException('Le rôle existe déjà');
-      await this.prismaService.role.create({ data: dto });
+      const data: Role = await this.roleRepository.save(dto);
+      return { data };
     } catch {
       throw new ConflictException('Erreur lors de la création du rôle');
     }
   }
 
-  async findAll() {
-    const data: Role[] = await this.prismaService.role.findMany();
+  async findAll(): Promise<{ data: Role[] }> {
+    const data: Role[] = await this.roleRepository.find({
+      order: { updatedAt: 'DESC' },
+    });
     return { data };
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<{ data: Role }> {
     try {
-      const data: Role = await this.prismaService.role.findUnique({
+      const data: Role = await this.roleRepository.findOneOrFail({
         where: { id },
       });
-      if (!data) throw new NotFoundException("Le rôle n'a pas été trouvé");
       return { data };
     } catch {
       throw new BadRequestException('Erreur lors de la récupération du rôle');
     }
   }
 
-  async update(id: number, dto: UpdateRoleDto) {
+  async update(id: number, dto: UpdateRoleDto): Promise<{ data: Role }> {
     try {
-      await this.findOne(id);
-      const data: Role = await this.prismaService.role.update({
-        data: dto,
-        where: { id },
-      });
+      const { data: role } = await this.findOne(id);
+      const updatedRole: Role & UpdateRoleDto = Object.assign(role, dto);
+      const data: Role = await this.roleRepository.save(updatedRole);
       return { data };
     } catch {
       throw new BadRequestException('Erreur lors de la mise à jour du rôle');
     }
   }
 
-  async remove(id: number) {
+  async remove(id: number): Promise<void> {
     try {
       await this.findOne(id);
-      await this.prismaService.role.delete({
-        where: { id },
-      });
+      await this.roleRepository.delete(id);
     } catch {
       throw new BadRequestException('Erreur lors de la suppression du rôle');
     }

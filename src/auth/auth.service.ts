@@ -1,7 +1,6 @@
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ResetPasswordRequestDto } from './dto/reset-password-request.dto';
-import { randomPassword } from './../helpers/random-password';
 import { BadRequestException, Injectable, Req, Res } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
@@ -10,8 +9,9 @@ import { CurrentUser } from './decorators/user.decorator';
 import { SignupDto } from './dto/register.dto';
 import { ConfigService } from '@nestjs/config';
 import UpdateProfileDto from './dto/update-profile.dto';
-import { User } from '@prisma/client';
 import { EmailService } from 'src/email/email.service';
+import { User } from '../users/entities/user.entity';
+import { randomPassword } from '../helpers/random-password';
 
 @Injectable()
 export class AuthService {
@@ -19,75 +19,70 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly usersService: UsersService,
     private readonly emailService: EmailService,
-  ) {}
-
-  async validateUser(email: string, password: string) {
-    const user = await this.usersService.findBy(email);
-    if (password) {
-      const passwordMatch: boolean = await this.passwordMatch(
-        password,
-        user.password,
-      );
-      if (!passwordMatch)
-        throw new BadRequestException('Les identifiants saisis sont invalides');
-    }
-    return user;
+  ) {
   }
-  async passwordMatch(password: string, hash: string) {
-    if (!hash)
+
+  async validateUser(email: string, password: string): Promise<{ data: User }> {
+    const { data } = await this.usersService.findByEmail(email);
+    const passwordMatch: boolean = await this.passwordMatch(password, data.password);
+    if (!passwordMatch)
       throw new BadRequestException('Les identifiants saisis sont invalides');
+    return { data };
+  }
+
+  async passwordMatch(password: string, hash: string): Promise<boolean> {
+    if (!hash) return false;
     return await bcrypt.compare(password, hash);
   }
 
-  async loginGoogle(@Res() res: Response) {
+  async loginGoogle(@Res() res: Response): Promise<void> {
     return res.redirect(this.configService.get('FRONTEND_URI'));
   }
 
-  async login(@Req() req: Request) {
-    const data = req.user;
+  async login(@Req() req: Request): Promise<{ data: Express.User }> {
+    const data: Express.User = req.user;
     return { data };
   }
 
-  async logout(@Req() request: Request) {
-    request.session.destroy(() => {});
+  async logout(@Req() request: Request): Promise<void> {
+    request.session.destroy(() => {
+    });
   }
 
-  async profile(@CurrentUser() data: User) {
+  async profile(@CurrentUser() data: User): Promise<{ data: User }> {
     return { data };
   }
 
-  async updateProfile(@CurrentUser() currentUser: User, dto: UpdateProfileDto) {
+  async updateProfile(@CurrentUser() currentUser: User, dto: UpdateProfileDto): Promise<{ data: User }> {
     return await this.usersService.updateProfile(currentUser, dto);
   }
 
-  async register(registerDto: SignupDto) {
+  async register(registerDto: SignupDto): Promise<{ data: User }> {
     const { data } = await this.usersService.register(registerDto);
     return { data };
   }
 
-  async updatePassword(@CurrentUser() user: User, dto: UpdatePasswordDto) {
+  async updatePassword(@CurrentUser() user: User, dto: UpdatePasswordDto): Promise<void> {
     const { password } = dto;
     await this.usersService.updatePassword(user.id, password);
   }
 
-  async resetPasswordRequest(dto: ResetPasswordRequestDto) {
+  async resetPasswordRequest(dto: ResetPasswordRequestDto): Promise<void> {
     const { email } = dto;
-    const user = await this.usersService.findBy(email);
+    const { data: user } = await this.usersService.findByEmail(email);
     const token = randomPassword();
-    await this.usersService.saveResetToken(email, token);
+    await this.usersService.update(user.id, { token });
     await this.emailService.sendResetPasswordRequest(user, token);
   }
 
-  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<void> {
     const { token, password } = resetPasswordDto;
-    const user = await this.usersService.findByResetToken(token);
+    const { data: user } = await this.usersService.findByResetToken(token);
     try {
-      await this.usersService.removeResetToken(user.id);
+      await this.usersService.resetPassword(user.id, password);
       await this.usersService.updatePassword(user.id, password);
     } catch {
-      throw new BadRequestException(
-        'Erreur lors de la réinitialisation du mot de passe',
-      );
+      throw new BadRequestException('Erreur lors de la réinitialisation du mot de passe');
     }
   }
 }

@@ -1,13 +1,23 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
+import { EntityManager } from 'typeorm';
+import { User } from '../users/entities/user.entity';
+import { Solution } from '../solutions/entities/solution.entity';
+import { Status } from '../status/entities/status.entity';
 
 @Injectable()
 export class DashboardService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly entityManager: EntityManager) {
+  }
 
-  async getCounts() {
-    const totalUsers = await this.prismaService.user.count();
-    const totalSolutions = await this.prismaService.solution.count();
+  async getCounts(): Promise<{ data: { totalUsers: number; totalSolutions: number } }> {
+    const totalUsers: number = await this.entityManager
+      .getRepository(User)
+      .count();
+
+    const totalSolutions: number = await this.entityManager
+      .getRepository(Solution)
+      .count();
+
     return {
       data: {
         totalUsers,
@@ -16,29 +26,32 @@ export class DashboardService {
     };
   }
 
-  async getUsers() {
-    const data = await this.prismaService.user.findMany({
-      select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+  async getUsers(): Promise<{ data: User[] }> {
+    const data: User[] = await this.entityManager
+      .getRepository(User)
+      .find({
+        select: ['id', 'createdAt', 'updatedAt'],
+      });
     return { data };
   }
 
-  async countByStatus() {
-    const data = await this.prismaService.solution.groupBy({
-      by: ['statusId'],
-      _count: true,
-    });
-    const status = await this.prismaService.status.findMany();
-    const statusMap = status.reduce((acc, curr) => {
-      acc.push({ id: curr.id, name: curr.name });
-      return acc;
-    }, []);
-    const formattedData = statusMap.map((item) => {
-      const count = data.find((d) => d.statusId === item.id)?._count ?? 0;
+  async countByStatus(): Promise<{ data: { status: string; count: number }[] }> {
+    const data: Solution[] = await this.entityManager
+      .getRepository(Solution)
+      .createQueryBuilder('solution')
+      .select('solution.statusId, COUNT(solution.statusId) as count')
+      .groupBy('solution.statusId')
+      .getMany();
+
+    const status: Status[] = await this.entityManager
+      .getRepository(Status)
+      .find();
+
+    const statusMap: { id: number, name: string }[] = status.map((status) => ({ id: status.id, name: status.name }));
+
+    const formattedData: { count: number, status: string }[] = statusMap.map((item) => {
+      const countObj: Solution = data.find((d) => d.statusId === item.id);
+      const count: number = countObj ? parseInt(countObj['count']) : 0;
       return {
         status: item.name,
         count,
@@ -47,27 +60,22 @@ export class DashboardService {
     return { data: formattedData };
   }
 
-  async getSolutions() {
-    const data = await this.prismaService.solution.findMany({
-      select: {
-        id: true,
-        status: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+
+  async getSolutions(): Promise<{ data: Solution[] }> {
+    const data: Solution[] = await this.entityManager
+      .getRepository(Solution)
+      .find({
+        select: ['id', 'createdAt', 'updatedAt'],
+      });
     return { data };
   }
 
-  async getSolutionsAndThematics() {
-    const data = await this.prismaService.solution.findMany({
-      select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        thematic: true,
-      },
-    });
+  async getSolutionsAndThematics(): Promise<{ data: Solution[] }> {
+    const data: Solution[] = await this.entityManager
+      .getRepository(Solution)
+      .find({
+        select: ['id', 'createdAt', 'updatedAt', 'thematic'],
+      });
     return { data };
   }
 }

@@ -1,29 +1,22 @@
-import { PrismaService } from '../database/prisma.service';
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateThematicDto } from './dto/create-thematic.dto';
 import { UpdateThematicDto } from './dto/update-thematic.dto';
-import { Thematic } from '@prisma/client';
+import { Repository } from 'typeorm';
+import { Thematic } from './entities/thematic.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class ThematicsService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    @InjectRepository(Thematic)
+    private readonly thematicRepository: Repository<Thematic>,
+  ) {
+  }
 
-  async create(dto: CreateThematicDto) {
+  async create(dto: CreateThematicDto): Promise<{ data: Thematic }> {
     try {
-      await this.prismaService.thematic.create({
-        data: {
-          ...dto,
-          calls: {
-            connect: {
-              id: dto.call,
-            },
-          },
-        },
-      });
+      const data: Thematic = await this.thematicRepository.save(dto);
+      return { data };
     } catch {
       throw new NotFoundException(
         'Erreur lors de la création de la thématique',
@@ -31,33 +24,17 @@ export class ThematicsService {
     }
   }
 
-  async findAll() {
-    const data: Thematic[] = await this.prismaService.thematic.findMany();
+  async findAll(): Promise<{ data: Thematic[] }> {
+    const data: Thematic[] = await this.thematicRepository.find({
+      order: { updatedAt: 'DESC' },
+    });
     return { data };
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<{ data: Thematic }> {
     try {
-      const data: Thematic = await this.prismaService.thematic.findUnique({
+      const data: Thematic = await this.thematicRepository.findOneOrFail({
         where: { id },
-        include: {
-          challenges: true,
-        },
-      });
-      if (!data)
-        throw new NotFoundException("La thématique n'a pas été trouvé");
-      return { data };
-    } catch {
-      throw new BadRequestException(
-        'Erreur lors de la récupération de la thématique',
-      );
-    }
-  }
-
-  async findByCall(callId: number) {
-    try {
-      const data: Thematic[] = await this.prismaService.thematic.findMany({
-        where: { calls: { some: { id: callId } } },
       });
       return { data };
     } catch {
@@ -67,13 +44,11 @@ export class ThematicsService {
     }
   }
 
-  async update(id: number, dto: UpdateThematicDto) {
+  async update(id: number, dto: UpdateThematicDto): Promise<{ data: Thematic }> {
     try {
-      await this.findOne(id);
-      const data: Thematic = await this.prismaService.thematic.update({
-        data: dto,
-        where: { id },
-      });
+      const { data: thematic } = await this.findOne(id);
+      const updatedThematic: Thematic & UpdateThematicDto = Object.assign(thematic, dto);
+      const data: Thematic = await this.thematicRepository.save(updatedThematic);
       return { data };
     } catch {
       throw new BadRequestException(
@@ -82,12 +57,10 @@ export class ThematicsService {
     }
   }
 
-  async remove(id: number) {
+  async remove(id: number): Promise<void> {
     try {
       await this.findOne(id);
-      await this.prismaService.thematic.delete({
-        where: { id },
-      });
+      await this.thematicRepository.delete(id);
     } catch {
       throw new BadRequestException(
         'Erreur lors de la suppression de la thématique',

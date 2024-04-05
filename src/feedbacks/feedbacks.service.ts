@@ -1,28 +1,26 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
-import { Feedback } from '@prisma/client';
-import { PrismaService } from 'src/database/prisma.service';
+import { Repository } from 'typeorm';
+import { Feedback } from './entities/feedback.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+
 
 @Injectable()
 export class FeedbacksService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    @InjectRepository(Feedback)
+    private readonly feedbackRepository: Repository<Feedback>,
+  ) {
+  }
 
-  async create(dto: CreateFeedbackDto) {
+  async create(dto: CreateFeedbackDto): Promise<{ data: Feedback }> {
     try {
-      const data: Feedback = await this.prismaService.feedback.create({
-        data: {
-          ...dto,
-          quotations: dto.quotations.join(', '),
-          user: {
-            connect: {
-              email: dto.user,
-            },
-          },
+      const data: Feedback = await this.feedbackRepository.save({
+        ...dto,
+        quotations: dto.quotations.join(', '),
+        user: {
+          email: dto.user,
         },
       });
       return { data };
@@ -31,43 +29,34 @@ export class FeedbacksService {
     }
   }
 
-  async findAll() {
-    const data = await this.prismaService.feedback.findMany({
-      include: {
-        user: true,
-      },
+  async findAll(): Promise<{ data: Feedback[] }> {
+    const data: Feedback[] = await this.feedbackRepository.find({
+      relations: ['user'],
     });
     return { data };
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<{ data: Feedback }> {
     try {
-      const data = await this.prismaService.feedback.findUnique({
+      const data: Feedback = await this.feedbackRepository.findOne({
         where: { id },
-        include: {
-          user: true,
-        },
+        relations: ['user'],
       });
-      if (!data) throw new NotFoundException(`Ce feedback n'existe pas`);
       return { data };
     } catch {
       throw new NotFoundException('Impossible de récupérer le feedback');
     }
   }
 
-  async update(id: number, dto: UpdateFeedbackDto) {
+  async update(id: number, dto: UpdateFeedbackDto): Promise<{ data: Feedback }> {
     try {
       const { data: feedback } = await this.findOne(id);
-      const data = await this.prismaService.feedback.update({
-        where: { id },
-        data: {
-          ...dto,
-          quotations: dto.quotations.join(', '),
-          user: {
-            connect: {
-              email: dto.user ?? feedback.user.email,
-            },
-          },
+      const updatedFeedbackDto: Feedback & UpdateFeedbackDto = Object.assign(feedback, dto);
+      const data: Feedback = await this.feedbackRepository.save({
+        ...updatedFeedbackDto,
+        quotations: updatedFeedbackDto.quotations.join(', '),
+        user: {
+          email: updatedFeedbackDto.user,
         },
       });
       return { data };
@@ -76,12 +65,10 @@ export class FeedbacksService {
     }
   }
 
-  async remove(id: number) {
+  async remove(id: number): Promise<void> {
     try {
       await this.findOne(id);
-      await this.prismaService.feedback.delete({
-        where: { id },
-      });
+      await this.feedbackRepository.delete(id);
     } catch {
       throw new NotFoundException('Impossible de supprimer le feedback');
     }

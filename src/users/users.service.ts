@@ -1,11 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { PrismaService } from '../database/prisma.service';
-import * as bcrypt from 'bcrypt';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import * as fs from 'fs';
 import { promisify } from 'util';
 import { SignupDto } from '../auth/dto/register.dto';
@@ -13,332 +6,211 @@ import CreateUserDto from './dto/create-user.dto';
 import { CreateWithGoogleDto } from './dto/create-with-google.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import UpdateProfileDto from '../auth/dto/update-profile.dto';
-import { User } from '@prisma/client';
-import { randomPassword } from 'src/helpers/random-password';
-import { MailerService } from '@nestjs-modules/mailer';
-import { ConfigService } from '@nestjs/config';
-import { paginate } from 'src/helpers/paginate';
 import { EmailService } from 'src/email/email.service';
 import { CurrentUser } from 'src/auth/decorators/user.decorator';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
+import { randomPassword } from '../helpers/random-password';
+import { RoleEnum } from '../auth/enums/role.enum';
+import { InjectRepository } from '@nestjs/typeorm';
 
 const unlinkAsync = promisify(fs.unlink);
 
 @Injectable()
 export class UsersService {
   constructor(
-    private readonly prismaService: PrismaService,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly emailService: EmailService,
-  ) {}
+  ) {
+  }
 
-  async create(dto: CreateUserDto) {
+  async create(dto: CreateUserDto): Promise<{ data: User }> {
     try {
-      await this.userExist(dto.email);
-      const password: string = randomPassword();
-      const hash = await this.hashPassword(password);
-      const user = await this.prismaService.user.create({
-        data: {
-          ...dto,
-          password: hash,
-          organisation: {
-            connect: {
-              id: dto.organisation,
-            },
-          },
-          pole: {
-            connect: {
-              id: dto.pole,
-            },
-          },
-          roles: {
-            connect: dto.roles.map((id) => ({ id })),
-          },
-        },
-      });
-      await this.emailService.sendRegisteringCurator(user, password);
-    } catch {
-      throw new BadRequestException(
-        "Erreur lors de la création de l'utilisateur",
-      );
-    }
-  }
-
-  async hashPassword(password: string) {
-    const salt = await bcrypt.genSalt(10);
-    return await bcrypt.hash(password, salt);
-  }
-
-  async userExist(email: string) {
-    const user = await this.prismaService.user.findUnique({
-      where: { email },
-    });
-    if (user) throw new ConflictException("L'utilisateur existe déjà");
-  }
-
-  async register(registerDto: SignupDto) {
-    await this.userExist(registerDto.email);
-    delete registerDto.passwordConfirm;
-    const password: string = registerDto.password as string;
-    const hash = await this.hashPassword(password);
-    const data = await this.prismaService.user.create({
-      data: {
-        ...registerDto,
-        password: hash,
-        roles: {
-          connect: {
-            id: 3,
-          },
-        },
-      },
-    });
-    return { data };
-  }
-
-  async findAll(page: number) {
-    const { offset, limit } = paginate(page, 10);
-    const data: User[] = await this.prismaService.user.findMany({
-      skip: offset,
-      take: limit,
-      include: {
-        roles: true,
-      },
-    });
-    return { data };
-  }
-
-  async findAllCurators(page: number) {
-    const { offset, limit } = paginate(page, 10);
-    const data = await this.prismaService.user.findMany({
-      skip: offset,
-      take: limit,
-      where: {
-        roles: {
-          some: {
-            id: 1,
-          },
-        },
-      },
-      include: {
-        roles: true,
-        pole: true,
-        organisation: true,
-      },
-    });
-    return { data };
-  }
-
-  async findAllAdmins(page: number) {
-    const { offset, limit } = paginate(page, 10);
-    const data = await this.prismaService.user.findMany({
-      skip: offset,
-      take: limit,
-      where: {
-        roles: {
-          some: {
-            id: 4,
-          },
-        },
-      },
-      include: {
-        roles: true,
-      },
-    });
-    return { data };
-  }
-
-  async findOne(id: number) {
-    try {
-      const data = await this.prismaService.user.findUnique({
-        where: { id },
-        include: {
-          roles: true,
-        },
-      });
-      if (!data)
-        throw new NotFoundException("L'utilisateur n'a pas été trouvé");
-      return { data };
-    } catch {
-      throw new BadRequestException(
-        "Erreur lors de la récupération de l'utilisateur",
-      );
-    }
-  }
-
-  async findOrCreate(dto: CreateWithGoogleDto) {
-    try {
-      let user = await this.prismaService.user.findUnique({
+      const exists: boolean = await this.userRepository.exists({
         where: { email: dto.email },
       });
-      if (!user) {
-        user = await this.prismaService.user.create({
-          data: {
-            ...dto,
-            roles: {
-              connect: {
-                id: 3,
-              },
-            },
-          },
-        });
-      }
-      return user;
+      if (exists) new ConflictException();
+      const user: User = await this.userRepository.save({
+        ...dto,
+        organisation: { id: dto.organisation },
+        pole: { id: dto.pole },
+        roles: dto.roles.map((id) => ({ id })),
+      });
+      const password: string = randomPassword();
+      await this.emailService.sendRegisteringCurator(user, password);
+      return { data: user };
     } catch {
       throw new BadRequestException(
-        "Erreur lors de la récupération de l'utilisateur",
+        'Erreur lors de la création de l\'utilisateur',
       );
     }
   }
 
-  async findBy(email: string) {
-    const user = await this.prismaService.user.findUnique({
-      where: { email },
-      include: {
-        roles: true,
-      },
+  async register(dto: SignupDto): Promise<{ data: User }> {
+    const exists: boolean = await this.userRepository.exists({
+      where: { email: dto.email },
     });
-    if (!user) throw new NotFoundException("L'utilisateur n'a pas été trouvé");
-    return user;
+    if (exists) new ConflictException();
+    delete dto.passwordConfirm;
+    const data: User = await this.userRepository.save({
+      ...dto,
+      roles: [{ id: 3 }],
+    });
+    return { data };
   }
 
-  async update(id: number, dto: UpdateUserDto) {
+  async findAll(): Promise<{ data: User[] }> {
+    const data: User[] = await this.userRepository.find({
+      relations: ['roles'],
+      order: { createdAt: 'DESC' },
+    });
+    return { data };
+  }
+
+  async findCurators(): Promise<{ data: User[] }> {
+    const data: User[] = await this.userRepository
+      .find({
+        where: { roles: { name: RoleEnum.Curator } },
+        relations: ['roles'],
+      });
+    return { data };
+  }
+
+  async findAdmins(): Promise<{ data: User[] }> {
+    const data: User[] = await this.userRepository.find({
+      where: {
+        roles: { name: RoleEnum.Admin },
+      },
+    });
+    return { data };
+  }
+
+  async findOne(id: number): Promise<{ data: User }> {
     try {
-      const { data: user } = await this.findOne(id);
-      const data: User = await this.prismaService.user.update({
+      const data: User = await this.userRepository.findOneOrFail({
         where: { id },
-        data: {
-          ...dto,
-          organisation: {
-            connect: {
-              id: dto.organisation ?? user.organisationId,
-            },
-          },
-          pole: {
-            connect: {
-              id: dto.pole ?? user.poleId,
-            },
-          },
-          roles: {
-            set: dto?.roles?.map((id) => ({ id })) ?? user.roles,
-          },
-        },
+        relations: ['roles', 'pole', 'organisation'],
       });
       return { data };
     } catch {
-      throw new BadRequestException(
-        "Erreur lors de la modification de l'utilisateur",
-      );
+      throw new BadRequestException('Erreur lors de la récupération de l\'utilisateur');
     }
   }
 
-  async passwordMatch(password: string, hash: string) {
-    if (!hash)
-      throw new BadRequestException('Les identifiants saisis sont invalides');
-    return await bcrypt.compare(password, hash);
+  async findByEmail(email: string): Promise<{ data: User }> {
+    try {
+      const data: User = await this.userRepository.findOneOrFail({
+        where: { email },
+      });
+      return { data };
+    } catch {
+      throw new BadRequestException('Erreur lors de la récupération de l\'utilisateur');
+    }
   }
 
-  async updateProfile(@CurrentUser() currentUser: User, dto: UpdateProfileDto) {
+  async findOrCreate(dto: CreateWithGoogleDto): Promise<{ data: User }> {
     try {
-      const data: User = await this.prismaService.user.update({
-        where: { id: currentUser.id },
-        data: {
-          name: dto.name,
-          address: dto.address,
-          phoneNumber: dto.phoneNumber,
-        },
+      const existingUser: User = await this.userRepository.findOne({
+        where: { email: dto.email },
       });
-      const isMatch =
-        dto.oldPassword &&
-        dto.password &&
-        (await this.passwordMatch(dto.oldPassword, data.password));
-      if (isMatch) {
-        await this.updatePassword(data.id, dto.password);
-      } else if (dto.oldPassword && dto.password) {
-        throw new BadRequestException('Les identifiants saisis sont invalides');
-      }
+      if (existingUser) return { data: existingUser };
+      const newUser: User = await this.userRepository.save({
+        ...dto,
+        roles: [{ name: RoleEnum.User }],
+      });
+      return { data: newUser };
+    } catch {
+      throw new BadRequestException('Erreur lors de la récupération de l\'utilisateur');
+    }
+  }
+
+
+  async update(id: number, dto: UpdateUserDto): Promise<{ data: User }> {
+    try {
+      const { data: user } = await this.findOne(id);
+      const updatedUser: User & UpdateUserDto = Object.assign(user, dto);
+      const data: User = await this.userRepository.save({
+        ...updatedUser,
+        organisation: {
+          id: dto.organisation ?? user.organisationId,
+        },
+        pole: {
+          id: dto.pole ?? user.poleId,
+        },
+        roles: dto?.roles?.map((id) => ({ id })) ?? user.roles,
+      });
+      return { data };
+    } catch {
+      throw new BadRequestException('Erreur lors de la modification de l\'utilisateur');
+    }
+  }
+
+
+  async updateProfile(@CurrentUser() currentUser: User, dto: UpdateProfileDto): Promise<{ data: User }> {
+    try {
+      const updatedProfile: User & UpdateProfileDto = Object.assign(currentUser, dto);
+      const data: User = await this.userRepository.save(updatedProfile);
       return { data };
     } catch {
       throw new BadRequestException('Erreur lors de la modification du profil');
     }
   }
 
-  async remove(id: number) {
-    try {
-      await this.findOne(id);
-      await this.prismaService.user.delete({
-        where: { id },
-      });
-    } catch {
-      throw new BadRequestException(
-        "Erreur lors de la suppression de l'utilisateur",
-      );
-    }
-  }
 
-  async uploadImage(id: number, image: Express.Multer.File): Promise<any> {
+  async uploadImage(id: number, image: Express.Multer.File): Promise<void> {
     try {
-      const user = await this.prismaService.user.findUnique({
-        where: { id },
-      });
+      const { data: user } = await this.findOne(id);
       if (user.profile) await unlinkAsync(`./uploads/${user.profile}`);
-      await this.prismaService.user.update({
-        where: { id },
-        data: {
-          profile: image.filename,
-        },
+      await this.userRepository.update(id, {
+        profile: image.filename,
       });
     } catch {
       throw new BadRequestException(
-        "Erreur lors de la modification de l'image",
+        'Erreur lors de la modification de l\'image',
       );
     }
   }
 
-  async deleteImage(id: number): Promise<any> {
+  async deleteProfileImage(id: number): Promise<void> {
     try {
       const { data: user } = await this.findOne(id);
       await unlinkAsync(`./uploads/${user.profile} `);
-      await this.prismaService.user.update({
-        where: { id },
-        data: { profile: null },
-      });
+      await this.userRepository.update(id, { profile: null });
     } catch {
-      throw new BadRequestException("Erreur lors de la suppression de l'image");
+      throw new BadRequestException('Erreur lors de la suppression de l\'image');
     }
   }
 
-  async updatePassword(id: number, password: string) {
+  async updatePassword(id: number, password: string): Promise<void> {
+    await this.userRepository.update(id, { password });
+  }
+
+
+  async findByResetToken(token: string): Promise<{ data: User }> {
     try {
-      const salt = await bcrypt.genSalt(10);
-      const passwordHash: string = await bcrypt.hash(password, salt);
-      await this.prismaService.user.update({
-        where: { id },
-        data: { password: passwordHash },
-      });
+      const data: User = await this.userRepository.findOneByOrFail({ token });
+      return { data };
     } catch {
-      throw new BadRequestException(
-        'Erreur lors de la modification du mot de passe',
-      );
+      throw new NotFoundException('le code fourni est invalide');
     }
   }
 
-  async saveResetToken(email: string, token: string) {
-    await this.prismaService.user.update({
-      where: { email },
-      data: { token },
-    });
+  async resetPassword(id: number, password: string): Promise<void> {
+    try {
+      await this.userRepository.update(id, { password, token: null });
+    } catch {
+      throw new BadRequestException('Erreur lors de la réinitialisation du mot de passe');
+    }
   }
 
-  async findByResetToken(token: string) {
-    const user = await this.prismaService.user.findFirst({
-      where: { token },
-    });
-    if (!user) throw new NotFoundException('le code fourni est invalide');
-    return user;
-  }
 
-  async removeResetToken(id: number) {
-    await this.prismaService.user.update({
-      where: { id },
-      data: { token: null },
-    });
+  async remove(id: number): Promise<void> {
+    try {
+      await this.findOne(id);
+      await this.userRepository.delete(id);
+    } catch {
+      throw new BadRequestException('Erreur lors de la suppression de l\'utilisateur');
+    }
   }
 }

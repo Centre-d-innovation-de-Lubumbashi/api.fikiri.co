@@ -1,15 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -18,48 +7,42 @@ import CreateUserDto from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RoleEnum } from 'src/auth/enums/role.enum';
+import { User } from './entities/user.entity';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly userService: UsersService) {}
+  constructor(private readonly userService: UsersService) {
+  }
 
   @Post()
   @Roles(RoleEnum.Admin)
-  create(@Body() createUserDto: CreateUserDto) {
+  create(@Body() createUserDto: CreateUserDto): Promise<{ data: User }> {
     return this.userService.create(createUserDto);
   }
 
   @Get()
-  findAll(@Query('page') page: string) {
-    return this.userService.findAll(+page);
+  findAll(): Promise<{ data: User [] }> {
+    return this.userService.findAll();
   }
 
   @Get('curators')
-  findAllCurators(@Query('page') page: string) {
-    return this.userService.findAllCurators(+page);
+  findCurators(): Promise<{ data: User[] }> {
+    return this.userService.findCurators();
   }
 
   @Get('admins')
-  findAllAdmins(@Query('page') page: string) {
-    return this.userService.findAllAdmins(+page);
+  findAdmins(): Promise<{ data: User[] }> {
+    return this.userService.findAdmins();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string): Promise<{ data: User }> {
     return this.userService.findOne(+id);
-  }
-
-  @Get(':email')
-  findByMail(@Param('email') email: string) {
-    return this.userService.findBy(email);
   }
 
   @Patch(':id')
   @Roles(RoleEnum.Admin)
-  update(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
-  ): Promise<any> {
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<{ data: User }> {
     return this.userService.update(+id, updateUserDto);
   }
 
@@ -67,28 +50,25 @@ export class UsersController {
     FileInterceptor('thumb', {
       storage: diskStorage({
         destination: './uploads',
-        filename: function (_req, file, cb) {
+        filename: function(_req, file, cb) {
           cb(null, `${uuidv4()}.${file.mimetype.split('/')[1]}`);
         },
       }),
     }),
   )
   @Post(':id/image')
-  uploadImage(
-    @Param('id') id: string,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
+  uploadImage(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<void> {
     return this.userService.uploadImage(+id, file);
   }
 
   @Delete(':id/image/delete')
-  removeImage(@Param('id') id: string) {
-    return this.userService.deleteImage(+id);
+  removeImage(@Param('id') id: string): Promise<void> {
+    return this.userService.deleteProfileImage(+id);
   }
 
   @Delete(':id')
   @Roles(RoleEnum.Admin)
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: string): Promise<void> {
     return this.userService.remove(+id);
   }
 }

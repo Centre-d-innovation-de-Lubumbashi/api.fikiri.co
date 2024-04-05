@@ -1,16 +1,11 @@
 import { Reflector } from '@nestjs/core';
-import {
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
 import { IS_PUBLIC } from '../decorators/public.decorator';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(private reflector: Reflector) {
+  }
 
   async canActivate(context: ExecutionContext) {
     const isPublic =

@@ -1,68 +1,40 @@
-import { MailerService } from '@nestjs-modules/mailer';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
-import { PrismaService } from 'src/database/prisma.service';
 import { CreateFeedbackDto } from 'src/feedbacks/dto/create-feedback.dto';
 import { UpdateFeedbackDto } from 'src/feedbacks/dto/update-feedback.dto';
 import { FeedbacksService } from 'src/feedbacks/feedbacks.service';
+import { Repository } from 'typeorm';
+import { Solution } from './entities/solution.entity';
+import { QuotationsService } from '../quotations/quotations.service';
+import { Feedback } from '../feedbacks/entities/feedback.entity';
+import { Quotation } from '../quotations/entities/quotation.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class SolutionsFeedbacksService {
   constructor(
-    private readonly prismaService: PrismaService,
+    @InjectRepository(Solution)
+    private readonly solutionRepository: Repository<Solution>,
     private readonly feedbacksService: FeedbacksService,
-    private readonly mailService: MailerService,
-  ) {}
-
-  async sendComment(user: User, comment: string) {
-    try {
-      await this.mailService.sendMail({
-        to: user.email,
-        subject: 'Commentaire sur votre solution soumise sur fikiri',
-        text: `
-Bonjour ${user.name},
-
-${comment}
-
-L'équipe Fikiri,
-Cordialement.
-      `,
-      });
-    } catch {
-      throw new BadRequestException("Erreur lors de l'envoi du commentaire");
-    }
+    private readonly quotationsService: QuotationsService,
+  ) {
   }
 
-  async addFeedback(id: number, dto: CreateFeedbackDto) {
+  async addFeedback(id: number, dto: CreateFeedbackDto): Promise<{ data: Solution }> {
     try {
-      const solution = await this.prismaService.solution.findUnique({
+      const solution: Solution = await this.solutionRepository.findOneOrFail({
         where: { id },
-        include: {
-          user: true,
-        },
+        relations: ['user'],
       });
-      const { data } = await this.feedbacksService.create(dto);
-      await this.prismaService.solution.update({
-        where: { id },
-        data: {
-          feedbacks: {
-            connect: {
-              id: data.id,
-            },
-          },
-        },
-      });
-      if (dto?.userComment)
-        await this.sendComment(solution.user, data.userComment);
+      const { data: feedBack } = await this.feedbacksService.create(dto);
+      solution.feedbacks = [...solution.feedbacks, feedBack];
+      const data: Solution = await this.solutionRepository.save(solution);
       return { data };
     } catch {
-      throw new BadRequestException(
-        "Erreur lors de l'ajout du feedback à la solution",
-      );
+      throw new BadRequestException('Erreur lors de l\'ajout du feedback à la solution');
     }
   }
 
-  async updateFeedback(id: number, dto: UpdateFeedbackDto) {
+  async updateFeedback(id: number, dto: UpdateFeedbackDto): Promise<{ data: Feedback }> {
     try {
       await this.feedbacksService.findOne(id);
       const { data } = await this.feedbacksService.update(id, dto);
@@ -74,7 +46,7 @@ Cordialement.
     }
   }
 
-  async deleteFeedback(id: number) {
+  async deleteFeedback(id: number): Promise<void> {
     try {
       await this.feedbacksService.findOne(id);
       await this.feedbacksService.remove(id);
@@ -85,39 +57,18 @@ Cordialement.
     }
   }
 
-  async findFeedbacksQuotations(id: number) {
+  async findFeedbacksQuotations(id: number): Promise<{ data: Quotation }[]> {
     try {
-      const solution = await this.prismaService.solution.findUnique({
+      const solution: Solution = await this.solutionRepository.findOne({
         where: { id },
-        include: {
-          feedbacks: true,
-        },
+        relations: ['feedbacks'],
       });
-      const quotations = solution.feedbacks.map((feedback) =>
-        feedback.quotations.split(',').map((quotation) => parseInt(quotation)),
-      );
-      const data = await Promise.all(
-        quotations.map(async (quotation) => {
-          const promises = quotation.map(async (id) => {
-            const data = await this.prismaService.quotation.findUnique({
-              where: { id },
-              select: {
-                id: true,
-                mention: true,
-                average: true,
-              },
-            });
-            return data;
-          });
-          return await Promise.all(promises);
-        }),
-      );
-
-      return { data };
+      const feedbackQuotations: number[] = solution.feedbacks.flatMap(feedback => feedback.quotations.split(',').map(Number));
+      const quotationPromises = feedbackQuotations.map(quotationId => this.quotationsService.findOne(quotationId));
+      return await Promise.all(quotationPromises);
     } catch {
-      throw new BadRequestException(
-        'Erreur lors de la récupération des citations du feedback',
-      );
+      throw new BadRequestException('Error fetching feedback quotations.');
     }
   }
+
 }

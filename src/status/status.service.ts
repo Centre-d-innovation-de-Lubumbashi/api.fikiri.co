@@ -1,31 +1,37 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PrismaService } from '../database/prisma.service';
 import { CreateStatusDto } from './dto/create-status.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
-import { Status } from '@prisma/client';
+import { Repository } from 'typeorm';
+import { Status } from './entities/status.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class StatusService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    @InjectRepository(Status)
+    private readonly statusRepository: Repository<Status>,
+  ) {
+  }
 
-  async create(dto: CreateStatusDto) {
+  async create(dto: CreateStatusDto): Promise<{ data: Status }> {
     try {
-      await this.prismaService.status.create({
-        data: dto,
-      });
+      const data: Status = await this.statusRepository.save(dto);
+      return { data };
     } catch {
       throw new BadRequestException('Erreur lors de la création du status');
     }
   }
 
-  async findAll() {
-    const data: Status[] = await this.prismaService.status.findMany();
+  async findAll(): Promise<{ data: Status[] }> {
+    const data: Status[] = await this.statusRepository.find({
+      order: { updatedAt: 'DESC' },
+    });
     return { data };
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<{ data: Status }> {
     try {
-      const data: Status = await this.prismaService.status.findUnique({
+      const data: Status = await this.statusRepository.findOneOrFail({
         where: { id },
       });
       return { data };
@@ -34,25 +40,21 @@ export class StatusService {
     }
   }
 
-  async update(id: number, dto: UpdateStatusDto) {
+  async update(id: number, dto: UpdateStatusDto): Promise<{ data: Status }> {
     try {
-      await this.findOne(id);
-      const data: Status = await this.prismaService.status.update({
-        where: { id },
-        data: dto,
-      });
+      const { data: status } = await this.findOne(id);
+      const updatedStatus: Status & UpdateStatusDto = Object.assign(status, dto);
+      const data: Status = await this.statusRepository.save(updatedStatus);
       return { data };
     } catch {
       throw new BadRequestException('Erreur lors de la mise à jour du status');
     }
   }
 
-  async delete(id: number) {
+  async delete(id: number): Promise<void> {
     try {
       await this.findOne(id);
-      await this.prismaService.status.delete({
-        where: { id },
-      });
+      await this.statusRepository.delete(id);
     } catch {
       throw new BadRequestException('Erreur lors de la suppression du status');
     }

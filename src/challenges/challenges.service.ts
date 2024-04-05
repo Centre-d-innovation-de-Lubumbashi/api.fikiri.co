@@ -1,41 +1,39 @@
-import { PrismaService } from '../database/prisma.service';
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
+import { Repository } from 'typeorm';
+import { Challenge } from './entities/challenge.entity';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
-import { Challenge } from '@prisma/client';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class ChallengesService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    @InjectRepository(Challenge)
+    private readonly challengeRepository: Repository<Challenge>
+  ) {
+  }
 
-  async create(dto: CreateChallengeDto) {
+  async create(dto: CreateChallengeDto): Promise<{ data: Challenge }> {
     try {
-      await this.prismaService.challenge.create({
-        data: {
-          ...dto,
-          thematics: {
-            connect: dto.thematics.map((id) => ({ id })),
-          },
-        },
+      const data: Challenge = await this.challengeRepository.save({
+        ...dto,
+        thematics: dto.thematics.map((id: number) => ({ id })),
       });
+      return { data };
     } catch {
       throw new BadRequestException('Impossible de créer le défi');
     }
   }
 
-  async findAll() {
-    const data: Challenge[] = await this.prismaService.challenge.findMany();
+  async findAll(): Promise<{ data: Challenge[] }> {
+    const data: Challenge[] = await this.challengeRepository.find();
     return { data };
   }
 
   async findByThematic(thematicId: number) {
     try {
-      const data = await this.prismaService.challenge.findMany({
-        where: { thematics: { some: { id: thematicId } } },
+      const data: Challenge[] = await this.challengeRepository.find({
+        where: { thematics: { id: thematicId } },
       });
       return { data };
     } catch {
@@ -45,46 +43,30 @@ export class ChallengesService {
     }
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<{ data: Challenge }> {
     try {
-      const data = await this.prismaService.challenge.findUnique({
-        where: { id },
-        include: {
-          thematics: true,
-        },
-      });
-      if (!data) throw new NotFoundException("Le défi n'a pas été trouvé");
+      const data: Challenge = await this.challengeRepository.findOne({ where: { id } });
       return { data };
     } catch {
-      throw new NotFoundException('Impossible de trouver le défi');
+      throw new NotFoundException('Impossible de récupérer le défi');
     }
   }
 
-  async update(id: number, dto: UpdateChallengeDto) {
+  async update(id: number, dto: UpdateChallengeDto): Promise<{ data: Challenge }> {
     try {
       const { data: challenge } = await this.findOne(id);
-      const data = await this.prismaService.challenge.update({
-        where: { id },
-        data: {
-          ...dto,
-          thematics: {
-            connect:
-              dto?.thematics?.map((id) => ({ id })) || challenge.thematics,
-          },
-        },
-      });
+      const updatedChallenge: Challenge & UpdateChallengeDto = Object.assign(challenge, dto);
+      const data: Challenge = await this.challengeRepository.save(updatedChallenge);
       return { data };
     } catch {
       throw new BadRequestException('Impossible de mettre à jour le défi');
     }
   }
 
-  async remove(id: number) {
+  async remove(id: number): Promise<void> {
     try {
       await this.findOne(id);
-      await this.prismaService.challenge.delete({
-        where: { id },
-      });
+      await this.challengeRepository.delete(id);
     } catch {
       throw new BadRequestException('Impossible de supprimer le défi');
     }

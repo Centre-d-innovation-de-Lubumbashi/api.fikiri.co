@@ -4,8 +4,8 @@ import { IsOptional } from 'class-validator';
 
 export class UpdateSolutionDto extends PartialType<CreateSolutionDto>(CreateSolutionDto) {
   @IsOptional()
-  pole: number
+  pole: number;
 
   @IsOptional()
-  status: number
+  status: number;
 }
