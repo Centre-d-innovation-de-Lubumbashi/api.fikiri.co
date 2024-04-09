@@ -1,4 +1,13 @@
-import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Solution } from '../../solutions/entities/solution.entity';
 import { Thematic } from '../../thematics/entities/thematic.entity';
 
@@ -11,24 +20,25 @@ export class Call {
   name: string;
 
   @Column()
-  startedAt: Date;
+  started_at: Date;
 
   @Column()
-  endedAt: Date;
+  ended_at: Date;
 
   @Column({ type: 'text' })
   description: string;
 
-  @Column({ nullable: true, default: () => 'now()' })
-  createdAt?: Date;
+  @CreateDateColumn({ type: 'datetime' })
+  created_at?: Date;
 
-  @Column({ nullable: true, onUpdate: 'CURRENT_TIMESTAMP' })
-  updatedAt?: Date;
+  @UpdateDateColumn({ type: 'datetime' })
+  updated_at?: Date;
 
   @OneToMany(() => Solution, (solution) => solution.call)
   solutions: Solution[];
 
   @ManyToMany(() => Thematic, (thematic) => thematic.calls)
-  @JoinTable({ name: 'CallToThematic' })
+  @JoinTable()
   thematics: Thematic[];
 }
+

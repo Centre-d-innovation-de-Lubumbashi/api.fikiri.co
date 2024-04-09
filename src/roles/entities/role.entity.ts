@@ -1,4 +1,4 @@
-import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
 @Entity()
@@ -9,13 +9,12 @@ export class Role {
   @Column({ unique: true })
   name: string;
 
-  @Column({ nullable: true, default: () => 'now()' })
-  createdAt?: Date;
+  @CreateDateColumn({ type: 'datetime' })
+  created_at: Date;
 
-  @Column({ nullable: true, onUpdate: 'CURRENT_TIMESTAMP' })
-  updatedAt?: Date;
+  @UpdateDateColumn({ type: 'datetime' })
+  updated_at: Date;
 
   @ManyToMany(() => User, (user) => user.roles)
-  @JoinTable({ name: 'RoleToUser' })
   users: User[];
 }

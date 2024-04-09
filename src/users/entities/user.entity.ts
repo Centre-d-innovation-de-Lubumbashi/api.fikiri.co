@@ -1,12 +1,16 @@
 import {
   BeforeInsert,
   Column,
+  CreateDateColumn,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Solution } from '../../solutions/entities/solution.entity';
 import { Feedback } from '../../feedbacks/entities/feedback.entity';
@@ -30,7 +34,7 @@ export class User {
   password?: string;
 
   @Column({ nullable: true })
-  phoneNumber?: string;
+  phone_number?: string;
 
   @Column({ nullable: true })
   address?: string;
@@ -39,38 +43,34 @@ export class User {
   token?: string;
 
   @Column({ nullable: true })
-  googleImage?: string;
+  google_image?: string;
 
   @Column({ nullable: true })
   profile?: string;
 
-  @Column({ nullable: true, default: () => 'now()' })
-  createdAt?: Date;
+  @CreateDateColumn({ type: 'datetime' })
+  created_at: Date;
 
-  @Column({ nullable: true, onUpdate: 'CURRENT_TIMESTAMP' })
-  updatedAt?: Date;
+  @UpdateDateColumn({ type: 'datetime' })
+  updated_at: Date;
 
   @OneToMany(() => Solution, (solution) => solution.user)
   solutions: Solution[];
 
-  @ManyToMany(() => Role, (role) => role.users)
-  @JoinTable({ name: 'RoleToUser' })
+  @ManyToMany(() => Role, (role) => role.users, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @JoinTable()
   roles: Role[];
 
-  @OneToMany(() => Feedback, (feedback) => feedback.user)
+  @OneToMany(() => Feedback, (feedback) => feedback.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   feedbacks: Feedback[];
 
-  @OneToOne(() => Pole, (pole) => pole.user)
-  pole?: Pole;
+  @ManyToOne(() => Pole, (pole) => pole.users)
+  @JoinColumn()
+  pole: Pole;
 
-  @Column({ nullable: true })
-  poleId?: number;
-
-  @OneToOne(() => Organisation, (organisation) => organisation.users)
-  organisation?: Organisation;
-
-  @Column({ nullable: true })
-  organisationId?: number;
+  @ManyToOne(() => Organisation, (organisation) => organisation.users)
+  @JoinColumn()
+  organisation: Organisation;
 
   @BeforeInsert()
   async hashPassword(): Promise<void> {

@@ -30,7 +30,7 @@ export class DashboardService {
     const data: User[] = await this.entityManager
       .getRepository(User)
       .find({
-        select: ['id', 'createdAt', 'updatedAt'],
+        select: ['id', 'created_at', 'updated_at'],
       });
     return { data };
   }
@@ -39,8 +39,8 @@ export class DashboardService {
     const data: Solution[] = await this.entityManager
       .getRepository(Solution)
       .createQueryBuilder('solution')
-      .select('solution.statusId, COUNT(solution.statusId) as count')
-      .groupBy('solution.statusId')
+      .select('solution.status.id, COUNT(solution.status.id) as count')
+      .groupBy('solution.status_id')
       .getMany();
 
     const status: Status[] = await this.entityManager
@@ -50,7 +50,7 @@ export class DashboardService {
     const statusMap: { id: number, name: string }[] = status.map((status) => ({ id: status.id, name: status.name }));
 
     const formattedData: { count: number, status: string }[] = statusMap.map((item) => {
-      const countObj: Solution = data.find((d) => d.statusId === item.id);
+      const countObj: Solution = data.find((d) => d.status.id === item.id);
       const count: number = countObj ? parseInt(countObj['count']) : 0;
       return {
         status: item.name,
@@ -65,7 +65,7 @@ export class DashboardService {
     const data: Solution[] = await this.entityManager
       .getRepository(Solution)
       .find({
-        select: ['id', 'createdAt', 'updatedAt'],
+        select: ['id', 'created_at', 'updated_at'],
       });
     return { data };
   }
@@ -74,7 +74,7 @@ export class DashboardService {
     const data: Solution[] = await this.entityManager
       .getRepository(Solution)
       .find({
-        select: ['id', 'createdAt', 'updatedAt', 'thematic'],
+        select: ['id', 'created_at', 'updated_at', 'thematic'],
       });
     return { data };
   }

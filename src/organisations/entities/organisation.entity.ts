@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
 @Entity()
@@ -9,11 +9,11 @@ export class Organisation {
   @Column({ unique: true })
   name: string;
 
-  @Column({ nullable: true, default: () => 'now()' })
-  createdAt?: Date;
+  @CreateDateColumn({ type: 'datetime' })
+  created_at?: Date;
 
-  @Column({ nullable: true, onUpdate: 'CURRENT_TIMESTAMP' })
-  updatedAt?: Date;
+  @UpdateDateColumn({ type: 'datetime' })
+  updated_at?: Date;
 
   @OneToMany(() => User, (user) => user.organisation)
   users: User[];

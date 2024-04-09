@@ -1,4 +1,4 @@
-import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Solution } from '../../solutions/entities/solution.entity';
 import { Thematic } from '../../thematics/entities/thematic.entity';
 
@@ -10,17 +10,15 @@ export class Challenge {
   @Column({ type: 'text' })
   name: string;
 
-  @Column({ nullable: true, default: () => 'now()' })
-  createdAt?: Date;
+  @CreateDateColumn({ type: 'datetime' })
+  created_at?: Date;
 
-  @Column({ nullable: true, onUpdate: 'CURRENT_TIMESTAMP' })
-  updatedAt?: Date;
+  @UpdateDateColumn({ type: 'datetime' })
+  updated_at?: Date;
 
   @ManyToMany(() => Solution, (solution) => solution.challenges)
-  @JoinTable({ name: 'ChallengeToSolution' })
   solutions: Solution[];
 
   @ManyToMany(() => Thematic, (thematic) => thematic.challenges)
-  @JoinTable({ name: 'ChallengeToThematic' })
   thematics: Thematic[];
 }

@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Solution } from '../../solutions/entities/solution.entity';
 import { User } from '../../users/entities/user.entity';
 
@@ -10,15 +10,15 @@ export class Pole {
   @Column({ unique: true })
   name: string;
 
-  @Column({ nullable: true, default: () => 'now()' })
-  createdAt?: Date;
+  @CreateDateColumn({ type: 'datetime' })
+  created_at?: Date;
 
-  @Column({ nullable: true, onUpdate: 'CURRENT_TIMESTAMP' })
-  updatedAt?: Date;
+  @UpdateDateColumn({ type: 'datetime' })
+  updated_at?: Date;
 
   @OneToMany(() => Solution, (solution) => solution.pole)
   solutions: Solution[];
 
-  @ManyToOne(() => User, (user) => user.pole, { nullable: true })
-  user?: User;
+  @OneToMany(() => User, (user) => user.pole, { nullable: true })
+  users: User[];
 }

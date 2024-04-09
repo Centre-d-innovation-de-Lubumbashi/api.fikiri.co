@@ -24,7 +24,7 @@ export class ImagesService {
 
   async findAll(): Promise<{ data: Image[] }> {
     const data: Image[] = await this.imageRepository.find({
-      order: { createdAt: 'DESC' },
+      order: { created_at: 'DESC' },
     });
     return { data };
   }

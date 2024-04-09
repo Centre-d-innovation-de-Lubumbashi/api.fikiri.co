@@ -24,7 +24,7 @@ export class RolesService {
 
   async findAll(): Promise<{ data: Role[] }> {
     const data: Role[] = await this.roleRepository.find({
-      order: { updatedAt: 'DESC' },
+      order: { updated_at: 'DESC' },
     });
     return { data };
   }

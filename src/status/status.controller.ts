@@ -5,7 +5,9 @@ import { CreateStatusDto } from './dto/create-status.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RoleEnum } from 'src/auth/enums/role.enum';
 import { Status } from './entities/status.entity';
+import { Public } from '../auth/decorators/public.decorator';
 
+@Public()
 @Controller('status')
 export class StatusController {
   constructor(private statusService: StatusService) {

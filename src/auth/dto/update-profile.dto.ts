@@ -5,7 +5,7 @@ export default class UpdateProfileDto {
   name: string;
 
   @IsNotEmpty({ message: 'Le numéro de télephone est obligatoire' })
-  phoneNumber: string;
+  phone_number: string;
 
   @IsNotEmpty({ message: 'L\'adresse est obligatoire' })
   address: string;

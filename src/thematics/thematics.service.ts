@@ -26,7 +26,7 @@ export class ThematicsService {
 
   async findAll(): Promise<{ data: Thematic[] }> {
     const data: Thematic[] = await this.thematicRepository.find({
-      order: { updatedAt: 'DESC' },
+      order: { updated_at: 'DESC' },
     });
     return { data };
   }

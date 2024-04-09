@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Solution } from '../../solutions/entities/solution.entity';
 
 @Entity()
@@ -7,14 +7,14 @@ export class Image {
   id: number;
 
   @Column()
-  imageLink: string;
+  image_link: string;
 
-  @Column({ nullable: true, default: () => 'now()' })
-  createdAt?: Date;
+  @CreateDateColumn({ type: 'datetime' })
+  created_at?: Date;
 
-  @Column({ nullable: true, onUpdate: 'CURRENT_TIMESTAMP' })
-  updatedAt?: Date;
+  @UpdateDateColumn({ type: 'datetime' })
+  updated_at?: Date;
 
-  @ManyToMany(() => Solution, (solution) => solution.images)
+  @ManyToOne(() => Solution, (solution) => solution.images)
   solution: Solution;
 }

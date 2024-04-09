@@ -41,7 +41,7 @@ export class SolutionsService {
   async findAll(): Promise<{ data: Solution[] }> {
     const data: Solution[] = await this.solutionRepository.find({
       relations: ['thematic', 'challenges', 'status', 'user', 'images', 'feedbacks'],
-      order: { updatedAt: 'DESC' },
+      order: { updated_at: 'DESC' },
     });
     return { data };
   }
@@ -75,11 +75,11 @@ export class SolutionsService {
       const updatedSolution: Solution & UpdateSolutionDto = Object.assign(solution, dto);
       const data = await this.solutionRepository.save({
         ...updatedSolution,
-        pole: { id: dto.pole ?? solution.poleId },
-        thematic: { id: dto.thematic ?? solution.thematicId },
+        pole: { id: dto.pole ?? solution.pole.id },
+        thematic: { id: dto.thematic ?? solution.thematic.id },
         user: { email: dto.user ?? solution.user.email },
-        call: { id: dto.call ?? solution.callId },
-        status: { id: dto.status ?? solution.statusId },
+        call: { id: dto.call ?? solution.call.id },
+        status: { id: dto.status ?? solution.status.id },
         challenges: dto?.challenges?.map((id: number) => ({ id })) ?? solution.challenges,
       });
       return { data };
@@ -104,7 +104,7 @@ export class SolutionsService {
   async uploadImages(id: number, file: Express.Multer.File): Promise<void> {
     try {
       const { data: solution } = await this.findOne(id);
-      const { data: image } = await this.imageService.create({ imageLink: file.filename });
+      const { data: image } = await this.imageService.create({ image_link: file.filename });
       solution.images = [...solution.images, image];
       await this.solutionRepository.save(solution);
     } catch {
@@ -115,7 +115,7 @@ export class SolutionsService {
   async deleteImage(id: number): Promise<void> {
     try {
       const { data: image } = await this.imageService.findOne(id);
-      await unlinkAsync(`./uploads/${image.imageLink}`);
+      await unlinkAsync(`./uploads/${image.image_link}`);
       await this.imageService.remove(id);
     } catch {
       throw new BadRequestException('Erreur lors de la suppression de l\'image');
@@ -125,7 +125,7 @@ export class SolutionsService {
   async findByPole(poleId: number): Promise<{ data: Solution[] }> {
     try {
       const data: Solution[] = await this.solutionRepository.find({
-        where: { poleId },
+        where: { pole: { id: poleId } },
         relations: ['user', 'status', 'user', 'thematic', 'images', 'feedbacks'],
       });
       return { data };
@@ -142,10 +142,10 @@ export class SolutionsService {
     const data: Solution[] = await this.solutionRepository
       .find({
         where: {
-          statusId: ArrayContains([2, 4, 4]),
+          status: ArrayContains([2, 4, 4]),
         },
         relations: ['user', 'status', 'user', 'thematic', 'images', 'feedbacks'],
-        order: { createdAt: 'DESC' },
+        order: { created_at: 'DESC' },
         take: take,
       });
     return { data };
@@ -155,7 +155,7 @@ export class SolutionsService {
     const data = await this.solutionRepository.findOne({
       where: {
         id: solutionId,
-        statusId: ArrayContains([2, 3, 4]),
+        status: ArrayContains([2, 3, 4]),
       },
       relations: ['user', 'status', 'user', 'thematic', 'images', 'feedbacks'],
     });
@@ -172,7 +172,7 @@ export class SolutionsService {
   async findPrevAndNext(solutionId: number): Promise<{ prev: number, next: number }> {
     const solutions: Solution[] = await this.solutionRepository.find({
       where: {
-        statusId: ArrayContains([2, 3, 4]),
+        status: ArrayContains([2, 3, 4]),
       },
       select: ['id'],
     });
@@ -188,13 +188,13 @@ export class SolutionsService {
       .select([
         'solution.id',
         'solution.name',
-        'solution.createdAt',
+        'solution.created_at',
         'solution.thematic',
         'solution.videoLink',
         'solution.imageLink',
       ])
       .leftJoinAndSelect('solution.images', 'images')
-      .where('solution.videoLink IS NOT NULL OR solution.imageLink IS NOT NULL')
+      .where('solution.videoLink IS NOT NULL OR solution.image_link IS NOT NULL')
       .orWhere('ARRAY_LENGTH(images) > 0')
       .getMany();
     return { data };
@@ -206,7 +206,7 @@ export class SolutionsService {
       .select([
         'solution.id',
         'solution.name',
-        'solution.createdAt',
+        'solution.created_at',
         'solution.feedbacks',
         'solution.thematic',
       ])
@@ -223,16 +223,16 @@ export class SolutionsService {
       .select([
         'solution.id',
         'solution.name',
-        'solution.createdAt',
+        'solution.created_at',
         'solution.feedbacks',
         'solution.thematic',
-        'solution.videoLink',
+        'solution.video_link',
         'solution.imageLink',
         'solution.images',
       ])
       .leftJoinAndSelect('solution.images', 'images')
-      .where('solution.videoLink IS NULL')
-      .andWhere('solution.imageLink IS NULL')
+      .where('solution.video_link IS NULL')
+      .andWhere('solution.image_link IS NULL')
       .andWhere('ARRAY_LENGTH(images) <= 0')
       .getMany();
     return { data };

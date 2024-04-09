@@ -1,4 +1,13 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToMany,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Solution } from '../../solutions/entities/solution.entity';
 
@@ -9,29 +18,24 @@ export class Feedback {
   id: number;
 
   @Column({ nullable: true })
-  adminComment?: string;
+  admin_comment: string;
 
   @Column({ nullable: true })
-  userComment?: string;
+  user_comment: string;
 
-  @Column({ nullable: true, default: () => 'now()' })
-  createdAt?: Date;
+  @CreateDateColumn({ type: 'datetime' })
+  created_at: Date;
 
-  @Column({ nullable: true, onUpdate: 'CURRENT_TIMESTAMP' })
-  updatedAt?: Date;
+  @UpdateDateColumn({ type: 'datetime' })
+  updated_at: Date;
 
   @Column()
   quotations: string;
 
-  @ManyToOne(() => Solution, (solution) => solution.feedbacks, { onDelete: 'SET NULL' })
-  solution?: Solution;
-
-  @OneToMany(() => Solution, (solution) => solution.feedbacks)
+  @ManyToMany(() => Solution, (solution) => solution.feedbacks)
   solutions: Solution[];
 
-  @ManyToOne(() => User, (user) => user.feedbacks, { onDelete: 'SET NULL' })
-  user?: User;
-
-  @Column({ nullable: true })
-  userId?: number;
+  @ManyToOne(() => User, (user) => user.feedbacks, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @JoinColumn()
+  user: User;
 }

@@ -9,10 +9,10 @@ import UpdateProfileDto from '../auth/dto/update-profile.dto';
 import { EmailService } from 'src/email/email.service';
 import { CurrentUser } from 'src/auth/decorators/user.decorator';
 import { Repository } from 'typeorm';
-import { User } from './entities/user.entity';
 import { randomPassword } from '../helpers/random-password';
 import { RoleEnum } from '../auth/enums/role.enum';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -63,7 +63,7 @@ export class UsersService {
   async findAll(): Promise<{ data: User[] }> {
     const data: User[] = await this.userRepository.find({
       relations: ['roles'],
-      order: { createdAt: 'DESC' },
+      order: { created_at: 'DESC' },
     });
     return { data };
   }
@@ -94,7 +94,7 @@ export class UsersService {
       });
       return { data };
     } catch {
-      throw new BadRequestException('Erreur lors de la récupération de l\'utilisateur');
+      throw new BadRequestException('Aucun utilisateur trouvé avec cet identifiant');
     }
   }
 
@@ -105,7 +105,7 @@ export class UsersService {
       });
       return { data };
     } catch {
-      throw new BadRequestException('Erreur lors de la récupération de l\'utilisateur');
+      throw new BadRequestException('Aucun utilisateur trouvé avec cet email');
     }
   }
 
@@ -133,10 +133,10 @@ export class UsersService {
       const data: User = await this.userRepository.save({
         ...updatedUser,
         organisation: {
-          id: dto.organisation ?? user.organisationId,
+          id: dto.organisation ?? user.organisation.id,
         },
         pole: {
-          id: dto.pole ?? user.poleId,
+          id: dto.pole ?? user.pole.id,
         },
         roles: dto?.roles?.map((id) => ({ id })) ?? user.roles,
       });
@@ -145,7 +145,6 @@ export class UsersService {
       throw new BadRequestException('Erreur lors de la modification de l\'utilisateur');
     }
   }
-
 
   async updateProfile(@CurrentUser() currentUser: User, dto: UpdateProfileDto): Promise<{ data: User }> {
     try {

@@ -24,7 +24,7 @@ export class StatusService {
 
   async findAll(): Promise<{ data: Status[] }> {
     const data: Status[] = await this.statusRepository.find({
-      order: { updatedAt: 'DESC' },
+      order: { updated_at: 'DESC' },
     });
     return { data };
   }
