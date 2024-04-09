@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import { Solution } from '../solutions/entities/solution.entity';
-import { Status } from '../status/entities/status.entity';
 
 @Injectable()
 export class DashboardService {
@@ -36,30 +35,16 @@ export class DashboardService {
   }
 
   async countByStatus(): Promise<{ data: { status: string; count: number }[] }> {
-    const data: Solution[] = await this.entityManager
+    const countByStatus: { status: string; count: number }[] = await this.entityManager
       .getRepository(Solution)
       .createQueryBuilder('solution')
-      .select('solution.status.id, COUNT(solution.status.id) as count')
-      .groupBy('solution.status_id')
-      .getMany();
-
-    const status: Status[] = await this.entityManager
-      .getRepository(Status)
-      .find();
-
-    const statusMap: { id: number, name: string }[] = status.map((status) => ({ id: status.id, name: status.name }));
-
-    const formattedData: { count: number, status: string }[] = statusMap.map((item) => {
-      const countObj: Solution = data.find((d) => d.status.id === item.id);
-      const count: number = countObj ? parseInt(countObj['count']) : 0;
-      return {
-        status: item.name,
-        count,
-      };
-    });
-    return { data: formattedData };
+      .select('status.name as status')
+      .addSelect('COUNT(solution.id) as count')
+      .innerJoin('solution.status', 'status')
+      .groupBy('status.name')
+      .getRawMany();
+    return { data: countByStatus };
   }
-
 
   async getSolutions(): Promise<{ data: Solution[] }> {
     const data: Solution[] = await this.entityManager
