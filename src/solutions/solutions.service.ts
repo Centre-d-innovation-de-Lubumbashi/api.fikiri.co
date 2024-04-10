@@ -1,6 +1,4 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import * as fs from 'fs';
-import { promisify } from 'util';
 import { CreateSolutionDto } from './dto/create-solution.dto';
 import { UpdateSolutionDto } from './dto/update-solution.dto';
 import { UpdateUserSolutionDto } from './dto/update-user-solution.dto';
@@ -8,8 +6,6 @@ import { Solution } from './entities/solution.entity';
 import { ArrayContains, Repository } from 'typeorm';
 import { ImagesService } from '../images/images.service';
 import { InjectRepository } from '@nestjs/typeorm';
-
-const unlinkAsync = promisify(fs.unlink);
 
 @Injectable()
 export class SolutionsService {
@@ -32,10 +28,13 @@ export class SolutionsService {
       });
       return { data };
     } catch {
-      throw new BadRequestException(
-        'Erreur lors de la création de la solution',
-      );
+      throw new BadRequestException('Erreur lors de la création de la solution');
     }
+  }
+
+  async saveSolution(user: Solution): Promise<{ data: Solution }> {
+    const data: Solution = await this.solutionRepository.save(user);
+    return { data };
   }
 
   async findAll(): Promise<{ data: Solution[] }> {
@@ -75,18 +74,16 @@ export class SolutionsService {
       const updatedSolution: Solution & UpdateSolutionDto = Object.assign(solution, dto);
       const data = await this.solutionRepository.save({
         ...updatedSolution,
-        pole: { id: dto.pole ?? solution.pole.id },
-        thematic: { id: dto.thematic ?? solution.thematic.id },
-        user: { email: dto.user ?? solution.user.email },
-        call: { id: dto.call ?? solution.call.id },
-        status: { id: dto.status ?? solution.status.id },
+        pole: { id: dto.pole || solution.pole?.id },
+        thematic: { id: dto.thematic || solution.thematic?.id },
+        user: { email: dto.user || solution.user?.email },
+        call: { id: dto.call || solution.call?.id },
+        status: { id: dto.status || solution.status?.id },
         challenges: dto?.challenges?.map((id: number) => ({ id })) ?? solution.challenges,
       });
       return { data };
     } catch {
-      throw new BadRequestException(
-        'Erreur lors de la mise à jour de la solution',
-      );
+      throw new BadRequestException('Erreur lors de la mise à jour de la solution');
     }
   }
 
@@ -95,13 +92,11 @@ export class SolutionsService {
       await this.findOne(id);
       await this.solutionRepository.delete(id);
     } catch {
-      throw new BadRequestException(
-        'Erreur lors de la suppression de la solution',
-      );
+      throw new BadRequestException('Erreur lors de la suppression de la solution');
     }
   }
 
-  async uploadImages(id: number, file: Express.Multer.File): Promise<void> {
+  async uploadImage(id: number, file: Express.Multer.File): Promise<void> {
     try {
       const { data: solution } = await this.findOne(id);
       const { data: image } = await this.imageService.create({ image_link: file.filename });
@@ -109,16 +104,6 @@ export class SolutionsService {
       await this.solutionRepository.save(solution);
     } catch {
       throw new BadRequestException('Erreur lors de l\'ajout des images à la solution');
-    }
-  }
-
-  async deleteImage(id: number): Promise<void> {
-    try {
-      const { data: image } = await this.imageService.findOne(id);
-      await unlinkAsync(`./uploads/${image.image_link}`);
-      await this.imageService.remove(id);
-    } catch {
-      throw new BadRequestException('Erreur lors de la suppression de l\'image');
     }
   }
 
@@ -152,14 +137,14 @@ export class SolutionsService {
   }
 
   async findOneMapped(solutionId: number): Promise<{ data: { solution: Solution, prev: number, next: number } }> {
-    const data = await this.solutionRepository.findOne({
+    const data: Solution = await this.solutionRepository.findOne({
       where: {
         id: solutionId,
         status: ArrayContains([2, 3, 4]),
       },
       relations: ['user', 'status', 'user', 'thematic', 'images', 'feedbacks'],
     });
-    const { prev, next } = await this.findPrevAndNext(solutionId);
+    const { prev, next } = await this.findNeighbors(solutionId);
     return {
       data: {
         solution: data,
@@ -169,11 +154,9 @@ export class SolutionsService {
     };
   }
 
-  async findPrevAndNext(solutionId: number): Promise<{ prev: number, next: number }> {
+  async findNeighbors(solutionId: number): Promise<{ prev: number, next: number }> {
     const solutions: Solution[] = await this.solutionRepository.find({
-      where: {
-        status: ArrayContains([2, 3, 4]),
-      },
+      where: { status: ArrayContains([2, 3, 4]) },
       select: ['id'],
     });
     const currentIndex = solutions.findIndex((solution) => solution.id === solutionId);
@@ -237,5 +220,4 @@ export class SolutionsService {
       .getMany();
     return { data };
   }
-
 }
