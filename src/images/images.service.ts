@@ -4,6 +4,11 @@ import { UpdateImageDto } from './dto/update-image.dto';
 import { Repository } from 'typeorm';
 import { Image } from './entities/image.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { promisify } from 'util';
+import fs from 'fs';
+
+
+const unlinkAsync = promisify(fs.unlink);
 
 @Injectable()
 export class ImagesService {
@@ -52,7 +57,8 @@ export class ImagesService {
   }
 
   async remove(id: number): Promise<void> {
-    await this.findOne(id);
+    const { data: image } = await this.findOne(id);
     await this.imageRepository.delete(id);
+    await unlinkAsync(`./uploads/${image.image_link}`);
   }
 }
