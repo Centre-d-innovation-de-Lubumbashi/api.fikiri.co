@@ -19,6 +19,7 @@ import { RolesGuard } from './auth/guards/roles.guard';
 import { EmailModule } from './email/email.module';
 import { ImagesModule } from './images/images.module';
 import { DatabaseModule } from './database/database.module';
+import { SolutionFeedbacksModule } from './solution-feedbacks/solution-feedbacks.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { DatabaseModule } from './database/database.module';
     EmailModule,
     ImagesModule,
     DatabaseModule,
+    SolutionFeedbacksModule,
   ],
   providers: [
     {
