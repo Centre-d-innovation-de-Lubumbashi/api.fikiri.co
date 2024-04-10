@@ -26,10 +26,10 @@ export class Solution {
   name: string;
 
   @Column({ nullable: true })
-  image_link?: string;
+  image_link: string;
 
   @Column({ nullable: true })
-  video_link?: string;
+  video_link: string;
 
   @Column({ type: 'text' })
   description: string;
