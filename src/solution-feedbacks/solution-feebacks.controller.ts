@@ -13,15 +13,15 @@ export class SolutionsFeedbacksController {
   constructor(private readonly solutionsFeedbacksService: SolutionFeedbacksService) {
   }
 
-  @Get(':id')
-  findFeedbacksQuotations(@Param('id') id: string): Promise<{data: Quotation[]}> {
-    return this.solutionsFeedbacksService.findQuotations(+id);
-  }
-
   @Post(':id')
   @Roles(RoleEnum.Admin, RoleEnum.Curator)
   addFeedback(@Param('id') id: string, @Body() dto: CreateFeedbackDto): Promise<{ data: Solution }> {
     return this.solutionsFeedbacksService.addFeedback(+id, dto);
+  }
+
+  @Get(':id')
+  findFeedbacksQuotations(@Param('id') id: string): Promise<{ data: Quotation[] }> {
+    return this.solutionsFeedbacksService.findQuotations(+id);
   }
 
   @Patch(':id')
