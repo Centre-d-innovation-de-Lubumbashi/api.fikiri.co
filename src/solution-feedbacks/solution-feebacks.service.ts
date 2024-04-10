@@ -4,7 +4,6 @@ import { UpdateFeedbackDto } from 'src/feedbacks/dto/update-feedback.dto';
 import { FeedbacksService } from 'src/feedbacks/feedbacks.service';
 import { QuotationsService } from '../quotations/quotations.service';
 import { Feedback } from '../feedbacks/entities/feedback.entity';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Solution } from '../solutions/entities/solution.entity';
 import { Quotation } from '../quotations/entities/quotation.entity';
 import { SolutionsService } from '../solutions/solutions.service';
@@ -12,7 +11,6 @@ import { SolutionsService } from '../solutions/solutions.service';
 @Injectable()
 export class SolutionFeedbacksService {
   constructor(
-    @InjectRepository(Solution)
     private readonly solutionsService: SolutionsService,
     private readonly feedbacksService: FeedbacksService,
     private readonly quotationsService: QuotationsService,
