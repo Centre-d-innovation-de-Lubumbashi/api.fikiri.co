@@ -38,7 +38,7 @@ export class UsersService {
         roles: dto.roles.map((id) => ({ id })),
       });
       const password: string = randomPassword();
-      await this.emailService.sendRegisteringCurator(user, password);
+      await this.emailService.sendRegistrationEmail(user, password);
       return { data: user };
     } catch {
       throw new BadRequestException(
@@ -55,15 +55,16 @@ export class UsersService {
     delete dto.passwordConfirm;
     const data: User = await this.userRepository.save({
       ...dto,
-      roles: [{ id: 3 }],
+      roles: [{ name: RoleEnum.User }],
     });
     return { data };
   }
 
-  async findAll(): Promise<{ data: User[] }> {
+  async findUsers(): Promise<{ data: User[] }> {
     const data: User[] = await this.userRepository.find({
       relations: ['roles'],
-      order: { created_at: 'DESC' },
+      where: { roles: { name: RoleEnum.User } },
+      order: { updated_at: 'DESC' },
     });
     return { data };
   }
@@ -72,16 +73,15 @@ export class UsersService {
     const data: User[] = await this.userRepository
       .find({
         where: { roles: { name: RoleEnum.Curator } },
-        relations: ['roles'],
+        relations: ['roles', 'organisation', 'pole'],
       });
     return { data };
   }
 
   async findAdmins(): Promise<{ data: User[] }> {
     const data: User[] = await this.userRepository.find({
-      where: {
-        roles: { name: RoleEnum.Admin },
-      },
+      where: { roles: { name: RoleEnum.Admin } },
+      relations: ['roles', 'organisation', 'pole'],
     });
     return { data };
   }
@@ -102,6 +102,7 @@ export class UsersService {
     try {
       const data: User = await this.userRepository.findOneOrFail({
         where: { email },
+        relations: ['roles'],
       });
       return { data };
     } catch {
@@ -132,13 +133,9 @@ export class UsersService {
       const updatedUser: User & UpdateUserDto = Object.assign(user, dto);
       const data: User = await this.userRepository.save({
         ...updatedUser,
-        organisation: {
-          id: dto.organisation ?? user.organisation.id,
-        },
-        pole: {
-          id: dto.pole ?? user.pole.id,
-        },
-        roles: dto?.roles?.map((id) => ({ id })) ?? user.roles,
+        organisation: { id: dto.organisation || updatedUser.organisation?.id },
+        pole: { id: dto.pole || updatedUser.pole?.id },
+        roles: dto?.roles?.map((id) => ({ id })) || updatedUser.roles,
       });
       return { data };
     } catch {
@@ -155,7 +152,6 @@ export class UsersService {
       throw new BadRequestException('Erreur lors de la modification du profil');
     }
   }
-
 
   async uploadImage(id: number, image: Express.Multer.File): Promise<void> {
     try {
@@ -185,7 +181,6 @@ export class UsersService {
     await this.userRepository.update(id, { password });
   }
 
-
   async findByResetToken(token: string): Promise<{ data: User }> {
     try {
       const data: User = await this.userRepository.findOneByOrFail({ token });
@@ -202,7 +197,6 @@ export class UsersService {
       throw new BadRequestException('Erreur lors de la réinitialisation du mot de passe');
     }
   }
-
 
   async remove(id: number): Promise<void> {
     try {
