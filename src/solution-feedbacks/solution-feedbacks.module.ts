@@ -1,14 +1,12 @@
 import { Module } from '@nestjs/common';
 import { FeedbacksModule } from 'src/feedbacks/feedbacks.module';
 import { QuotationsModule } from '../quotations/quotations.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ImagesModule } from '../images/images.module';
 import { SolutionsFeedbacksController } from './solution-feebacks.controller';
 import { SolutionFeedbacksService } from './solution-feebacks.service';
-import { Solution } from '../solutions/entities/solution.entity';
+import { SolutionsModule } from '../solutions/solutions.module';
 
 @Module({
-  imports: [FeedbacksModule, QuotationsModule, ImagesModule, TypeOrmModule.forFeature([Solution])],
+  imports: [FeedbacksModule, QuotationsModule, SolutionsModule],
   controllers: [SolutionsFeedbacksController],
   providers: [SolutionFeedbacksService],
 })
