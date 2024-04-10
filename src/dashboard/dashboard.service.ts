@@ -59,7 +59,8 @@ export class DashboardService {
     const data: Solution[] = await this.entityManager
       .getRepository(Solution)
       .find({
-        select: ['id', 'created_at', 'updated_at', 'thematic'],
+        select: ['id', 'created_at', 'updated_at'],
+        relations: ['thematic']
       });
     return { data };
   }
