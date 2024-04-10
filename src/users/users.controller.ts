@@ -21,8 +21,8 @@ export class UsersController {
   }
 
   @Get()
-  findAll(): Promise<{ data: User [] }> {
-    return this.userService.findAll();
+  findUsers(): Promise<{ data: User [] }> {
+    return this.userService.findUsers();
   }
 
   @Get('curators')
