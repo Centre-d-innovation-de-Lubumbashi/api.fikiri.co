@@ -5,13 +5,13 @@ import { Repository } from 'typeorm';
 import { Image } from './entities/image.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { promisify } from 'util';
-import fs from 'fs';
+import * as fs from 'node:fs';
 
-
-const unlinkAsync = promisify(fs.unlink);
 
 @Injectable()
 export class ImagesService {
+  unlinkAsync = promisify(fs.unlink);
+
   constructor(
     @InjectRepository(Image)
     private readonly imageRepository: Repository<Image>,
@@ -59,6 +59,6 @@ export class ImagesService {
   async remove(id: number): Promise<void> {
     const { data: image } = await this.findOne(id);
     await this.imageRepository.delete(id);
-    await unlinkAsync(`./uploads/${image.image_link}`);
+    await this.unlinkAsync(`./uploads/${image.image_link}`);
   }
 }
