@@ -39,38 +39,45 @@ export class SolutionsService {
 
   async findAll(): Promise<{ data: Solution[] }> {
     const data: Solution[] = await this.solutionRepository.find({
+      select: ['id', 'name', 'created_at'],
       relations: ['thematic', 'challenges', 'status', 'user', 'images', 'feedbacks'],
       order: { updated_at: 'DESC' },
     });
     return { data };
   }
 
-  async findOne(id: number): Promise<{ data: Solution }> {
-    const data: Solution = await this.solutionRepository.findOneOrFail({
-      where: { id },
-      relations: ['images', 'status', 'feedbacks', 'feedbacks.user', 'challenges', 'pole'],
-    });
-    if (!data) throw new NotFoundException('La solution n\'a pas été trouvé');
-    return { data };
-  }
+  async findOne(id: number): Promise<{ data: { solution: Solution, prev: number, next: number } }> {
+    try {
+      const solution: Solution = await this.solutionRepository.findOneOrFail({
+        where: { id },
+        relations: ['images', 'status', 'feedbacks', 'challenges', 'pole'],
+      });
+      const { prev, next } = await this.findNeighbors(id);
 
+      return {
+        data: { solution, prev, next },
+      };
+    } catch {
+      throw new NotFoundException('La solution n\'a pas été trouvé');
+    }
+  }
 
   async userUpdateSolution(id: number, dto: UpdateUserSolutionDto) {
     try {
-      const { data: solution } = await this.findOne(id);
+      const { data: oldSolution } = await this.findOne(id);
+      const { solution } = oldSolution;
       const updatedSolution: Solution & UpdateUserSolutionDto = Object.assign(solution, dto);
       const data: Solution = await this.solutionRepository.save(updatedSolution);
       return { data };
     } catch {
-      throw new BadRequestException(
-        'Erreur lors de la mise à jour de la solution',
-      );
+      throw new BadRequestException('Erreur lors de la mise à jour de la solution');
     }
   }
 
   async update(id: number, dto: UpdateSolutionDto): Promise<{ data: Solution }> {
     try {
-      const { data: solution } = await this.findOne(id);
+      const { data: oldSolution } = await this.findOne(id);
+      const { solution } = oldSolution;
       const updatedSolution: Solution & UpdateSolutionDto = Object.assign(solution, dto);
       const data = await this.solutionRepository.save({
         ...updatedSolution,
@@ -98,7 +105,8 @@ export class SolutionsService {
 
   async uploadImage(id: number, file: Express.Multer.File): Promise<void> {
     try {
-      const { data: solution } = await this.findOne(id);
+      const { data: oldSolution } = await this.findOne(id);
+      const { solution } = oldSolution;
       const { data: image } = await this.imageService.create({ image_link: file.filename });
       solution.images = [...solution.images, image];
       await this.solutionRepository.save(solution);
@@ -137,7 +145,7 @@ export class SolutionsService {
   }
 
   async findOneMapped(solutionId: number): Promise<{ data: { solution: Solution, prev: number, next: number } }> {
-    const data: Solution = await this.solutionRepository.findOne({
+    const solution: Solution = await this.solutionRepository.findOne({
       where: {
         id: solutionId,
         status: ArrayContains([2, 3, 4]),
@@ -146,77 +154,39 @@ export class SolutionsService {
     });
     const { prev, next } = await this.findNeighbors(solutionId);
     return {
-      data: {
-        solution: data,
-        prev: prev,
-        next: next,
-      },
+      data: { solution, prev, next },
     };
   }
 
   async findNeighbors(solutionId: number): Promise<{ prev: number, next: number }> {
     const solutions: Solution[] = await this.solutionRepository.find({
-      where: { status: ArrayContains([2, 3, 4]) },
       select: ['id'],
     });
     const currentIndex = solutions.findIndex((solution) => solution.id === solutionId);
-    const prev = solutions[currentIndex - 1]?.id;
-    const next = solutions[currentIndex + 1]?.id;
+    const prev = solutions[currentIndex - 1].id;
+    const next = solutions[currentIndex + 1].id;
     return { prev, next };
   }
 
   async findConforms(): Promise<{ data: Solution[] }> {
     const data: Solution[] = await this.solutionRepository
-      .createQueryBuilder('solution')
-      .select([
-        'solution.id',
-        'solution.name',
-        'solution.created_at',
-        'solution.thematic',
-        'solution.videoLink',
-        'solution.imageLink',
-      ])
-      .leftJoinAndSelect('solution.images', 'images')
-      .where('solution.videoLink IS NOT NULL OR solution.image_link IS NOT NULL')
-      .orWhere('ARRAY_LENGTH(images) > 0')
+      .createQueryBuilder('s')
+      .select(['s.id', 's.name', 's.created_at'])
+      .leftJoin('s.images', 'images')
+      .leftJoinAndSelect('s.thematic', 'thematic')
+      .where('images.id IS NOT NULL OR s.image_link IS NOT NULL OR LENGTH(s.video_link) > 0')
       .getMany();
+    console.log(data.length);
     return { data };
   }
 
   async findCurated(): Promise<{ data: Solution[] }> {
     const data: Solution[] = await this.solutionRepository
-      .createQueryBuilder('solution')
-      .select([
-        'solution.id',
-        'solution.name',
-        'solution.created_at',
-        'solution.feedbacks',
-        'solution.thematic',
-      ])
-      .leftJoinAndSelect('solution.feedbacks', 'feedbacks')
-      .where('ARRAY_LENGTH(feedbacks) > 0')
-      .getMany();
-
-    return { data };
-  }
-
-  async findNonConforms(): Promise<{ data: Solution[] }> {
-    const data: Solution[] = await this.solutionRepository
-      .createQueryBuilder('solution')
-      .select([
-        'solution.id',
-        'solution.name',
-        'solution.created_at',
-        'solution.feedbacks',
-        'solution.thematic',
-        'solution.video_link',
-        'solution.imageLink',
-        'solution.images',
-      ])
-      .leftJoinAndSelect('solution.images', 'images')
-      .where('solution.video_link IS NULL')
-      .andWhere('solution.image_link IS NULL')
-      .andWhere('ARRAY_LENGTH(images) <= 0')
+      .createQueryBuilder('s')
+      .select(['s.id', 's.name', 's.created_at'])
+      .leftJoinAndSelect('s.thematic', 'thematic')
+      .leftJoinAndSelect('s.feedbacks', 'feedbacks')
+      .where('feedbacks.id IS NOT NULL')
       .getMany();
     return { data };
   }
