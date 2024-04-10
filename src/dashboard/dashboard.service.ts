@@ -51,6 +51,7 @@ export class DashboardService {
       .getRepository(Solution)
       .find({
         select: ['id', 'created_at', 'updated_at'],
+        relations: ['status']
       });
     return { data };
   }
