@@ -21,7 +21,8 @@ export class SolutionFeedbacksService {
 
   async addFeedback(id: number, dto: CreateFeedbackDto): Promise<{ data: Solution }> {
     try {
-      const { data: solution } = await this.solutionsService.findOne(id);
+      const { data: result } = await this.solutionsService.findOne(id);
+      const { solution } = result;
       const { data: feedBack } = await this.feedbacksService.create(dto);
       solution.feedbacks = [...solution.feedbacks, feedBack];
       const { data } = await this.solutionsService.saveSolution(solution);
@@ -54,7 +55,8 @@ export class SolutionFeedbacksService {
 
   async findQuotations(id: number): Promise<{ data: Quotation[] }> {
     try {
-      const { data: solution } = await this.solutionsService.findOne(id);
+      const { data: result } = await this.solutionsService.findOne(id);
+      const { solution } = result;
       const feedbackQuotations: number[] = solution.feedbacks.flatMap(feedback => feedback.quotations.split(',').map(Number));
       const quotation: Promise<Quotation>[] = feedbackQuotations.map(async (quotationId) => {
         const { data: quotation } = await this.quotationsService.findOne(quotationId);
