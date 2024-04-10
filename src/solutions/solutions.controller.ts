@@ -72,13 +72,7 @@ export class SolutionsController {
   )
   @Post(':id/images')
   uploadImages(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<void> {
-    return this.solutionsService.uploadImages(+id, file);
-  }
-
-  @Delete(':id/image/delete')
-  @Roles(RoleEnum.Admin)
-  removeImage(@Param('id') id: string): Promise<void> {
-    return this.solutionsService.deleteImage(+id);
+    return this.solutionsService.uploadImage(+id, file);
   }
 
   @Public()
