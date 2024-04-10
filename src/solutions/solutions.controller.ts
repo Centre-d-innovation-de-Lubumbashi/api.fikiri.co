@@ -38,8 +38,35 @@ export class SolutionsController {
   }
 
   @Public()
+  @Get('mapped')
+  findMapped(@Query('cursor') cursor: string): Promise<{ data: Solution[] }> {
+    return this.solutionsService.findMapped(+cursor);
+  }
+
+  @Public()
+  @Get('mapped/:id')
+  findOneMapped(@Param('id') id: string): Promise<{ data: { solution: Solution, prev: number, next: number } }> {
+    return this.solutionsService.findOneMapped(+id);
+  }
+
+  @Get('pole/:id')
+  getByPole(@Param('id') id: string): Promise<{ data: Solution[] }> {
+    return this.solutionsService.findByPole(+id);
+  }
+
+  @Get('conforms')
+  findConforms(): Promise<{ data: Solution[] }> {
+    return this.solutionsService.findConforms();
+  }
+
+  @Get('curated')
+  findCurated(): Promise<{ data: Solution[] }> {
+    return this.solutionsService.findCurated();
+  }
+
+  @Public()
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<{ data: Solution }> {
+  findOne(@Param('id') id: string): Promise<{ data: { solution: Solution, prev: number, next: number } }> {
     return this.solutionsService.findOne(+id);
   }
 
@@ -70,41 +97,8 @@ export class SolutionsController {
       }),
     }),
   )
-  @Post(':id/images')
-  uploadImages(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<void> {
+  @Post(':id/image')
+  uploadImage(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<void> {
     return this.solutionsService.uploadImage(+id, file);
-  }
-
-  @Public()
-  @Get('mapped/all')
-  findMapped(@Query('cursor') cursor: string): Promise<{ data: Solution[] }> {
-    return this.solutionsService.findMapped(+cursor);
-  }
-
-  @Public()
-  @Get('mapped/one/:id')
-  findOneMapped(@Param('id') id: string): Promise<{ data: { solution: Solution, prev: number, next: number } }> {
-    return this.solutionsService.findOneMapped(+id);
-  }
-
-
-  @Get('pole/:poleId')
-  getByPole(@Param('poleId') poleId: string): Promise<{ data: Solution[] }> {
-    return this.solutionsService.findByPole(+poleId);
-  }
-
-  @Get('conforms/all')
-  findConforms(): Promise<{ data: Solution[] }> {
-    return this.solutionsService.findConforms();
-  }
-
-  @Get('non-conforms/all')
-  findNonConforms(): Promise<{ data: Solution[] }> {
-    return this.solutionsService.findNonConforms();
-  }
-
-  @Get('curated/all')
-  findCurated(): Promise<{ data: Solution[] }> {
-    return this.solutionsService.findCurated();
   }
 }
