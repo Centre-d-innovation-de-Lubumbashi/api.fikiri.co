@@ -13,12 +13,11 @@ export class CallsController {
   }
 
   @Post()
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   create(@Body() createCallsDto: CreateCallDto): Promise<{ data: Call }> {
     return this.callsService.create(createCallsDto);
   }
 
-  @Public()
   @Get('')
   findAll(): Promise<{ data: [call: Call[], number] }> {
     return this.callsService.findAll();
@@ -37,13 +36,13 @@ export class CallsController {
   }
 
   @Patch(':id')
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   update(@Param('id') id: string, @Body() updateCallsDto: UpdateCallDto): Promise<{ data: Call }> {
     return this.callsService.update(+id, updateCallsDto);
   }
 
   @Delete(':id')
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   remove(@Param('id') id: string): Promise<void> {
     return this.callsService.remove(+id);
   }

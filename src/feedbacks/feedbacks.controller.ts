@@ -20,13 +20,13 @@ export class FeedbacksController {
   }
 
   @Patch(':id')
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   update(@Param('id') id: string, dto: any): Promise<{ data: Feedback }> {
     return this.feedbacksService.update(+id, dto);
   }
 
   @Delete(':id')
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   remove(@Param('id') id: string): Promise<void> {
     return this.feedbacksService.remove(+id);
   }

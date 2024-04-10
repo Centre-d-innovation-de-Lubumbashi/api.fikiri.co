@@ -14,7 +14,7 @@ export class StatusController {
   }
 
   @Post()
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   create(@Body() dto: CreateStatusDto): Promise<{ data: Status }> {
     return this.statusService.create(dto);
   }
@@ -30,13 +30,13 @@ export class StatusController {
   }
 
   @Patch(':id')
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   update(@Param('id') id: string, @Body() dto: UpdateStatusDto): Promise<{ data: Status }> {
     return this.statusService.update(+id, dto);
   }
 
   @Delete('id')
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   delete(@Param('id') id: string): Promise<void> {
     return this.statusService.delete(+id);
   }

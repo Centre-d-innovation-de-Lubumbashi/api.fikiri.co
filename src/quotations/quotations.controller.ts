@@ -12,7 +12,7 @@ export class QuotationsController {
   }
 
   @Post()
-  @Roles(RoleEnum.Admin, RoleEnum.Curator)
+  @Roles([RoleEnum.Admin, RoleEnum.Curator])
   create(@Body() createLableDto: CreateLableDto): Promise<{ data: Quotation }> {
     return this.lablesService.create(createLableDto);
   }
@@ -33,7 +33,7 @@ export class QuotationsController {
   }
 
   @Delete(':id')
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   remove(@Param('id') id: string): Promise<void> {
     return this.lablesService.remove(+id);
   }

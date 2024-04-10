@@ -12,7 +12,7 @@ export class PolesController {
   }
 
   @Post()
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   create(@Body() createPoleDto: CreatePoleDto): Promise<{ data: Pole }> {
     return this.polesService.create(createPoleDto);
   }
@@ -28,13 +28,13 @@ export class PolesController {
   }
 
   @Patch(':id')
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   update(@Param('id') id: string, @Body() updatePoleDto: UpdatePoleDto): Promise<{ data: Pole }> {
     return this.polesService.update(+id, updatePoleDto);
   }
 
   @Delete(':id')
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   remove(@Param('id') id: string): Promise<void> {
     return this.polesService.remove(+id);
   }

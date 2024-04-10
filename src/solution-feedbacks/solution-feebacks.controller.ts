@@ -14,7 +14,7 @@ export class SolutionsFeedbacksController {
   }
 
   @Post(':id')
-  @Roles(RoleEnum.Admin, RoleEnum.Curator)
+  @Roles([RoleEnum.Admin, RoleEnum.Curator])
   addFeedback(@Param('id') id: string, @Body() dto: CreateFeedbackDto): Promise<{ data: Solution }> {
     return this.solutionsFeedbacksService.addFeedback(+id, dto);
   }
@@ -30,7 +30,7 @@ export class SolutionsFeedbacksController {
   }
 
   @Delete(':id')
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   deleteFeedback(@Param('id') id: string): Promise<void> {
     return this.solutionsFeedbacksService.deleteFeedback(+id);
   }

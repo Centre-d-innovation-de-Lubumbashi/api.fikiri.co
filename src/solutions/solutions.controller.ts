@@ -71,13 +71,13 @@ export class SolutionsController {
   }
 
   @Patch(':id')
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   update(@Param('id') id: string, @Body() data: UpdateSolutionDto): Promise<{ data: Solution }> {
     return this.solutionsService.update(+id, data);
   }
 
   @Delete(':id')
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   remove(@Param('id') id: string): Promise<void> {
     return this.solutionsService.remove(+id);
   }

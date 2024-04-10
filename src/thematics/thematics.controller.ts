@@ -13,7 +13,7 @@ export class ThematicsController {
   }
 
   @Post()
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   create(@Body() createThematicDto: CreateThematicDto): Promise<{ data: Thematic }> {
     return this.thematicsService.create(createThematicDto);
   }
@@ -31,13 +31,13 @@ export class ThematicsController {
   }
 
   @Patch(':id')
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   update(@Param('id') id: string, @Body() data: UpdateThematicDto): Promise<{ data: Thematic }> {
     return this.thematicsService.update(+id, data);
   }
 
   @Delete(':id')
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   remove(@Param('id') id: string): Promise<void> {
     return this.thematicsService.remove(+id);
   }

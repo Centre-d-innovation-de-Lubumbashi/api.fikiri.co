@@ -12,7 +12,7 @@ export class OrganisationsController {
   }
 
   @Post()
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   create(@Body() dto: CreateOrganisationDto): Promise<{ data: Organisation }> {
     return this.organisationsService.create(dto);
   }
@@ -28,13 +28,13 @@ export class OrganisationsController {
   }
 
   @Patch(':id')
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   update(@Param('id') id: string, @Body() dto: UpdateOrganisationDto): Promise<{ data: Organisation }> {
     return this.organisationsService.update(+id, dto);
   }
 
   @Delete(':id')
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   remove(@Param('id') id: string): Promise<void> {
     return this.organisationsService.remove(+id);
   }

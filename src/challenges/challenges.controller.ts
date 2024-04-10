@@ -13,7 +13,7 @@ export class ChallengesController {
   }
 
   @Post()
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   create(@Body() createChallengeDto: CreateChallengeDto): Promise<{ data: Challenge }> {
     return this.ChallengesService.create(createChallengeDto);
   }
@@ -35,13 +35,13 @@ export class ChallengesController {
   }
 
   @Patch(':id')
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   update(@Param('id') id: string, @Body() updateChallengeDto: UpdateChallengeDto): Promise<{ data: Challenge }> {
     return this.ChallengesService.update(+id, updateChallengeDto);
   }
 
   @Delete(':id')
-  @Roles(RoleEnum.Admin)
+  @Roles([RoleEnum.Admin])
   remove(@Param('id') id: string): Promise<void> {
     return this.ChallengesService.remove(+id);
   }
