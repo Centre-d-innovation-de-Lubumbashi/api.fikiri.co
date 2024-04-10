@@ -27,6 +27,7 @@ export class AuthService {
     const passwordMatch: boolean = await this.passwordMatch(password, data.password);
     if (!passwordMatch)
       throw new BadRequestException('Les identifiants saisis sont invalides');
+    delete data.password;
     return { data };
   }
 
@@ -72,7 +73,7 @@ export class AuthService {
     const { data: user } = await this.usersService.findByEmail(email);
     const token = randomPassword();
     await this.usersService.update(user.id, { token });
-    await this.emailService.sendResetPasswordRequest(user, token);
+    await this.emailService.sendResetPasswordEmail(user, token);
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<void> {
