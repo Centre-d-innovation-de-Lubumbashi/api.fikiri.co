@@ -18,20 +18,20 @@ export class CallsController {
     return this.callsService.create(createCallsDto);
   }
 
-  @Get('')
-  findAll(): Promise<{ data: [call: Call[], number] }> {
+  @Get()
+  findAll(): Promise<{ data: Call[] }> {
     return this.callsService.findAll();
   }
 
   @Public()
-  @Get('recent/one')
-  findRecent(): Promise<{ data: Call }> {
+  @Get('recent')
+  findRecent(): Promise<{ data: { call: Call, prev: number, next: number } }> {
     return this.callsService.findRecent();
   }
 
   @Public()
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<{ data: Call }> {
+  findOne(@Param('id') id: string): Promise<{ data: { call: Call, prev: number, next: number } }> {
     return this.callsService.findOne(+id);
   }
 
