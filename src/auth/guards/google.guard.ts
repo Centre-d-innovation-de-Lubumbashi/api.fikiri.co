@@ -7,7 +7,7 @@ export class GoogleGuard extends AuthGuard('google') {
     super();
   }
 
-  async canActivate(context: ExecutionContext) {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const result: boolean = (await super.canActivate(context)) as boolean;
     await super.logIn(context.switchToHttp().getRequest());
     return result;
