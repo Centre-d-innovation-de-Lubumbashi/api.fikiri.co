@@ -53,7 +53,6 @@ export class SolutionsService {
         .leftJoinAndSelect('s.images', 'images')
         .leftJoinAndSelect('s.status', 'status')
         .leftJoinAndSelect('s.feedbacks', 'feedbacks')
-        .orderBy('feedbacks.quotations', 'ASC')
         .leftJoinAndSelect('s.challenges', 'challenges')
         .leftJoinAndSelect('s.thematic', 'thematic')
         .leftJoinAndSelect('s.user', 'user')
