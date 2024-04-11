@@ -50,7 +50,7 @@ export class SolutionsService {
     try {
       const solution: Solution = await this.solutionRepository.findOneOrFail({
         where: { id },
-        relations: ['images', 'status', 'feedbacks', 'challenges', 'pole'],
+        relations: ['images', 'status', 'feedbacks', 'challenges', 'pole', 'thematic'],
       });
       const { prev, next } = await this.findNeighbors(id);
 
