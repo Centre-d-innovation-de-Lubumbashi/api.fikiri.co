@@ -53,7 +53,6 @@ export class SolutionsService {
         relations: ['images', 'status', 'feedbacks', 'challenges', 'pole', 'thematic'],
       });
       const { prev, next } = await this.findNeighbors(id);
-
       return {
         data: { solution, prev, next },
       };
