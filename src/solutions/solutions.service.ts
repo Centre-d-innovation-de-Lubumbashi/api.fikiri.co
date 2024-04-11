@@ -55,7 +55,9 @@ export class SolutionsService {
         .leftJoinAndSelect('s.feedbacks', 'feedbacks')
         .leftJoinAndSelect('s.challenges', 'challenges')
         .leftJoinAndSelect('s.thematic', 'thematic')
-        .leftJoinAndSelect('feedbacks.user', 'feedbackuser')
+        .leftJoinAndSelect('feedbacks.user', 'feedbackUser')
+        .leftJoinAndSelect('feedbackUser.organisation', 'feedbackuserOrganisation')
+        .leftJoinAndSelect('feedbackUser.pole', 'feedbackuserPole')
         .leftJoinAndSelect('s.user', 'user')
         .getOne();
       const { prev, next } = await this.findNeighbors(id);
