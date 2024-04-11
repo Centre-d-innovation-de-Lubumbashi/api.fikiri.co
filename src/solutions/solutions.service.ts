@@ -3,7 +3,7 @@ import { CreateSolutionDto } from './dto/create-solution.dto';
 import { UpdateSolutionDto } from './dto/update-solution.dto';
 import { UpdateUserSolutionDto } from './dto/update-user-solution.dto';
 import { Solution } from './entities/solution.entity';
-import { ArrayContains, Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { ImagesService } from '../images/images.service';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -133,38 +133,45 @@ export class SolutionsService {
     if (isNaN(cursor) || cursor <= 0) cursor = 1;
     const take: number = cursor * 8;
     const data: Solution[] = await this.solutionRepository
-      .find({
-        where: {
-          status: ArrayContains([2, 4, 4]),
-        },
-        relations: ['user', 'status', 'user', 'thematic', 'images', 'feedbacks'],
-        order: { created_at: 'DESC' },
-        take: take,
-      });
+      .createQueryBuilder('s')
+      .select(['s.id', 's.name', 's.created_at'])
+      .leftJoinAndSelect('s.images', 'images')
+      .leftJoinAndSelect('s.user', 'user')
+      .orderBy('s.updated_at', 'DESC')
+      .take(take)
+      .where('status.id IN (2, 3, 4)')
+      .getMany();
     return { data };
   }
 
   async findOneMapped(solutionId: number): Promise<{ data: { solution: Solution, prev: number, next: number } }> {
-    const solution: Solution = await this.solutionRepository.findOne({
-      where: {
-        id: solutionId,
-        status: ArrayContains([2, 3, 4]),
-      },
-      relations: ['user', 'status', 'user', 'thematic', 'images', 'feedbacks'],
-    });
-    const { prev, next } = await this.findNeighbors(solutionId);
+    const solution: Solution = await this.solutionRepository
+      .createQueryBuilder('s')
+      .select(['s.id', 's.name', 's.description', 's.targeted_problem', 's.created_at'])
+      .leftJoinAndSelect('s.thematic', 'thematic')
+      .leftJoinAndSelect('s.feedbacks', 'feedbacks')
+      .leftJoinAndSelect('s.images', 'images')
+      .leftJoinAndSelect('s.status', 'status')
+      .leftJoinAndSelect('s.user', 'user')
+      .leftJoinAndSelect('s.challenges', 'challenges')
+      .where('status.id IN (2, 3, 4)')
+      .getOne();
+    if (!solution) throw new NotFoundException('La solution n\'a pas été trouvé')
+    const { prev, next } = await this.findNeighbors(solutionId, true);
     return {
       data: { solution, prev, next },
     };
   }
 
-  async findNeighbors(solutionId: number): Promise<{ prev: number, next: number }> {
-    const solutions: Solution[] = await this.solutionRepository.find({
-      select: ['id'],
-    });
-    const currentIndex = solutions.findIndex((solution) => solution.id === solutionId);
-    const prev = solutions[currentIndex - 1].id;
-    const next = solutions[currentIndex + 1].id;
+  async findNeighbors(solutionId: number, filtered: boolean = false): Promise<{ prev: number, next: number }> {
+    const query: SelectQueryBuilder<Solution> = this.solutionRepository
+      .createQueryBuilder('s')
+      .select(['s.id']);
+    if (filtered) query.where('s.status.id IN (2, 3, 4)');
+    const solutions: Solution[] = await query.getMany();
+    const currentIndex: number = solutions.findIndex((solution) => solution.id === solutionId);
+    const prev: number = solutions[currentIndex - 1]?.id ?? null;
+    const next: number = solutions[currentIndex + 1]?.id ?? null;
     return { prev, next };
   }
 
