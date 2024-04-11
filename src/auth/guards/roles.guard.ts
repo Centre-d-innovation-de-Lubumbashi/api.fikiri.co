@@ -21,6 +21,6 @@ export class RolesGuard implements CanActivate {
     const userRoles = user.roles.map((role: Role) =>
       role.name.toLocaleLowerCase(),
     );
-    return requiredRoles.flat().some((role) => userRoles?.includes(role));
+    return requiredRoles.some((role) => userRoles?.includes(role));
   }
 }
