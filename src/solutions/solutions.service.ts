@@ -39,19 +39,25 @@ export class SolutionsService {
 
   async findAll(): Promise<{ data: Solution[] }> {
     const data: Solution[] = await this.solutionRepository.find({
-      select: ['id', 'name', 'created_at'],
-      relations: ['thematic', 'challenges', 'status', 'user', 'images', 'feedbacks'],
-      order: { updated_at: 'DESC' },
-    });
+        select: ['id', 'name', 'created_at'],
+        relations: ['thematic', 'feedbacks'],
+        order: { updated_at: 'DESC' },
+      });
     return { data };
   }
 
   async findOne(id: number): Promise<{ data: { solution: Solution, prev: number, next: number } }> {
     try {
-      const solution: Solution = await this.solutionRepository.findOneOrFail({
-        where: { id },
-        relations: ['images', 'status', 'feedbacks', 'challenges', 'pole', 'thematic'],
-      });
+      const solution: Solution = await this.solutionRepository
+        .createQueryBuilder('s')
+        .leftJoinAndSelect('s.images', 'images')
+        .leftJoinAndSelect('s.status', 'status')
+        .leftJoinAndSelect('s.feedbacks', 'feedbacks')
+        .orderBy('feedbacks.quotations', 'ASC')
+        .leftJoinAndSelect('s.challenges', 'challenges')
+        .leftJoinAndSelect('s.thematic', 'thematic')
+        .leftJoinAndSelect('s.user', 'user')
+        .getOne();
       const { prev, next } = await this.findNeighbors(id);
       return {
         data: { solution, prev, next },
@@ -155,7 +161,7 @@ export class SolutionsService {
       .leftJoinAndSelect('s.challenges', 'challenges')
       .where('status.id IN (2, 3, 4)')
       .getOne();
-    if (!solution) throw new NotFoundException('La solution n\'a pas été trouvé')
+    if (!solution) throw new NotFoundException('La solution n\'a pas été trouvé');
     const { prev, next } = await this.findNeighbors(solutionId, true);
     return {
       data: { solution, prev, next },
