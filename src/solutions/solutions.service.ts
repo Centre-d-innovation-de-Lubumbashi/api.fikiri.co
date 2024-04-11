@@ -183,7 +183,6 @@ export class SolutionsService {
       .leftJoinAndSelect('s.thematic', 'thematic')
       .where('images.id IS NOT NULL OR s.image_link IS NOT NULL OR LENGTH(s.video_link) > 0')
       .getMany();
-    console.log(data.length);
     return { data };
   }
 
