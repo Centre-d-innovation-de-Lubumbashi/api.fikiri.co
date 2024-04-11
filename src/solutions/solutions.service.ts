@@ -39,10 +39,10 @@ export class SolutionsService {
 
   async findAll(): Promise<{ data: Solution[] }> {
     const data: Solution[] = await this.solutionRepository.find({
-        select: ['id', 'name', 'created_at'],
-        relations: ['thematic', 'feedbacks'],
-        order: { updated_at: 'DESC' },
-      });
+      select: ['id', 'name', 'created_at'],
+      relations: ['thematic', 'feedbacks'],
+      order: { updated_at: 'DESC' },
+    });
     return { data };
   }
 
@@ -55,6 +55,7 @@ export class SolutionsService {
         .leftJoinAndSelect('s.feedbacks', 'feedbacks')
         .leftJoinAndSelect('s.challenges', 'challenges')
         .leftJoinAndSelect('s.thematic', 'thematic')
+        .leftJoinAndSelect('feedbacks.user', 'feedbackuser')
         .leftJoinAndSelect('s.user', 'user')
         .getOne();
       const { prev, next } = await this.findNeighbors(id);
