@@ -11,7 +11,7 @@ export class SignupDto {
   password: string;
 
   @Match('password', { message: 'Les mots de passe ne correspondent pas' })
-  passwordConfirm: string;
+  password_confirm: string;
 
   @IsNotEmpty({ message: 'Le nom est obligatoire' })
   name: string;
