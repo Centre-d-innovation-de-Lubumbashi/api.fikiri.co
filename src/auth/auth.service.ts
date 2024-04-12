@@ -27,7 +27,6 @@ export class AuthService {
     const passwordMatch: boolean = await this.passwordMatch(password, data.password);
     if (!passwordMatch)
       throw new BadRequestException('Les identifiants saisis sont invalides');
-    delete data.password;
     return { data };
   }
 
@@ -65,7 +64,9 @@ export class AuthService {
 
   async updatePassword(@CurrentUser() user: User, dto: UpdatePasswordDto): Promise<void> {
     const { password } = dto;
-    await this.usersService.updatePassword(user.id, password);
+    const isMatch: boolean = await this.passwordMatch(dto.old_password, user.password);
+    if (isMatch) await this.usersService.updatePassword(user.id, password);
+    else throw new BadRequestException('L\'ancien mot de passe est incorrect');
   }
 
   async resetPasswordRequest(dto: ResetPasswordRequestDto): Promise<void> {
