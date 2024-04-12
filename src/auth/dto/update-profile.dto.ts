@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 
 export default class UpdateProfileDto {
   @IsNotEmpty({ message: 'Le nom d\'utilisateur est obligatoire' })
