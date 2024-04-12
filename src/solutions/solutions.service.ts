@@ -47,26 +47,24 @@ export class SolutionsService {
   }
 
   async findOne(id: number): Promise<{ data: { solution: Solution, prev: number, next: number } }> {
-    try {
-      const solution: Solution = await this.solutionRepository
-        .createQueryBuilder('s')
-        .leftJoinAndSelect('s.images', 'images')
-        .leftJoinAndSelect('s.status', 'status')
-        .leftJoinAndSelect('s.feedbacks', 'feedbacks')
-        .leftJoinAndSelect('s.challenges', 'challenges')
-        .leftJoinAndSelect('s.thematic', 'thematic')
-        .leftJoinAndSelect('feedbacks.user', 'feedbackUser')
-        .leftJoinAndSelect('feedbackUser.organisation', 'feedbackuserOrganisation')
-        .leftJoinAndSelect('feedbackUser.pole', 'feedbackuserPole')
-        .leftJoinAndSelect('s.user', 'user')
-        .getOne();
-      const { prev, next } = await this.findNeighbors(id);
-      return {
-        data: { solution, prev, next },
-      };
-    } catch {
-      throw new NotFoundException('La solution n\'a pas été trouvé');
-    }
+    const solution: Solution = await this.solutionRepository
+      .createQueryBuilder('s')
+      .leftJoinAndSelect('s.user', 'innovator')
+      .leftJoinAndSelect('s.images', 'images')
+      .leftJoinAndSelect('s.status', 'status')
+      .leftJoinAndSelect('s.feedbacks', 'feedbacks')
+      .leftJoinAndSelect('s.challenges', 'challenges')
+      .leftJoinAndSelect('s.thematic', 'thematic')
+      .leftJoinAndSelect('feedbacks.user', 'feedbackUser')
+      .leftJoinAndSelect('feedbackUser.organisation', 'feedbackuserOrganisation')
+      .leftJoinAndSelect('feedbackUser.pole', 'feedbackuserPole')
+      .where('s.id = :id', { id })
+      .getOne();
+    if (!solution) throw new NotFoundException('La solution n\'a pas été trouvé');
+    const { prev, next } = await this.findNeighbors(id);
+    return {
+      data: { solution, prev, next },
+    };
   }
 
   async userUpdateSolution(id: number, dto: UpdateUserSolutionDto) {
