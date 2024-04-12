@@ -52,7 +52,7 @@ export class UsersService {
       where: { email: dto.email },
     });
     if (exists) new ConflictException();
-    delete dto.passwordConfirm;
+    delete dto.password_confirm;
     const data: User = await this.userRepository.save({
       ...dto,
       roles: [{ name: RoleEnum.User }],
