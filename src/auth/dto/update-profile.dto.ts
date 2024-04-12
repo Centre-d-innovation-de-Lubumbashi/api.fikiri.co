@@ -9,10 +9,4 @@ export default class UpdateProfileDto {
 
   @IsNotEmpty({ message: 'L\'adresse est obligatoire' })
   address: string;
-
-  @IsOptional()
-  oldPassword: string;
-
-  @IsOptional()
-  password: string;
 }
