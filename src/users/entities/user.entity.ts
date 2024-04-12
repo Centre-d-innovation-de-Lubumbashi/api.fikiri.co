@@ -1,5 +1,6 @@
 import {
   BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -77,6 +78,15 @@ export class User {
 
   @BeforeInsert()
   async hashPassword(): Promise<void> {
-    this.password = await bcrypt.hash(this.password, 10);
+    const salt: string = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+  }
+
+  @BeforeUpdate()
+  async hashNewPassword(): Promise<void> {
+    if (this.password) {
+      const salt: string = await bcrypt.genSalt(10);
+      this.password = await bcrypt.hash(this.password, salt);
+    }
   }
 }
