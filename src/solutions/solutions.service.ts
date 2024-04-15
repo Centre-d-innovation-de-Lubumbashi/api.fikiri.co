@@ -143,7 +143,7 @@ export class SolutionsService {
       .leftJoinAndSelect('s.images', 'images')
       .leftJoinAndSelect('s.user', 'user')
       .leftJoinAndSelect('s.status', 'status')
-      .orderBy('s.updated_at', 'DESC')
+      .orderBy('s.created_at', 'ASC')
       .take(take)
       .where('status.id IN (2, 3, 4)')
       .getMany();
