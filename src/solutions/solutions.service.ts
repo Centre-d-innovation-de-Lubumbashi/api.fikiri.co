@@ -142,6 +142,7 @@ export class SolutionsService {
       .select(['s.id', 's.name', 's.created_at'])
       .leftJoinAndSelect('s.images', 'images')
       .leftJoinAndSelect('s.user', 'user')
+      .leftJoinAndSelect('s.status', 'status')
       .orderBy('s.updated_at', 'DESC')
       .take(take)
       .where('status.id IN (2, 3, 4)')
