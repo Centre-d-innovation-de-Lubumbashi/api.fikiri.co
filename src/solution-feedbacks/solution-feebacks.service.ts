@@ -5,7 +5,6 @@ import { FeedbacksService } from 'src/feedbacks/feedbacks.service';
 import { QuotationsService } from '../quotations/quotations.service';
 import { Feedback } from '../feedbacks/entities/feedback.entity';
 import { Solution } from '../solutions/entities/solution.entity';
-import { Quotation } from '../quotations/entities/quotation.entity';
 import { SolutionsService } from '../solutions/solutions.service';
 
 @Injectable()
@@ -48,22 +47,6 @@ export class SolutionFeedbacksService {
       await this.feedbacksService.remove(id);
     } catch {
       throw new BadRequestException('Erreur lors de la suppression du feedback à la solution');
-    }
-  }
-
-  async findQuotations(id: number): Promise<{ data: Quotation[] }> {
-    try {
-      const { data: result } = await this.solutionsService.findOne(id);
-      const { solution } = result;
-      const feedbackQuotations: number[] = solution.feedbacks.flatMap(feedback => feedback.quotations.split(',').map(Number));
-      const quotation: Promise<Quotation>[] = feedbackQuotations.map(async (quotationId) => {
-        const { data: quotation } = await this.quotationsService.findOne(quotationId);
-        return quotation;
-      });
-      const data: Quotation[] = await Promise.all(quotation);
-      return { data };
-    } catch {
-      throw new BadRequestException('Error fetching feedback quotations');
     }
   }
 }
