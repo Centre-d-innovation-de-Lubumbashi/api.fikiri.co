@@ -196,9 +196,9 @@ export class SolutionsService {
     const data: Solution[] = await this.solutionRepository
       .createQueryBuilder('s')
       .select(['s.id', 's.name', 's.description'  ,'s.created_at'])
-      .leftJoinAndSelect('s.user', 'innovator')
       .leftJoinAndSelect('s.thematic', 'thematic')
       .leftJoinAndSelect('s.feedbacks', 'feedbacks')
+      .leftJoinAndSelect('s.user', 'user')
       .leftJoinAndSelect('feedbacks.user', 'feedbacksUser')
       .leftJoinAndSelect('feedbacksUser.organisation', 'feedbackuserOrganisation')
       .leftJoinAndSelect('feedbacksUser.pole', 'feedbackuserPole')
