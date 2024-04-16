@@ -198,6 +198,7 @@ export class SolutionsService {
       .select(['s.id', 's.name', 's.created_at'])
       .leftJoinAndSelect('s.thematic', 'thematic')
       .leftJoinAndSelect('s.feedbacks', 'feedbacks')
+      .leftJoinAndSelect('s.feedbacks.user', 'feedbacksUser')
       .where('feedbacks.id IS NOT NULL')
       .getMany();
     return { data };
