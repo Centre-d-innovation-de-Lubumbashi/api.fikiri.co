@@ -195,8 +195,9 @@ export class SolutionsService {
   async findCurated(): Promise<{ data: Solution[] }> {
     const data: Solution[] = await this.solutionRepository
       .createQueryBuilder('s')
-      .select(['s.id', 's.name', 's.description'  ,'s.created_at'])
+      .select(['s.id', 's.name', 's.description', 's.created_at'])
       .leftJoinAndSelect('s.thematic', 'thematic')
+      .leftJoinAndSelect('s.status', 'status')
       .leftJoinAndSelect('s.feedbacks', 'feedbacks')
       .leftJoinAndSelect('s.user', 'user')
       .leftJoinAndSelect('feedbacks.user', 'feedbacksUser')
