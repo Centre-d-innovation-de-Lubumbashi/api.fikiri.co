@@ -62,7 +62,7 @@ export class UsersService {
     const data: User[] = await this.userRepository.find({
       relations: ['roles'],
       where: { roles: { name: RoleEnum.User } },
-      order: { updated_at: 'DESC' },
+      order: { created_at: 'DESC' },
     });
     return { data };
   }
