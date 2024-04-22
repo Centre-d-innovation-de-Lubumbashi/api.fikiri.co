@@ -184,10 +184,9 @@ export class SolutionsService {
   async findConforms(): Promise<{ data: Solution[] }> {
     const data: Solution[] = await this.solutionRepository
       .createQueryBuilder('s')
-      .select(['s.id', 's.name', 's.created_at'])
       .leftJoin('s.images', 'images')
       .leftJoinAndSelect('s.thematic', 'thematic')
-      .where('images.id IS NOT NULL OR s.image_link IS NOT NULL OR LENGTH(s.video_link) > 0')
+      .where('(images.id IS NOT NULL) OR (s.image_link IS NOT NULL) OR (LENGTH(s.video_link) > 0)')
       .getMany();
     return { data };
   }

@@ -30,7 +30,7 @@ export class UsersService {
       const exists: boolean = await this.userRepository.exists({
         where: { email: dto.email },
       });
-      if (exists) new ConflictException();
+      if (exists) new ConflictException('L\'utilisateur existe déjà');
       const user: User = await this.userRepository.save({
         ...dto,
         organisation: { id: dto.organisation },
@@ -41,9 +41,7 @@ export class UsersService {
       await this.emailService.sendRegistrationEmail(user, password);
       return { data: user };
     } catch {
-      throw new BadRequestException(
-        'Erreur lors de la création de l\'utilisateur',
-      );
+      throw new BadRequestException('Erreur lors de la création de l\'utilisateur');
     }
   }
 

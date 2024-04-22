@@ -12,13 +12,14 @@ export class CallsController {
   constructor(private readonly callsService: CallsService) {
   }
 
-  @Post()
+  @Post('')
   @Roles([RoleEnum.Admin])
   create(@Body() createCallsDto: CreateCallDto): Promise<{ data: Call }> {
     return this.callsService.create(createCallsDto);
   }
 
-  @Get()
+  @Public()
+  @Get('')
   findAll(): Promise<{ data: Call[] }> {
     return this.callsService.findAll();
   }
