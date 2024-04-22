@@ -11,7 +11,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { SolutionsService } from './solutions.service';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateSolutionDto } from './dto/create-solution.dto';
@@ -88,7 +88,7 @@ export class SolutionsController {
   }
 
   @UseInterceptors(
-    FilesInterceptor('thumbs', 3, {
+    FileInterceptor('thumb', {
       storage: diskStorage({
         destination: './uploads',
         filename: function(_req, file, cb) {
@@ -99,6 +99,7 @@ export class SolutionsController {
   )
   @Post(':id/image')
   uploadImage(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<void> {
+    console.log('file');
     return this.solutionsService.uploadImage(+id, file);
   }
 }
