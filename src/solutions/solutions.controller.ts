@@ -99,7 +99,6 @@ export class SolutionsController {
   )
   @Post(':id/image')
   uploadImage(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<void> {
-    console.log('file');
     return this.solutionsService.uploadImage(+id, file);
   }
 }
