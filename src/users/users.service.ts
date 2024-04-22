@@ -153,8 +153,8 @@ export class UsersService {
 
   async uploadImage(id: number, image: Express.Multer.File): Promise<void> {
     try {
-      const { data: user } = await this.findOne(id);
-      if (user.profile) await unlinkAsync(`./uploads/${user.profile}`);
+      // const { data: user } = await this.findOne(id);
+      // if (user.profile) await unlinkAsync(`./uploads/${user.profile}`);
       await this.userRepository.update(id, {
         profile: image.filename,
       });
