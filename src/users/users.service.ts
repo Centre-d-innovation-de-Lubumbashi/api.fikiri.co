@@ -12,6 +12,7 @@ import { RoleEnum } from '../auth/enums/role.enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import { EmailService } from '../email/email.service';
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -20,7 +21,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    // private readonly emailService: EmailService,
+    private readonly emailService: EmailService,
   ) {
   }
 
@@ -40,7 +41,7 @@ export class UsersService {
         pole: { id: dto.pole },
         roles: dto.roles.map((id) => ({ id })),
       });
-      // await this.emailService.sendRegistrationEmail(user, password);
+      await this.emailService.sendRegistrationEmail(user, password);
       return { data: user };
     } catch (e) {
       console.log(e);

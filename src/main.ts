@@ -1,10 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
-import { join } from 'path';
 import * as passport from 'passport';
 import * as session from 'express-session';
-import * as express from 'express';
 
 const port = Number(process.env.PORT) as number;
 
@@ -16,7 +14,6 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials: true,
   });
-  app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
   app.use(
     session({
       secret: process.env.SESSION_SECRET,
