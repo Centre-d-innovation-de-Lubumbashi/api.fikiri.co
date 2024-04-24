@@ -11,8 +11,8 @@ import { Repository } from 'typeorm';
 import { RoleEnum } from '../auth/enums/role.enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import * as bcrypt from 'bcrypt';
 import { EmailService } from '../email/email.service';
+import { randomPassword } from '../helpers/random-password';
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -31,20 +31,17 @@ export class UsersService {
         where: { email: dto.email },
       });
       if (exists) new ConflictException('L\'utilisateur existe déjà');
-      const password: string = 'admin1234';
-      const salt: string = await bcrypt.genSalt(10);
-      const hash = await bcrypt.hash(password, salt);
+      const password: string = randomPassword();
       const user: User = await this.userRepository.save({
         ...dto,
+        password,
         organisation: { id: dto.organisation },
-        password: hash,
         pole: { id: dto.pole },
         roles: dto.roles.map((id) => ({ id })),
       });
       await this.emailService.sendRegistrationEmail(user, password);
       return { data: user };
-    } catch (e) {
-      console.log(e);
+    } catch {
       throw new BadRequestException('Erreur lors de la création de l\'utilisateur');
     }
   }
@@ -179,12 +176,6 @@ export class UsersService {
     }
   }
 
-  async updatePassword(id: number, password: string): Promise<void> {
-    const salt: string = await bcrypt.genSalt(10);
-    password = await bcrypt.hash(password, salt);
-    await this.userRepository.update(id, { password });
-  }
-
   async findByResetToken(token: string): Promise<{ data: User }> {
     try {
       const data: User = await this.userRepository.findOneByOrFail({ token });
@@ -194,7 +185,7 @@ export class UsersService {
     }
   }
 
-  async resetPassword(id: number, password: string): Promise<void> {
+  async updatePassword(id: number, password: string): Promise<void> {
     try {
       await this.userRepository.update(id, { password, token: null });
     } catch {

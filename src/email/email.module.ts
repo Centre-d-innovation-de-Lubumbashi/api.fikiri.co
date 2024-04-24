@@ -23,7 +23,7 @@ import { join } from 'path';
           from: `Suport fikiri <${config.get('MAIL_USERNAME')}>`,
         },
         template: {
-          dir: join(__dirname, '..', 'templates'),
+          dir: join(__dirname, '..', '..', 'templates'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,

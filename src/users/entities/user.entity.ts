@@ -1,6 +1,4 @@
 import {
-  BeforeInsert,
-  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -17,7 +15,6 @@ import { Feedback } from '../../feedbacks/entities/feedback.entity';
 import { Pole } from '../../poles/entities/pole.entity';
 import { Organisation } from '../../organisations/entities/organisation.entity';
 import { Role } from '../../roles/entities/role.entity';
-import * as bcrypt from 'bcrypt';
 
 @Entity()
 export class User {
@@ -75,18 +72,4 @@ export class User {
   @ManyToOne(() => Organisation, (organisation) => organisation.users)
   @JoinColumn()
   organisation: Organisation;
-
-  @BeforeInsert()
-  async hashPassword(): Promise<void> {
-    const salt: string = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-  }
-
-  @BeforeUpdate()
-  async hashNewPassword(): Promise<void> {
-    if (this.password) {
-      const salt: string = await bcrypt.genSalt(10);
-      this.password = await bcrypt.hash(this.password, salt);
-    }
-  }
 }

@@ -20,7 +20,7 @@ export class UsersController {
     return this.userService.create(createUserDto);
   }
 
-  @Get()
+  @Get('')
   findUsers(): Promise<{ data: User [] }> {
     return this.userService.findUsers();
   }

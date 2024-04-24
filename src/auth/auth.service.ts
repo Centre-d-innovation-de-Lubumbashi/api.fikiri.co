@@ -81,7 +81,6 @@ export class AuthService {
     const { token, password } = resetPasswordDto;
     const { data: user } = await this.usersService.findByResetToken(token);
     try {
-      await this.usersService.resetPassword(user.id, password);
       await this.usersService.updatePassword(user.id, password);
     } catch {
       throw new BadRequestException('Erreur lors de la réinitialisation du mot de passe');
