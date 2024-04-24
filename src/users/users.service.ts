@@ -6,7 +6,6 @@ import CreateUserDto from './dto/create-user.dto';
 import { CreateWithGoogleDto } from './dto/create-with-google.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import UpdateProfileDto from '../auth/dto/update-profile.dto';
-import { EmailService } from 'src/email/email.service';
 import { CurrentUser } from 'src/auth/decorators/user.decorator';
 import { Repository } from 'typeorm';
 import { RoleEnum } from '../auth/enums/role.enum';
@@ -21,7 +20,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    private readonly emailService: EmailService,
+    // private readonly emailService: EmailService,
   ) {
   }
 
@@ -41,9 +40,10 @@ export class UsersService {
         pole: { id: dto.pole },
         roles: dto.roles.map((id) => ({ id })),
       });
-      await this.emailService.sendRegistrationEmail(user, password);
+      // await this.emailService.sendRegistrationEmail(user, password);
       return { data: user };
-    } catch {
+    } catch (e) {
+      console.log(e);
       throw new BadRequestException('Erreur lors de la création de l\'utilisateur');
     }
   }
