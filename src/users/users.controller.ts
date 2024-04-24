@@ -54,8 +54,7 @@ export class UsersController {
           cb(null, `${uuidv4()}.${file.mimetype.split('/')[1]}`);
         },
       }),
-    }),
-  )
+    }))
   @Post(':id/image')
   uploadImage(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<void> {
     return this.userService.uploadImage(+id, file);

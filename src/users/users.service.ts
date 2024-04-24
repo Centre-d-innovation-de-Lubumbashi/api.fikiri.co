@@ -9,10 +9,10 @@ import UpdateProfileDto from '../auth/dto/update-profile.dto';
 import { EmailService } from 'src/email/email.service';
 import { CurrentUser } from 'src/auth/decorators/user.decorator';
 import { Repository } from 'typeorm';
-import { randomPassword } from '../helpers/random-password';
 import { RoleEnum } from '../auth/enums/role.enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt';
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -31,13 +31,16 @@ export class UsersService {
         where: { email: dto.email },
       });
       if (exists) new ConflictException('L\'utilisateur existe déjà');
+      const password: string = 'admin1234';
+      const salt: string = await bcrypt.genSalt(10);
+      const hash = await bcrypt.hash(password, salt);
       const user: User = await this.userRepository.save({
         ...dto,
         organisation: { id: dto.organisation },
+        password: hash,
         pole: { id: dto.pole },
         roles: dto.roles.map((id) => ({ id })),
       });
-      const password: string = randomPassword();
       await this.emailService.sendRegistrationEmail(user, password);
       return { data: user };
     } catch {
@@ -176,6 +179,8 @@ export class UsersService {
   }
 
   async updatePassword(id: number, password: string): Promise<void> {
+    const salt: string = await bcrypt.genSalt(10);
+    password = await bcrypt.hash(password, salt);
     await this.userRepository.update(id, { password });
   }
 
