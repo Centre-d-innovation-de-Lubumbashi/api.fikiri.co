@@ -13,5 +13,4 @@ import { EmailModule } from '../email/email.module';
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, Session, GoogleStrategy],
 })
-export class AuthModule {
-}
+export class AuthModule {}

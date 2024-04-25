@@ -10,5 +10,4 @@ import { Feedback } from './entities/feedback.entity';
   providers: [FeedbacksService],
   exports: [FeedbacksService],
 })
-export class FeedbacksModule {
-}
+export class FeedbacksModule {}

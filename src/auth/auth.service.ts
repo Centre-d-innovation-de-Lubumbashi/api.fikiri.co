@@ -19,14 +19,12 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly usersService: UsersService,
     private readonly emailService: EmailService,
-  ) {
-  }
+  ) {}
 
   async validateUser(email: string, password: string): Promise<{ data: User }> {
     const { data } = await this.usersService.findByEmail(email);
     const passwordMatch: boolean = await this.passwordMatch(password, data.password);
-    if (!passwordMatch)
-      throw new BadRequestException('Les identifiants saisis sont invalides');
+    if (!passwordMatch) throw new BadRequestException('Les identifiants saisis sont invalides');
     return { data };
   }
 
@@ -45,8 +43,7 @@ export class AuthService {
   }
 
   async logout(@Req() request: Request): Promise<void> {
-    request.session.destroy(() => {
-    });
+    request.session.destroy(() => {});
   }
 
   async profile(@CurrentUser() data: User): Promise<{ data: User }> {
@@ -66,7 +63,7 @@ export class AuthService {
     const { password } = dto;
     const isMatch: boolean = await this.passwordMatch(dto.old_password, user.password);
     if (isMatch) await this.usersService.updatePassword(user.id, password);
-    else throw new BadRequestException('L\'ancien mot de passe est incorrect');
+    else throw new BadRequestException("L'ancien mot de passe est incorrect");
   }
 
   async resetPasswordRequest(dto: ResetPasswordRequestDto): Promise<void> {

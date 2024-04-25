@@ -10,8 +10,7 @@ export class PolesService {
   constructor(
     @InjectRepository(Pole)
     private readonly poleRepository: Repository<Pole>,
-  ) {
-  }
+  ) {}
 
   async create(dto: CreatePoleDto): Promise<{ data: Pole }> {
     try {

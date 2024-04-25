@@ -11,5 +11,4 @@ import { ImagesModule } from '../images/images.module';
   providers: [SolutionsService],
   exports: [SolutionsService],
 })
-export class SolutionsModule {
-}
+export class SolutionsModule {}

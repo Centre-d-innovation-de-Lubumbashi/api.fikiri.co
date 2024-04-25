@@ -10,8 +10,7 @@ export class QuotationsService {
   constructor(
     @InjectRepository(Quotation)
     private readonly quotationRepository: Repository<Quotation>,
-  ) {
-  }
+  ) {}
 
   async create(dto: CreateLableDto): Promise<{ data: Quotation }> {
     try {
@@ -54,9 +53,7 @@ export class QuotationsService {
       await this.findOne(id);
       await this.quotationRepository.delete(id);
     } catch {
-      throw new ConflictException(
-        'Erreur lors de la suppression de la quotation',
-      );
+      throw new ConflictException('Erreur lors de la suppression de la quotation');
     }
   }
 }

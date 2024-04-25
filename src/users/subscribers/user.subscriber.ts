@@ -4,7 +4,6 @@ import * as bcrypt from 'bcrypt';
 
 @EventSubscriber()
 export class UserSubscriber implements EntitySubscriberInterface<User> {
-
   listenTo() {
     return User;
   }

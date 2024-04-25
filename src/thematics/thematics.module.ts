@@ -9,5 +9,4 @@ import { Thematic } from './entities/thematic.entity';
   controllers: [ThematicsController],
   providers: [ThematicsService],
 })
-export class ThematicsModule {
-}
+export class ThematicsModule {}

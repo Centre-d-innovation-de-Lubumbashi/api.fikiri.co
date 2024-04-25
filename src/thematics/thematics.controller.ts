@@ -9,8 +9,7 @@ import { Thematic } from './entities/thematic.entity';
 
 @Controller('thematics')
 export class ThematicsController {
-  constructor(private readonly thematicsService: ThematicsService) {
-  }
+  constructor(private readonly thematicsService: ThematicsService) {}
 
   @Post()
   @Roles([RoleEnum.Admin])
@@ -20,10 +19,9 @@ export class ThematicsController {
 
   @Public()
   @Get()
-  findAll(): Promise<{ data: Thematic [] }> {
+  findAll(): Promise<{ data: Thematic[] }> {
     return this.thematicsService.findAll();
   }
-
 
   @Get(':id')
   findOne(@Param('id') id: string): Promise<{ data: Thematic }> {

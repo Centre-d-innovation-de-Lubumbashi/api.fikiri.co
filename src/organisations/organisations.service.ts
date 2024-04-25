@@ -10,15 +10,14 @@ export class OrganisationsService {
   constructor(
     @InjectRepository(Organisation)
     private readonly organisationRepository: Repository<Organisation>,
-  ) {
-  }
+  ) {}
 
   async create(dto: CreateOrganisationDto): Promise<{ data: Organisation }> {
     try {
       const data: Organisation = await this.organisationRepository.save(dto);
       return { data };
     } catch {
-      throw new ConflictException('Impossible de créer l\'organisation');
+      throw new ConflictException("Impossible de créer l'organisation");
     }
   }
 
@@ -34,7 +33,7 @@ export class OrganisationsService {
       });
       return { data };
     } catch {
-      throw new NotFoundException('Impossible de récupérer l\'organisation');
+      throw new NotFoundException("Impossible de récupérer l'organisation");
     }
   }
 
@@ -45,7 +44,7 @@ export class OrganisationsService {
       const data: Organisation = await this.organisationRepository.save(updatedOrganisation);
       return { data };
     } catch {
-      throw new ConflictException('Impossible de mettre à jour l\'organisation');
+      throw new ConflictException("Impossible de mettre à jour l'organisation");
     }
   }
 
@@ -54,7 +53,7 @@ export class OrganisationsService {
       await this.findOne(id);
       await this.organisationRepository.delete(id);
     } catch {
-      throw new ConflictException('Impossible de supprimer l\'organisation');
+      throw new ConflictException("Impossible de supprimer l'organisation");
     }
   }
 }

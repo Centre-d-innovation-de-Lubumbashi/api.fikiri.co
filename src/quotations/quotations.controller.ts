@@ -8,8 +8,7 @@ import { Quotation } from './entities/quotation.entity';
 
 @Controller('quotations')
 export class QuotationsController {
-  constructor(private readonly lablesService: QuotationsService) {
-  }
+  constructor(private readonly lablesService: QuotationsService) {}
 
   @Post()
   @Roles([RoleEnum.Admin, RoleEnum.Curator])

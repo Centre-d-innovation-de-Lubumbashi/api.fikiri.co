@@ -17,4 +17,4 @@ export const dataSource = new DataSource({
   entities: ['dist/**/*.entity.js'],
 });
 
-dataSource.initialize().catch(error => console.log(error));
+dataSource.initialize().catch((error) => console.log(error));

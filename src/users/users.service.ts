@@ -22,15 +22,14 @@ export class UsersService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly emailService: EmailService,
-  ) {
-  }
+  ) {}
 
   async create(dto: CreateUserDto): Promise<{ data: User }> {
     try {
       const exists: boolean = await this.userRepository.exists({
         where: { email: dto.email },
       });
-      if (exists) new ConflictException('L\'utilisateur existe déjà');
+      if (exists) new ConflictException("L'utilisateur existe déjà");
       const password: string = randomPassword();
       const user: User = await this.userRepository.save({
         ...dto,
@@ -42,7 +41,7 @@ export class UsersService {
       await this.emailService.sendRegistrationEmail(user, password);
       return { data: user };
     } catch {
-      throw new BadRequestException('Erreur lors de la création de l\'utilisateur');
+      throw new BadRequestException("Erreur lors de la création de l'utilisateur");
     }
   }
 
@@ -69,11 +68,10 @@ export class UsersService {
   }
 
   async findCurators(): Promise<{ data: User[] }> {
-    const data: User[] = await this.userRepository
-      .find({
-        where: { roles: { name: RoleEnum.Curator } },
-        relations: ['roles', 'organisation', 'pole'],
-      });
+    const data: User[] = await this.userRepository.find({
+      where: { roles: { name: RoleEnum.Curator } },
+      relations: ['roles', 'organisation', 'pole'],
+    });
     return { data };
   }
 
@@ -121,10 +119,9 @@ export class UsersService {
       });
       return { data: newUser };
     } catch {
-      throw new BadRequestException('Erreur lors de la récupération de l\'utilisateur');
+      throw new BadRequestException("Erreur lors de la récupération de l'utilisateur");
     }
   }
-
 
   async update(id: number, dto: UpdateUserDto): Promise<{ data: User }> {
     try {
@@ -138,7 +135,7 @@ export class UsersService {
       });
       return { data };
     } catch {
-      throw new BadRequestException('Erreur lors de la modification de l\'utilisateur');
+      throw new BadRequestException("Erreur lors de la modification de l'utilisateur");
     }
   }
 
@@ -160,9 +157,7 @@ export class UsersService {
         profile: image.filename,
       });
     } catch {
-      throw new BadRequestException(
-        'Erreur lors de la modification de l\'image',
-      );
+      throw new BadRequestException("Erreur lors de la modification de l'image");
     }
   }
 
@@ -172,7 +167,7 @@ export class UsersService {
       await unlinkAsync(`./uploads/${user.profile} `);
       await this.userRepository.update(id, { profile: null });
     } catch {
-      throw new BadRequestException('Erreur lors de la suppression de l\'image');
+      throw new BadRequestException("Erreur lors de la suppression de l'image");
     }
   }
 
@@ -198,7 +193,7 @@ export class UsersService {
       await this.findOne(id);
       await this.userRepository.delete(id);
     } catch {
-      throw new BadRequestException('Erreur lors de la suppression de l\'utilisateur');
+      throw new BadRequestException("Erreur lors de la suppression de l'utilisateur");
     }
   }
 }

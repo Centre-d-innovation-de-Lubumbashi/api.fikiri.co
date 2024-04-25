@@ -9,5 +9,4 @@ import { Call } from './entities/call.entity';
   controllers: [CallsController],
   providers: [CallsService],
 })
-export class CallsModule {
-}
+export class CallsModule {}

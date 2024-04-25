@@ -41,4 +41,3 @@ export class Call {
   @JoinTable()
   thematics: Thematic[];
 }
-

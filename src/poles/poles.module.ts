@@ -9,5 +9,4 @@ import { Pole } from './entities/pole.entity';
   controllers: [PolesController],
   providers: [PolesService],
 })
-export class PolesModule {
-}
+export class PolesModule {}

@@ -10,8 +10,7 @@ export class StatusService {
   constructor(
     @InjectRepository(Status)
     private readonly statusRepository: Repository<Status>,
-  ) {
-  }
+  ) {}
 
   async create(dto: CreateStatusDto): Promise<{ data: Status }> {
     try {

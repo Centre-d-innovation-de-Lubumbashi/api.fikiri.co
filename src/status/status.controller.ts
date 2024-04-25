@@ -10,8 +10,7 @@ import { Public } from '../auth/decorators/public.decorator';
 @Public()
 @Controller('status')
 export class StatusController {
-  constructor(private statusService: StatusService) {
-  }
+  constructor(private statusService: StatusService) {}
 
   @Post()
   @Roles([RoleEnum.Admin])

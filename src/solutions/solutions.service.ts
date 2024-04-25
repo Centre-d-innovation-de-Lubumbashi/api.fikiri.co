@@ -13,8 +13,7 @@ export class SolutionsService {
     @InjectRepository(Solution)
     private readonly solutionRepository: Repository<Solution>,
     private readonly imageService: ImagesService,
-  ) {
-  }
+  ) {}
 
   async create(dto: CreateSolutionDto): Promise<{ data: Solution }> {
     try {
@@ -46,7 +45,7 @@ export class SolutionsService {
     return { data };
   }
 
-  async findOne(id: number): Promise<{ data: { solution: Solution, prev: number, next: number } }> {
+  async findOne(id: number): Promise<{ data: { solution: Solution; prev: number; next: number } }> {
     const solution: Solution = await this.solutionRepository
       .createQueryBuilder('s')
       .leftJoinAndSelect('s.user', 'innovator')
@@ -60,7 +59,7 @@ export class SolutionsService {
       .leftJoinAndSelect('feedbackUser.pole', 'feedbackuserPole')
       .where('s.id = :id', { id })
       .getOne();
-    if (!solution) throw new NotFoundException('La solution n\'a pas été trouvé');
+    if (!solution) throw new NotFoundException("La solution n'a pas été trouvé");
     const { prev, next } = await this.findNeighbors(id);
     return {
       data: { solution, prev, next },
@@ -116,7 +115,7 @@ export class SolutionsService {
       solution.images = [...solution.images, image];
       await this.solutionRepository.save(solution);
     } catch {
-      throw new BadRequestException('Erreur lors de l\'ajout des images à la solution');
+      throw new BadRequestException("Erreur lors de l'ajout des images à la solution");
     }
   }
 
@@ -128,9 +127,7 @@ export class SolutionsService {
       });
       return { data };
     } catch {
-      throw new BadRequestException(
-        'Erreur lors de la récupération des solutions par pôle',
-      );
+      throw new BadRequestException('Erreur lors de la récupération des solutions par pôle');
     }
   }
 
@@ -150,7 +147,7 @@ export class SolutionsService {
     return { data };
   }
 
-  async findOneMapped(solutionId: number): Promise<{ data: { solution: Solution, prev: number, next: number } }> {
+  async findOneMapped(id: number): Promise<{ data: { solution: Solution; prev: number; next: number } }> {
     const solution: Solution = await this.solutionRepository
       .createQueryBuilder('s')
       .select(['s.id', 's.name', 's.description', 's.targeted_problem', 's.created_at'])
@@ -160,19 +157,17 @@ export class SolutionsService {
       .leftJoinAndSelect('s.status', 'status')
       .leftJoinAndSelect('s.user', 'user')
       .leftJoinAndSelect('s.challenges', 'challenges')
-      .where('status.id IN (2, 3, 4)')
+      .where('s.id = :id AND status.id IN (2, 3, 4)', { id })
       .getOne();
-    if (!solution) throw new NotFoundException('La solution n\'a pas été trouvé');
-    const { prev, next } = await this.findNeighbors(solutionId, true);
+    if (!solution) throw new NotFoundException("La solution n'a pas été trouvé");
+    const { prev, next } = await this.findNeighbors(id, true);
     return {
       data: { solution, prev, next },
     };
   }
 
-  async findNeighbors(solutionId: number, filtered: boolean = false): Promise<{ prev: number, next: number }> {
-    const query: SelectQueryBuilder<Solution> = this.solutionRepository
-      .createQueryBuilder('s')
-      .select(['s.id']);
+  async findNeighbors(solutionId: number, filtered: boolean = false): Promise<{ prev: number; next: number }> {
+    const query: SelectQueryBuilder<Solution> = this.solutionRepository.createQueryBuilder('s').select(['s.id']);
     if (filtered) query.where('s.status.id IN (2, 3, 4)');
     const solutions: Solution[] = await query.getMany();
     const currentIndex: number = solutions.findIndex((solution) => solution.id === solutionId);

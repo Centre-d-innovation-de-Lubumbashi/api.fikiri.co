@@ -9,5 +9,4 @@ import { Status } from './entities/status.entity';
   providers: [StatusService],
   controllers: [StatusController],
 })
-export class StatusModule {
-}
+export class StatusModule {}

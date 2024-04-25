@@ -11,8 +11,7 @@ import { User } from './entities/user.entity';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly userService: UsersService) {
-  }
+  constructor(private readonly userService: UsersService) {}
 
   @Post('')
   @Roles([RoleEnum.Admin])
@@ -21,7 +20,7 @@ export class UsersController {
   }
 
   @Get('')
-  findUsers(): Promise<{ data: User [] }> {
+  findUsers(): Promise<{ data: User[] }> {
     return this.userService.findUsers();
   }
 
@@ -50,11 +49,12 @@ export class UsersController {
     FileInterceptor('thumb', {
       storage: diskStorage({
         destination: './uploads',
-        filename: function(_req, file, cb) {
+        filename: function (_req, file, cb) {
           cb(null, `${uuidv4()}.${file.mimetype.split('/')[1]}`);
         },
       }),
-    }))
+    }),
+  )
   @Post(':id/image')
   uploadImage(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<void> {
     return this.userService.uploadImage(+id, file);

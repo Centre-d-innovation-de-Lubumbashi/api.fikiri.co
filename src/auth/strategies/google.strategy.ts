@@ -7,7 +7,6 @@ import { CreateWithGoogleDto } from '../../users/dto/create-with-google.dto';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
-
   constructor(
     private readonly userService: UsersService,
     readonly configService: ConfigService,

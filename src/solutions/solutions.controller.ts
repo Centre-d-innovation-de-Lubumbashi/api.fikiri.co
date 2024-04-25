@@ -24,8 +24,7 @@ import { Solution } from './entities/solution.entity';
 
 @Controller('solutions')
 export class SolutionsController {
-  constructor(private readonly solutionsService: SolutionsService) {
-  }
+  constructor(private readonly solutionsService: SolutionsService) {}
 
   @Post('')
   create(@Body() data: CreateSolutionDto): Promise<{ data: Solution }> {
@@ -45,7 +44,7 @@ export class SolutionsController {
 
   @Public()
   @Get('mapped/:id')
-  findOneMapped(@Param('id') id: string): Promise<{ data: { solution: Solution, prev: number, next: number } }> {
+  findOneMapped(@Param('id') id: string): Promise<{ data: { solution: Solution; prev: number; next: number } }> {
     return this.solutionsService.findOneMapped(+id);
   }
 
@@ -66,7 +65,7 @@ export class SolutionsController {
 
   @Public()
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<{ data: { solution: Solution, prev: number, next: number } }> {
+  findOne(@Param('id') id: string): Promise<{ data: { solution: Solution; prev: number; next: number } }> {
     return this.solutionsService.findOne(+id);
   }
 
@@ -91,7 +90,7 @@ export class SolutionsController {
     FileInterceptor('thumb', {
       storage: diskStorage({
         destination: './uploads',
-        filename: function(_req, file, cb) {
+        filename: function (_req, file, cb) {
           cb(null, `${uuidv4()}.${file.mimetype.split('/')[1]}`);
         },
       }),

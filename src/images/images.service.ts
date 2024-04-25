@@ -7,7 +7,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { promisify } from 'util';
 import * as fs from 'node:fs';
 
-
 @Injectable()
 export class ImagesService {
   unlinkAsync = promisify(fs.unlink);
@@ -15,15 +14,14 @@ export class ImagesService {
   constructor(
     @InjectRepository(Image)
     private readonly imageRepository: Repository<Image>,
-  ) {
-  }
+  ) {}
 
   async create(dto: CreateImageDto): Promise<{ data: Image }> {
     try {
       const data: Image = await this.imageRepository.save(dto);
       return { data };
     } catch {
-      throw new BadRequestException('Impossible d\'uploader l\'image');
+      throw new BadRequestException("Impossible d'uploader l'image");
     }
   }
 
@@ -52,7 +50,7 @@ export class ImagesService {
       const data: Image = await this.imageRepository.save(updatedImage);
       return { data };
     } catch {
-      throw new BadRequestException('Une erreur est survenue lors de la mise à jour de l\'image');
+      throw new BadRequestException("Une erreur est survenue lors de la mise à jour de l'image");
     }
   }
 

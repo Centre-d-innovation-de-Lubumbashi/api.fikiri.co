@@ -54,15 +54,11 @@ export class User {
   @OneToMany(() => Solution, (solution) => solution.user)
   solutions: Solution[];
 
-  @ManyToMany(() => Role, (role) => role.users,
-    { onDelete: 'CASCADE', onUpdate: 'CASCADE' },
-  )
+  @ManyToMany(() => Role, (role) => role.users, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   @JoinTable()
   roles: Role[];
 
-  @OneToMany(() => Feedback, (feedback) => feedback.user,
-    { onDelete: 'CASCADE', onUpdate: 'CASCADE' },
-  )
+  @OneToMany(() => Feedback, (feedback) => feedback.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   feedbacks: Feedback[];
 
   @ManyToOne(() => Pole, (pole) => pole.users)

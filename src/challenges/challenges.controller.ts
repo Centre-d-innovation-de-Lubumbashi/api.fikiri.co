@@ -9,8 +9,7 @@ import { Challenge } from './entities/challenge.entity';
 
 @Controller('challenges')
 export class ChallengesController {
-  constructor(private readonly ChallengesService: ChallengesService) {
-  }
+  constructor(private readonly ChallengesService: ChallengesService) {}
 
   @Post()
   @Roles([RoleEnum.Admin])

@@ -12,6 +12,4 @@ import { UserSubscriber } from './subscribers/user.subscriber';
   providers: [UsersService, UserSubscriber],
   exports: [UsersService],
 })
-
-export class UsersModule {
-}
+export class UsersModule {}

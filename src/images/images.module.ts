@@ -8,5 +8,4 @@ import { Image } from './entities/image.entity';
   providers: [ImagesService],
   exports: [ImagesService],
 })
-export class ImagesModule {
-}
+export class ImagesModule {}

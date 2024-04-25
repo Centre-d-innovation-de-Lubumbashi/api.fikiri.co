@@ -13,8 +13,7 @@ export class SolutionFeedbacksService {
     private readonly solutionsService: SolutionsService,
     private readonly feedbacksService: FeedbacksService,
     private readonly quotationsService: QuotationsService,
-  ) {
-  }
+  ) {}
 
   async addFeedback(id: number, dto: CreateFeedbackDto): Promise<{ data: Solution }> {
     try {
@@ -25,7 +24,7 @@ export class SolutionFeedbacksService {
       const { data } = await this.solutionsService.saveSolution(solution);
       return { data };
     } catch {
-      throw new BadRequestException('Erreur lors de l\'ajout du feedback à la solution');
+      throw new BadRequestException("Erreur lors de l'ajout du feedback à la solution");
     }
   }
 

@@ -9,8 +9,7 @@ import { Solution } from '../solutions/entities/solution.entity';
 
 @Controller('solution-feedbacks')
 export class SolutionsFeedbacksController {
-  constructor(private readonly solutionsFeedbacksService: SolutionFeedbacksService) {
-  }
+  constructor(private readonly solutionsFeedbacksService: SolutionFeedbacksService) {}
 
   @Post(':id')
   @Roles([RoleEnum.Admin, RoleEnum.Curator])

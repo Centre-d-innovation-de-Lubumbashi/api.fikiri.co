@@ -10,17 +10,14 @@ export class ThematicsService {
   constructor(
     @InjectRepository(Thematic)
     private readonly thematicRepository: Repository<Thematic>,
-  ) {
-  }
+  ) {}
 
   async create(dto: CreateThematicDto): Promise<{ data: Thematic }> {
     try {
       const data: Thematic = await this.thematicRepository.save(dto);
       return { data };
     } catch {
-      throw new NotFoundException(
-        'Erreur lors de la création de la thématique',
-      );
+      throw new NotFoundException('Erreur lors de la création de la thématique');
     }
   }
 
@@ -38,9 +35,7 @@ export class ThematicsService {
       });
       return { data };
     } catch {
-      throw new BadRequestException(
-        'Erreur lors de la récupération de la thématique',
-      );
+      throw new BadRequestException('Erreur lors de la récupération de la thématique');
     }
   }
 
@@ -51,9 +46,7 @@ export class ThematicsService {
       const data: Thematic = await this.thematicRepository.save(updatedThematic);
       return { data };
     } catch {
-      throw new BadRequestException(
-        'Erreur lors de la modification de la thématique',
-      );
+      throw new BadRequestException('Erreur lors de la modification de la thématique');
     }
   }
 
@@ -62,9 +55,7 @@ export class ThematicsService {
       await this.findOne(id);
       await this.thematicRepository.delete(id);
     } catch {
-      throw new BadRequestException(
-        'Erreur lors de la suppression de la thématique',
-      );
+      throw new BadRequestException('Erreur lors de la suppression de la thématique');
     }
   }
 }

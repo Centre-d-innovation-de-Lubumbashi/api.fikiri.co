@@ -2,7 +2,7 @@ import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 import { Match } from '../decorators/match.decorator';
 
 export class SignupDto {
-  @IsEmail({}, { message: 'L\'email saisi est invalide' })
+  @IsEmail({}, { message: "L'email saisi est invalide" })
   email: string;
 
   @MinLength(4, {
@@ -19,6 +19,6 @@ export class SignupDto {
   @MinLength(7, { message: 'Minimum 10 caractères' })
   phone_number: string;
 
-  @IsNotEmpty({ message: 'L\'adresse est obligatoire' })
+  @IsNotEmpty({ message: "L'adresse est obligatoire" })
   address: string;
 }

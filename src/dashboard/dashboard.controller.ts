@@ -6,8 +6,7 @@ import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('dashboard')
 export class DashboardController {
-  constructor(private readonly dashboardService: DashboardService) {
-  }
+  constructor(private readonly dashboardService: DashboardService) {}
 
   @Public()
   @Get()

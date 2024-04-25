@@ -10,5 +10,4 @@ import { SolutionsModule } from '../solutions/solutions.module';
   controllers: [SolutionsFeedbacksController],
   providers: [SolutionFeedbacksService],
 })
-export class SolutionFeedbacksModule {
-}
+export class SolutionFeedbacksModule {}

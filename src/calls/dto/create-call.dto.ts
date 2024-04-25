@@ -5,7 +5,7 @@ export class CreateCallDto {
   name: string;
 
   @IsNotEmpty({ message: 'La description ne peut pas être vide' })
-  description:  string;
+  description: string;
 
   @IsNotEmpty({ message: 'La date de début ne peut pas être vide' })
   startedAt: Date;

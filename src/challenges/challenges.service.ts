@@ -9,9 +9,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 export class ChallengesService {
   constructor(
     @InjectRepository(Challenge)
-    private readonly challengeRepository: Repository<Challenge>
-  ) {
-  }
+    private readonly challengeRepository: Repository<Challenge>,
+  ) {}
 
   async create(dto: CreateChallengeDto): Promise<{ data: Challenge }> {
     try {
@@ -37,9 +36,7 @@ export class ChallengesService {
       });
       return { data };
     } catch {
-      throw new BadRequestException(
-        'Impossible de trouver les défis pour cette thématique',
-      );
+      throw new BadRequestException('Impossible de trouver les défis pour cette thématique');
     }
   }
 

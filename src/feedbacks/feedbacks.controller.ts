@@ -6,8 +6,7 @@ import { Feedback } from './entities/feedback.entity';
 
 @Controller('feedbacks')
 export class FeedbacksController {
-  constructor(private readonly feedbacksService: FeedbacksService) {
-  }
+  constructor(private readonly feedbacksService: FeedbacksService) {}
 
   @Get()
   findAll(): Promise<{ data: Feedback[] }> {

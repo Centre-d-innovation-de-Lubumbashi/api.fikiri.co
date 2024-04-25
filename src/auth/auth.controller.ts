@@ -14,8 +14,7 @@ import { User } from '../users/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {
-  }
+  constructor(private readonly authService: AuthService) {}
 
   @Post('logout')
   logout(@Req() request: Request): Promise<any> {
@@ -42,8 +41,7 @@ export class AuthController {
   @Public()
   @UseGuards(GoogleGuard)
   @Get('login')
-  loginGoogle(): void {
-  }
+  loginGoogle(): void {}
 
   @Public()
   @Post('register')

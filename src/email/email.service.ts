@@ -4,9 +4,7 @@ import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class EmailService {
-
-  constructor(private readonly mailerSerive: MailerService) {
-  }
+  constructor(private readonly mailerSerive: MailerService) {}
 
   async sendResetPasswordEmail(user: User, token: string): Promise<void> {
     const mail: ISendMailOptions = {
@@ -18,7 +16,7 @@ export class EmailService {
     try {
       await this.mailerSerive.sendMail(mail);
     } catch {
-      throw new BadRequestException('Une erreur est survenenue lors de l\'envoie d\'email');
+      throw new BadRequestException("Une erreur est survenenue lors de l'envoie d'email");
     }
   }
 
@@ -32,7 +30,7 @@ export class EmailService {
     try {
       await this.mailerSerive.sendMail(mail);
     } catch {
-      throw new BadRequestException('Une erreur est survenenue lors de l\'envoie d\'email');
+      throw new BadRequestException("Une erreur est survenenue lors de l'envoie d'email");
     }
   }
 }

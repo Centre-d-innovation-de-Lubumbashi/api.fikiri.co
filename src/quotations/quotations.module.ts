@@ -10,5 +10,4 @@ import { Quotation } from './entities/quotation.entity';
   providers: [QuotationsService],
   exports: [QuotationsService],
 })
-export class QuotationsModule {
-}
+export class QuotationsModule {}

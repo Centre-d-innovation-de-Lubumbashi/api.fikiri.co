@@ -16,10 +16,10 @@ export class CreateSolutionDto {
   @IsNotEmpty({ message: 'La thématique est obligatoire' })
   thematic: number;
 
-  @IsNotEmpty({ message: 'L\'utilisateur est obligatoire' })
+  @IsNotEmpty({ message: "L'utilisateur est obligatoire" })
   user: string;
 
-  @IsNotEmpty({ message: 'L\'appel est obligatoire' })
+  @IsNotEmpty({ message: "L'appel est obligatoire" })
   call: number;
 
   @IsNotEmpty({ message: 'Les challenges sont obligatoires' })

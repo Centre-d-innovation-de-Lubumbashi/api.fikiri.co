@@ -8,7 +8,8 @@ A platform where innovators can connect and upload their projects in relation to
 - [pnpm](https://pnpm.js.org/en/installation) >= 8
 - [NestJS](https://docs.nestjs.com/#installation) >= 10
 
-### Clone 
+### Clone
+
 ```bash
 $ gh repo clone musanziw/fikiri-api
 ```
@@ -31,4 +32,3 @@ $ pnpm build
 # production mode
 $ pnpm start
 ```
-

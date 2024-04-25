@@ -9,8 +9,7 @@ import { Call } from './entities/call.entity';
 
 @Controller('calls')
 export class CallsController {
-  constructor(private readonly callsService: CallsService) {
-  }
+  constructor(private readonly callsService: CallsService) {}
 
   @Post('')
   @Roles([RoleEnum.Admin])
@@ -26,13 +25,13 @@ export class CallsController {
 
   @Public()
   @Get('recent')
-  findRecent(): Promise<{ data: { call: Call, prev: number, next: number } }> {
+  findRecent(): Promise<{ data: { call: Call; prev: number; next: number } }> {
     return this.callsService.findRecent();
   }
 
   @Public()
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<{ data: { call: Call, prev: number, next: number } }> {
+  findOne(@Param('id') id: string): Promise<{ data: { call: Call; prev: number; next: number } }> {
     return this.callsService.findOne(+id);
   }
 

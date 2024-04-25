@@ -5,14 +5,12 @@ import { Repository } from 'typeorm';
 import { Feedback } from './entities/feedback.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
-
 @Injectable()
 export class FeedbacksService {
   constructor(
     @InjectRepository(Feedback)
     private readonly feedbackRepository: Repository<Feedback>,
-  ) {
-  }
+  ) {}
 
   async create(dto: CreateFeedbackDto): Promise<{ data: Feedback }> {
     try {

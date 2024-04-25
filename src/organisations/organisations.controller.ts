@@ -8,8 +8,7 @@ import { Organisation } from './entities/organisation.entity';
 
 @Controller('organisations')
 export class OrganisationsController {
-  constructor(private readonly organisationsService: OrganisationsService) {
-  }
+  constructor(private readonly organisationsService: OrganisationsService) {}
 
   @Post()
   @Roles([RoleEnum.Admin])
