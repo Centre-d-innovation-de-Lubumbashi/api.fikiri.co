@@ -61,9 +61,11 @@ export class AuthService {
 
   async updatePassword(@CurrentUser() user: User, dto: UpdatePasswordDto): Promise<void> {
     const { password } = dto;
-    const isMatch: boolean = await this.passwordMatch(dto.old_password, user.password);
-    if (isMatch) await this.usersService.updatePassword(user.id, password);
-    else throw new BadRequestException("L'ancien mot de passe est incorrect");
+    if (user.password) {
+      const isMatch: boolean = await this.passwordMatch(dto.old_password, user.password);
+      if (!isMatch) throw new BadRequestException("L'ancien mot de passe est incorrect");
+    }
+    await this.usersService.updatePassword(user.id, password);
   }
 
   async resetPasswordRequest(dto: ResetPasswordRequestDto): Promise<void> {

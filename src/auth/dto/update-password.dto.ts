@@ -1,8 +1,8 @@
-import { IsNotEmpty, MinLength } from 'class-validator';
+import { IsNotEmpty, IsOptional, MinLength } from 'class-validator';
 import { Match } from '../decorators/match.decorator';
 
 export class UpdatePasswordDto {
-  @IsNotEmpty({ message: "L'ancien mot de passe est recquis" })
+  @IsOptional()
   old_password: string;
 
   @MinLength(6, {
