@@ -42,8 +42,13 @@ export class AuthService {
     return { data };
   }
 
-  async logout(@Req() request: Request): Promise<void> {
+  async logout(@Req() request: Request): Promise<{ data: { message: string } }> {
     request.session.destroy(() => {});
+    return {
+      data: {
+        message: 'Vous avez été déconnecté avec succès',
+      },
+    };
   }
 
   async profile(@CurrentUser() data: User): Promise<{ data: User }> {
@@ -59,13 +64,22 @@ export class AuthService {
     return { data };
   }
 
-  async updatePassword(@CurrentUser() user: User, dto: UpdatePasswordDto): Promise<void> {
+  async updatePassword(@CurrentUser() user: User, dto: UpdatePasswordDto): Promise<{ data: { message: string } }> {
     const { password } = dto;
     if (user.password) {
       const isMatch: boolean = await this.passwordMatch(dto.old_password, user.password);
       if (!isMatch) throw new BadRequestException("L'ancien mot de passe est incorrect");
     }
-    await this.usersService.updatePassword(user.id, password);
+    try {
+      await this.usersService.updatePassword(user.id, password);
+      return {
+        data: {
+          message: 'Votre mot de passe a été mis à jour avec succès',
+        },
+      };
+    } catch {
+      throw new BadRequestException('Erreur lors de la mise à jour du mot de passe');
+    }
   }
 
   async resetPasswordRequest(dto: ResetPasswordRequestDto): Promise<void> {

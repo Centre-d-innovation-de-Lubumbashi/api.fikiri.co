@@ -8,7 +8,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RoleEnum } from 'src/auth/enums/role.enum';
 import { User } from './entities/user.entity';
-import { FileValidationPipe, validateFile } from 'src/pipes/file-validation.pipe';
+import { validateFile } from 'src/pipes/file-validation.pipe';
 
 @Controller('users')
 export class UsersController {
@@ -59,14 +59,13 @@ export class UsersController {
   )
   uploadImage(
     @Param('id') id: string,
-    @UploadedFile(validateFile())
-    file: Express.Multer.File,
-  ): Promise<void> {
+    @UploadedFile(validateFile()) file: Express.Multer.File,
+  ): Promise<{ data: User }> {
     return this.userService.uploadImage(+id, file);
   }
 
   @Delete(':id/image/delete')
-  removeImage(@Param('id') id: string): Promise<void> {
+  removeImage(@Param('id') id: string): Promise<{ data: { message: string } }> {
     return this.userService.deleteProfileImage(+id);
   }
 

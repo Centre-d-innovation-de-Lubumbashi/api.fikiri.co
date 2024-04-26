@@ -17,12 +17,12 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('logout')
-  logout(@Req() request: Request): Promise<any> {
+  logout(@Req() request: Request): Promise<{ data: { message: string } }> {
     return this.authService.logout(request);
   }
 
   @Get('profile')
-  profile(@CurrentUser() user: User): Promise<any> {
+  profile(@CurrentUser() user: User): Promise<{ data: User }> {
     return this.authService.profile(user);
   }
 
@@ -57,7 +57,7 @@ export class AuthController {
   }
 
   @Patch('update-password')
-  updatePassword(@CurrentUser() user: User, @Body() dto: UpdatePasswordDto): Promise<void> {
+  updatePassword(@CurrentUser() user: User, @Body() dto: UpdatePasswordDto): Promise<{ data: { message: string } }> {
     return this.authService.updatePassword(user, dto);
   }
 

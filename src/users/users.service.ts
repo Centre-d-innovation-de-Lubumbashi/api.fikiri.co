@@ -149,22 +149,24 @@ export class UsersService {
     }
   }
 
-  async uploadImage(id: number, image: Express.Multer.File): Promise<void> {
+  async uploadImage(id: number, image: Express.Multer.File): Promise<{ data: User }> {
     const { data: user } = await this.findOne(id);
     try {
       await unlinkAsync(`./uploads/${user.profile}`);
+    } catch {
     } finally {
-      await this.userRepository.update(id, {
-        profile: image.filename,
-      });
+      user.profile = image.filename;
+      await this.userRepository.save(user);
+      return { data: user };
     }
   }
 
-  async deleteProfileImage(id: number): Promise<void> {
+  async deleteProfileImage(id: number): Promise<{ data: { message: string } }> {
     try {
       const { data: user } = await this.findOne(id);
       await unlinkAsync(`./uploads/${user.profile}`);
       await this.userRepository.update(id, { profile: null });
+      return { data: { message: 'Image de profil supprimée avec succès' } };
     } catch {
       throw new BadRequestException("Erreur lors de la suppression de l'image");
     }
@@ -179,9 +181,12 @@ export class UsersService {
     }
   }
 
-  async updatePassword(id: number, password: string): Promise<void> {
+  async updatePassword(id: number, password: string): Promise<{ data: User }> {
     try {
-      await this.userRepository.update(id, { password, token: null });
+      const { data: user } = await this.findOne(id);
+      user.password = password;
+      const updatedUser = await this.userRepository.save(user);
+      return { data: updatedUser };
     } catch {
       throw new BadRequestException('Erreur lors de la réinitialisation du mot de passe');
     }
