@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -52,10 +42,7 @@ export class UsersController {
 
   @Patch(':id')
   @Roles([RoleEnum.Admin])
-  update(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
-  ): Promise<{ data: User }> {
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<{ data: User }> {
     return this.userService.update(+id, updateUserDto);
   }
 
@@ -66,13 +53,13 @@ export class UsersController {
         destination: './uploads',
         filename: function (_req, file, cb) {
           cb(null, `${uuidv4()}.${file.mimetype.split('/')[1]}`);
-        },
-      }),
-    }),
+        }
+      })
+    })
   )
   uploadImage(
     @Param('id') id: string,
-    @UploadedFile(validateFile()) file: Express.Multer.File,
+    @UploadedFile(validateFile()) file: Express.Multer.File
   ): Promise<{ data: User }> {
     return this.userService.uploadImage(+id, file);
   }

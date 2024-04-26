@@ -8,7 +8,7 @@ import {
   Post,
   Query,
   UploadedFile,
-  UseInterceptors,
+  UseInterceptors
 } from '@nestjs/common';
 import { SolutionsService } from './solutions.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -44,9 +44,7 @@ export class SolutionsController {
 
   @Public()
   @Get('mapped/:id')
-  findOneMapped(
-    @Param('id') id: string,
-  ): Promise<{ data: { solution: Solution; prev: number; next: number } }> {
+  findOneMapped(@Param('id') id: string): Promise<{ data: { solution: Solution; prev: number; next: number } }> {
     return this.solutionsService.findOneMapped(+id);
   }
 
@@ -67,18 +65,13 @@ export class SolutionsController {
 
   @Public()
   @Get(':id')
-  findOne(
-    @Param('id') id: string,
-  ): Promise<{ data: { solution: Solution; prev: number; next: number } }> {
+  findOne(@Param('id') id: string): Promise<{ data: { solution: Solution; prev: number; next: number } }> {
     return this.solutionsService.findOne(+id);
   }
 
   @Patch(':id')
   @Roles([RoleEnum.Admin])
-  update(
-    @Param('id') id: string,
-    @Body() data: UpdateSolutionDto,
-  ): Promise<{ data: Solution }> {
+  update(@Param('id') id: string, @Body() data: UpdateSolutionDto): Promise<{ data: Solution }> {
     return this.solutionsService.update(+id, data);
   }
 
@@ -89,10 +82,7 @@ export class SolutionsController {
   }
 
   @Patch(':id/user')
-  updateUserSolution(
-    @Param('id') id: string,
-    @Body() data: UpdateUserSolutionDto,
-  ): Promise<{ data: Solution }> {
+  updateUserSolution(@Param('id') id: string, @Body() data: UpdateUserSolutionDto): Promise<{ data: Solution }> {
     return this.solutionsService.userUpdateSolution(+id, data);
   }
 
@@ -102,15 +92,12 @@ export class SolutionsController {
         destination: './uploads',
         filename: function (_req, file, cb) {
           cb(null, `${uuidv4()}.${file.mimetype.split('/')[1]}`);
-        },
-      }),
-    }),
+        }
+      })
+    })
   )
   @Post(':id/image')
-  uploadImage(
-    @Param('id') id: string,
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<void> {
+  uploadImage(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<void> {
     return this.solutionsService.uploadImage(+id, file);
   }
 }

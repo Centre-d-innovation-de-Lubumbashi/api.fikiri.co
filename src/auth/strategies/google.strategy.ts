@@ -9,27 +9,22 @@ import { CreateWithGoogleDto } from '../../users/dto/create-with-google.dto';
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(
     private readonly userService: UsersService,
-    readonly configService: ConfigService,
+    readonly configService: ConfigService
   ) {
     super({
       clientID: configService.get('GOOGLE_CLIENT_ID'),
       clientSecret: configService.get('GOOGLE_SECRET'),
       callbackURL: configService.get('GOOGLE_REDIRECT_URI'),
-      scope: ['email', 'profile'],
+      scope: ['email', 'profile']
     });
   }
 
-  async validate(
-    _accessToken: string,
-    _refreshToken: string,
-    profile: any,
-    done: VerifyCallback,
-  ) {
+  async validate(_accessToken: string, _refreshToken: string, profile: any, done: VerifyCallback) {
     const { emails, name, photos } = profile;
     const userDto: CreateWithGoogleDto = {
       email: emails[0].value,
       name: `${name.givenName} ${name.familyName}`,
-      googleImage: photos[0].value,
+      googleImage: photos[0].value
     };
     const { data: user } = await this.userService.findOrCreate(userDto);
     done(null, user);

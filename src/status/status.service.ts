@@ -9,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 export class StatusService {
   constructor(
     @InjectRepository(Status)
-    private readonly statusRepository: Repository<Status>,
+    private readonly statusRepository: Repository<Status>
   ) {}
 
   async create(dto: CreateStatusDto): Promise<{ data: Status }> {
@@ -23,7 +23,7 @@ export class StatusService {
 
   async findAll(): Promise<{ data: Status[] }> {
     const data: Status[] = await this.statusRepository.find({
-      order: { updated_at: 'DESC' },
+      order: { updated_at: 'DESC' }
     });
     return { data };
   }
@@ -31,7 +31,7 @@ export class StatusService {
   async findOne(id: number): Promise<{ data: Status }> {
     try {
       const data: Status = await this.statusRepository.findOneOrFail({
-        where: { id },
+        where: { id }
       });
       return { data };
     } catch {
@@ -42,10 +42,7 @@ export class StatusService {
   async update(id: number, dto: UpdateStatusDto): Promise<{ data: Status }> {
     try {
       const { data: status } = await this.findOne(id);
-      const updatedStatus: Status & UpdateStatusDto = Object.assign(
-        status,
-        dto,
-      );
+      const updatedStatus: Status & UpdateStatusDto = Object.assign(status, dto);
       const data: Status = await this.statusRepository.save(updatedStatus);
       return { data };
     } catch {

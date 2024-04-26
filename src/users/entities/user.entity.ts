@@ -8,7 +8,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
+  UpdateDateColumn
 } from 'typeorm';
 import { Solution } from '../../solutions/entities/solution.entity';
 import { Feedback } from '../../feedbacks/entities/feedback.entity';
@@ -56,14 +56,14 @@ export class User {
 
   @ManyToMany(() => Role, (role) => role.users, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
+    onUpdate: 'CASCADE'
   })
   @JoinTable()
   roles: Role[];
 
   @OneToMany(() => Feedback, (feedback) => feedback.user, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
+    onUpdate: 'CASCADE'
   })
   feedbacks: Feedback[];
 

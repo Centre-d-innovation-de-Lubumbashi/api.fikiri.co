@@ -6,7 +6,7 @@ export class SignupDto {
   email: string;
 
   @MinLength(4, {
-    message: 'Le mot de passe doit contenir au-moins 4 caractères',
+    message: 'Le mot de passe doit contenir au-moins 4 caractères'
   })
   password: string;
 

@@ -12,15 +12,15 @@ async function bootstrap() {
     origin: true,
     allowedHeaders: ['Content-Type'],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    credentials: true,
+    credentials: true
   });
   app.use(
     session({
       secret: process.env.SESSION_SECRET,
       resave: Boolean(process.env.SESSION_RESAVE),
       saveUninitialized: Boolean(process.env.SESSION_SAVE_UNINITIALIZED),
-      cookie: { maxAge: +process.env.SESSION_MAX_AGE, secure: false },
-    }),
+      cookie: { maxAge: +process.env.SESSION_MAX_AGE, secure: false }
+    })
   );
   app.use(passport.initialize());
   app.use(passport.session());
@@ -29,15 +29,13 @@ async function bootstrap() {
       exceptionFactory: (errors) => {
         const result = errors.map((error) => ({
           property: error.property,
-          message: error.constraints[Object.keys(error.constraints)[0]],
+          message: error.constraints[Object.keys(error.constraints)[0]]
         }));
         return new BadRequestException(result);
-      },
-    }),
+      }
+    })
   );
   await app.listen(port);
 }
 
-bootstrap().then(() =>
-  console.log(`🚀 Application is running on: localhost:${port}`),
-);
+bootstrap().then(() => console.log(`🚀 Application is running on: localhost:${port}`));

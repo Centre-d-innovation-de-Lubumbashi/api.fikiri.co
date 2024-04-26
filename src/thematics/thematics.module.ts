@@ -7,6 +7,6 @@ import { Thematic } from './entities/thematic.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Thematic])],
   controllers: [ThematicsController],
-  providers: [ThematicsService],
+  providers: [ThematicsService]
 })
 export class ThematicsModule {}

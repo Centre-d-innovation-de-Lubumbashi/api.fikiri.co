@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCallDto } from './dto/create-call.dto';
 import { UpdateCallDto } from './dto/update-call.dto';
 import { Repository } from 'typeorm';
@@ -13,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 export class CallsService {
   constructor(
     @InjectRepository(Call)
-    private readonly callRepository: Repository<Call>,
+    private readonly callRepository: Repository<Call>
   ) {}
 
   async create(dto: CreateCallDto): Promise<{ data: Call }> {
@@ -27,7 +23,7 @@ export class CallsService {
 
   async findAll(): Promise<{ data: Call[] }> {
     const data: Call[] = await this.callRepository.find({
-      relations: ['thematics'],
+      relations: ['thematics']
     });
     return { data };
   }
@@ -35,26 +31,21 @@ export class CallsService {
   async findRecent(): Promise<{
     data: { call: Call; prev: number; next: number };
   }> {
-    const call: Call = await this.callRepository
-      .createQueryBuilder('c')
-      .orderBy('c.created_at', 'DESC')
-      .getOne();
+    const call: Call = await this.callRepository.createQueryBuilder('c').orderBy('c.created_at', 'DESC').getOne();
     const { prev, next } = await this.findNeighbours(call.id);
     return {
-      data: { call, prev, next },
+      data: { call, prev, next }
     };
   }
 
-  async findOne(
-    id: number,
-  ): Promise<{ data: { call: Call; prev: number; next: number } }> {
+  async findOne(id: number): Promise<{ data: { call: Call; prev: number; next: number } }> {
     try {
       const call: Call = await this.callRepository.findOneOrFail({
-        where: { id },
+        where: { id }
       });
       const { prev, next } = await this.findNeighbours(id);
       return {
-        data: { call, prev, next },
+        data: { call, prev, next }
       };
     } catch {
       throw new NotFoundException("Impossible de récupérer l'appel à solution");
@@ -62,10 +53,7 @@ export class CallsService {
   }
 
   async findNeighbours(id: number): Promise<{ prev: number; next: number }> {
-    const data: Call[] = await this.callRepository
-      .createQueryBuilder('c')
-      .select('c.id')
-      .getMany();
+    const data: Call[] = await this.callRepository.createQueryBuilder('c').select('c.id').getMany();
 
     const index: number = data.findIndex((call) => call.id === id);
     const prev: number = data[index - 1]?.id ?? null;
@@ -81,9 +69,7 @@ export class CallsService {
       const data: Call = await this.callRepository.save(updatedCall);
       return { data };
     } catch {
-      throw new BadRequestException(
-        "Impossible de mettre à jour l'appel à solution",
-      );
+      throw new BadRequestException("Impossible de mettre à jour l'appel à solution");
     }
   }
 
@@ -92,9 +78,7 @@ export class CallsService {
       await this.findOne(id);
       await this.callRepository.delete(id);
     } catch {
-      throw new BadRequestException(
-        "Impossible de supprimer l'appel à solution",
-      );
+      throw new BadRequestException("Impossible de supprimer l'appel à solution");
     }
   }
 }

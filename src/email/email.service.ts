@@ -11,14 +11,12 @@ export class EmailService {
       to: user.email,
       subject: 'Réinitialisation du mot de passe',
       template: './reset-password',
-      context: { user, token },
+      context: { user, token }
     };
     try {
       await this.mailerSerive.sendMail(mail);
     } catch {
-      throw new BadRequestException(
-        "Une erreur est survenenue lors de l'envoie d'email",
-      );
+      throw new BadRequestException("Une erreur est survenenue lors de l'envoie d'email");
     }
   }
 
@@ -27,14 +25,12 @@ export class EmailService {
       to: user.email,
       subject: 'Bienvenue sur fikiri',
       template: './registration',
-      context: { user, password },
+      context: { user, password }
     };
     try {
       await this.mailerSerive.sendMail(mail);
     } catch {
-      throw new BadRequestException(
-        "Une erreur est survenenue lors de l'envoie d'email",
-      );
+      throw new BadRequestException("Une erreur est survenenue lors de l'envoie d'email");
     }
   }
 }

@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RoleEnum } from 'src/auth/enums/role.enum';
@@ -21,9 +13,7 @@ export class ChallengesController {
 
   @Post()
   @Roles([RoleEnum.Admin])
-  create(
-    @Body() createChallengeDto: CreateChallengeDto,
-  ): Promise<{ data: Challenge }> {
+  create(@Body() createChallengeDto: CreateChallengeDto): Promise<{ data: Challenge }> {
     return this.challengesService.create(createChallengeDto);
   }
 
@@ -45,10 +35,7 @@ export class ChallengesController {
 
   @Patch(':id')
   @Roles([RoleEnum.Admin])
-  update(
-    @Param('id') id: string,
-    @Body() updateChallengeDto: UpdateChallengeDto,
-  ): Promise<{ data: Challenge }> {
+  update(@Param('id') id: string, @Body() updateChallengeDto: UpdateChallengeDto): Promise<{ data: Challenge }> {
     return this.challengesService.update(+id, updateChallengeDto);
   }
 

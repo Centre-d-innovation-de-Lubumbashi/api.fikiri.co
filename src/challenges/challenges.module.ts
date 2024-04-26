@@ -7,6 +7,6 @@ import { Challenge } from './entities/challenge.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Challenge])],
   controllers: [ChallengesController],
-  providers: [ChallengesService],
+  providers: [ChallengesService]
 })
 export class ChallengesModule {}

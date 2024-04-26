@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Patch,
-  Post,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalGuard } from './guards/local.guard';
 import { Request } from 'express';
@@ -36,10 +27,7 @@ export class AuthController {
   }
 
   @Patch('profile')
-  updateProfile(
-    @CurrentUser() currentUser: User,
-    @Body() data: UpdateProfileDto,
-  ): Promise<{ data: User }> {
+  updateProfile(@CurrentUser() currentUser: User, @Body() data: UpdateProfileDto): Promise<{ data: User }> {
     return this.authService.updateProfile(currentUser, data);
   }
 
@@ -69,26 +57,19 @@ export class AuthController {
   }
 
   @Patch('update-password')
-  updatePassword(
-    @CurrentUser() user: User,
-    @Body() dto: UpdatePasswordDto,
-  ): Promise<{ data: { message: string } }> {
+  updatePassword(@CurrentUser() user: User, @Body() dto: UpdatePasswordDto): Promise<{ data: { message: string } }> {
     return this.authService.updatePassword(user, dto);
   }
 
   @Public()
   @Post('reset-password-request')
-  resetPasswordRequest(
-    @Body() dto: ResetPasswordRequestDto,
-  ): Promise<{ data: { message: string } }> {
+  resetPasswordRequest(@Body() dto: ResetPasswordRequestDto): Promise<{ data: { message: string } }> {
     return this.authService.resetPasswordRequest(dto);
   }
 
   @Public()
   @Post('reset-password')
-  resetPassword(
-    @Body() dto: ResetPasswordDto,
-  ): Promise<{ data: { message: string } }> {
+  resetPassword(@Body() dto: ResetPasswordDto): Promise<{ data: { message: string } }> {
     return this.authService.resetPassword(dto);
   }
 }

@@ -9,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 export class PolesService {
   constructor(
     @InjectRepository(Pole)
-    private readonly poleRepository: Repository<Pole>,
+    private readonly poleRepository: Repository<Pole>
   ) {}
 
   async create(dto: CreatePoleDto): Promise<{ data: Pole }> {
@@ -29,7 +29,7 @@ export class PolesService {
   async findOne(id: number): Promise<{ data: Pole }> {
     try {
       const data: Pole = await this.poleRepository.findOneOrFail({
-        where: { id },
+        where: { id }
       });
       return { data };
     } catch {

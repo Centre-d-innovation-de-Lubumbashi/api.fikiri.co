@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { Repository } from 'typeorm';
@@ -13,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 export class RolesService {
   constructor(
     @InjectRepository(Role)
-    private readonly roleRepository: Repository<Role>,
+    private readonly roleRepository: Repository<Role>
   ) {}
 
   async create(dto: CreateRoleDto): Promise<{ data: Role }> {
@@ -27,7 +23,7 @@ export class RolesService {
 
   async findAll(): Promise<{ data: Role[] }> {
     const data: Role[] = await this.roleRepository.find({
-      order: { updated_at: 'DESC' },
+      order: { updated_at: 'DESC' }
     });
     return { data };
   }
@@ -35,7 +31,7 @@ export class RolesService {
   async findOne(id: number): Promise<{ data: Role }> {
     try {
       const data: Role = await this.roleRepository.findOneOrFail({
-        where: { id },
+        where: { id }
       });
       return { data };
     } catch {

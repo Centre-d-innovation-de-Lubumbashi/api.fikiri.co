@@ -8,7 +8,7 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
-  PrimaryGeneratedColumn,
+  PrimaryGeneratedColumn
 } from 'typeorm';
 import { Challenge } from '../../challenges/entities/challenge.entity';
 import { Status } from '../../status/entities/status.entity';

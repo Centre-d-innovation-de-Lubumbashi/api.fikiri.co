@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import * as fs from 'fs';
 import { promisify } from 'util';
 import { SignupDto } from '../auth/dto/register.dto';
@@ -26,13 +21,13 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    private readonly emailService: EmailService,
+    private readonly emailService: EmailService
   ) {}
 
   async create(dto: CreateUserDto): Promise<{ data: User }> {
     try {
       const exists: boolean = await this.userRepository.exists({
-        where: { email: dto.email },
+        where: { email: dto.email }
       });
       if (exists) new ConflictException("L'utilisateur existe déjà");
       const password: string = randomPassword();
@@ -41,26 +36,24 @@ export class UsersService {
         password,
         organisation: { id: dto.organisation },
         pole: { id: dto.pole },
-        roles: dto.roles.map((id) => ({ id })),
+        roles: dto.roles.map((id) => ({ id }))
       });
       await this.emailService.sendRegistrationEmail(user, password);
       return { data: user };
     } catch {
-      throw new BadRequestException(
-        "Erreur lors de la création de l'utilisateur",
-      );
+      throw new BadRequestException("Erreur lors de la création de l'utilisateur");
     }
   }
 
   async register(dto: SignupDto): Promise<{ data: User }> {
     const exists: boolean = await this.userRepository.exists({
-      where: { email: dto.email },
+      where: { email: dto.email }
     });
     if (exists) new ConflictException();
     delete dto.password_confirm;
     const data: User = await this.userRepository.save({
       ...dto,
-      roles: [{ name: RoleEnum.User }],
+      roles: [{ name: RoleEnum.User }]
     });
     return { data };
   }
@@ -69,7 +62,7 @@ export class UsersService {
     const data: User[] = await this.userRepository.find({
       relations: ['roles'],
       where: { roles: { name: RoleEnum.User } },
-      order: { created_at: 'DESC' },
+      order: { created_at: 'DESC' }
     });
     return { data };
   }
@@ -77,7 +70,7 @@ export class UsersService {
   async findCurators(): Promise<{ data: User[] }> {
     const data: User[] = await this.userRepository.find({
       where: { roles: { name: RoleEnum.Curator } },
-      relations: ['roles', 'organisation', 'pole'],
+      relations: ['roles', 'organisation', 'pole']
     });
     return { data };
   }
@@ -85,7 +78,7 @@ export class UsersService {
   async findAdmins(): Promise<{ data: User[] }> {
     const data: User[] = await this.userRepository.find({
       where: { roles: { name: RoleEnum.Admin } },
-      relations: ['roles', 'organisation', 'pole'],
+      relations: ['roles', 'organisation', 'pole']
     });
     return { data };
   }
@@ -94,13 +87,11 @@ export class UsersService {
     try {
       const data: User = await this.userRepository.findOneOrFail({
         where: { id },
-        relations: ['roles', 'pole', 'organisation'],
+        relations: ['roles', 'pole', 'organisation']
       });
       return { data };
     } catch {
-      throw new BadRequestException(
-        'Aucun utilisateur trouvé avec cet identifiant',
-      );
+      throw new BadRequestException('Aucun utilisateur trouvé avec cet identifiant');
     }
   }
 
@@ -108,7 +99,7 @@ export class UsersService {
     try {
       const data: User = await this.userRepository.findOneOrFail({
         where: { email },
-        relations: ['roles'],
+        relations: ['roles']
       });
       return { data };
     } catch {
@@ -119,18 +110,16 @@ export class UsersService {
   async findOrCreate(dto: CreateWithGoogleDto): Promise<{ data: User }> {
     try {
       const existingUser: User = await this.userRepository.findOne({
-        where: { email: dto.email },
+        where: { email: dto.email }
       });
       if (existingUser) return { data: existingUser };
       const newUser: User = await this.userRepository.save({
         ...dto,
-        roles: [{ name: RoleEnum.User }],
+        roles: [{ name: RoleEnum.User }]
       });
       return { data: newUser };
     } catch {
-      throw new BadRequestException(
-        "Erreur lors de la récupération de l'utilisateur",
-      );
+      throw new BadRequestException("Erreur lors de la récupération de l'utilisateur");
     }
   }
 
@@ -142,25 +131,17 @@ export class UsersService {
         ...updatedUser,
         organisation: { id: dto.organisation || updatedUser.organisation?.id },
         pole: { id: dto.pole || updatedUser.pole?.id },
-        roles: dto?.roles?.map((id) => ({ id })) || updatedUser.roles,
+        roles: dto?.roles?.map((id) => ({ id })) || updatedUser.roles
       });
       return { data };
     } catch {
-      throw new BadRequestException(
-        "Erreur lors de la modification de l'utilisateur",
-      );
+      throw new BadRequestException("Erreur lors de la modification de l'utilisateur");
     }
   }
 
-  async updateProfile(
-    @CurrentUser() currentUser: User,
-    dto: UpdateProfileDto,
-  ): Promise<{ data: User }> {
+  async updateProfile(@CurrentUser() currentUser: User, dto: UpdateProfileDto): Promise<{ data: User }> {
     try {
-      const updatedProfile: User & UpdateProfileDto = Object.assign(
-        currentUser,
-        dto,
-      );
+      const updatedProfile: User & UpdateProfileDto = Object.assign(currentUser, dto);
       const data: User = await this.userRepository.save(updatedProfile);
       return { data };
     } catch {
@@ -168,10 +149,7 @@ export class UsersService {
     }
   }
 
-  async uploadImage(
-    id: number,
-    image: Express.Multer.File,
-  ): Promise<{ data: User }> {
+  async uploadImage(id: number, image: Express.Multer.File): Promise<{ data: User }> {
     const { data: user } = await this.findOne(id);
     try {
       await unlinkAsync(`./uploads/${user.profile}`);
@@ -210,9 +188,7 @@ export class UsersService {
       const updatedUser = await this.userRepository.save(user);
       return { data: updatedUser };
     } catch {
-      throw new BadRequestException(
-        'Erreur lors de la réinitialisation du mot de passe',
-      );
+      throw new BadRequestException('Erreur lors de la réinitialisation du mot de passe');
     }
   }
 
@@ -221,9 +197,7 @@ export class UsersService {
       await this.findOne(id);
       await this.userRepository.delete(id);
     } catch {
-      throw new BadRequestException(
-        "Erreur lors de la suppression de l'utilisateur",
-      );
+      throw new BadRequestException("Erreur lors de la suppression de l'utilisateur");
     }
   }
 }

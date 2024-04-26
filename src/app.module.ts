@@ -27,10 +27,10 @@ import { join } from 'path';
   imports: [
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '../../'),
-      renderPath: '/uploads',
+      renderPath: '/uploads'
     }),
     ConfigModule.forRoot({
-      isGlobal: true,
+      isGlobal: true
     }),
     AuthModule,
     UsersModule,
@@ -48,17 +48,17 @@ import { join } from 'path';
     EmailModule,
     ImagesModule,
     DatabaseModule,
-    SolutionFeedbacksModule,
+    SolutionFeedbacksModule
   ],
   providers: [
     {
       provide: APP_GUARD,
-      useClass: AuthGuard,
+      useClass: AuthGuard
     },
     {
       provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
-  ],
+      useClass: RolesGuard
+    }
+  ]
 })
 export class AppModule {}

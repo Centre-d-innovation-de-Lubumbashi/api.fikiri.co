@@ -8,6 +8,6 @@ import { Feedback } from './entities/feedback.entity';
   imports: [TypeOrmModule.forFeature([Feedback])],
   controllers: [FeedbacksController],
   providers: [FeedbacksService],
-  exports: [FeedbacksService],
+  exports: [FeedbacksService]
 })
 export class FeedbacksModule {}

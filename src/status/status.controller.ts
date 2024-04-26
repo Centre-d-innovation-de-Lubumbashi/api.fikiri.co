@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { StatusService } from './status.service';
 import { UpdateStatusDto } from './dto/update-status.dto';
 import { CreateStatusDto } from './dto/create-status.dto';
@@ -38,10 +30,7 @@ export class StatusController {
 
   @Patch(':id')
   @Roles([RoleEnum.Admin])
-  update(
-    @Param('id') id: string,
-    @Body() dto: UpdateStatusDto,
-  ): Promise<{ data: Status }> {
+  update(@Param('id') id: string, @Body() dto: UpdateStatusDto): Promise<{ data: Status }> {
     return this.statusService.update(+id, dto);
   }
 

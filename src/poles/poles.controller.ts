@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { PolesService } from './poles.service';
 import { CreatePoleDto } from './dto/create-pole.dto';
 import { UpdatePoleDto } from './dto/update-pole.dto';
@@ -36,10 +28,7 @@ export class PolesController {
 
   @Patch(':id')
   @Roles([RoleEnum.Admin])
-  update(
-    @Param('id') id: string,
-    @Body() updatePoleDto: UpdatePoleDto,
-  ): Promise<{ data: Pole }> {
+  update(@Param('id') id: string, @Body() updatePoleDto: UpdatePoleDto): Promise<{ data: Pole }> {
     return this.polesService.update(+id, updatePoleDto);
   }
 

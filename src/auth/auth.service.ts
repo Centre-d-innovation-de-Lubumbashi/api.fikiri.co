@@ -18,17 +18,13 @@ export class AuthService {
   constructor(
     private readonly configService: ConfigService,
     private readonly usersService: UsersService,
-    private readonly emailService: EmailService,
+    private readonly emailService: EmailService
   ) {}
 
   async validateUser(email: string, password: string): Promise<{ data: User }> {
     const { data } = await this.usersService.findByEmail(email);
-    const passwordMatch: boolean = await this.passwordMatch(
-      password,
-      data.password,
-    );
-    if (!passwordMatch)
-      throw new BadRequestException('Les identifiants saisis sont invalides');
+    const passwordMatch: boolean = await this.passwordMatch(password, data.password);
+    if (!passwordMatch) throw new BadRequestException('Les identifiants saisis sont invalides');
     return { data };
   }
 
@@ -46,14 +42,12 @@ export class AuthService {
     return { data };
   }
 
-  async logout(
-    @Req() request: Request,
-  ): Promise<{ data: { message: string } }> {
+  async logout(@Req() request: Request): Promise<{ data: { message: string } }> {
     request.session.destroy(() => {});
     return {
       data: {
-        message: 'Vous avez été déconnecté avec succès',
-      },
+        message: 'Vous avez été déconnecté avec succès'
+      }
     };
   }
 
@@ -61,10 +55,7 @@ export class AuthService {
     return { data };
   }
 
-  async updateProfile(
-    @CurrentUser() currentUser: User,
-    dto: UpdateProfileDto,
-  ): Promise<{ data: User }> {
+  async updateProfile(@CurrentUser() currentUser: User, dto: UpdateProfileDto): Promise<{ data: User }> {
     return await this.usersService.updateProfile(currentUser, dto);
   }
 
@@ -73,36 +64,25 @@ export class AuthService {
     return { data };
   }
 
-  async updatePassword(
-    @CurrentUser() user: User,
-    dto: UpdatePasswordDto,
-  ): Promise<{ data: { message: string } }> {
+  async updatePassword(@CurrentUser() user: User, dto: UpdatePasswordDto): Promise<{ data: { message: string } }> {
     const { password } = dto;
     if (user.password) {
-      const isMatch: boolean = await this.passwordMatch(
-        dto.old_password,
-        user.password,
-      );
-      if (!isMatch)
-        throw new BadRequestException("L'ancien mot de passe est incorrect");
+      const isMatch: boolean = await this.passwordMatch(dto.old_password, user.password);
+      if (!isMatch) throw new BadRequestException("L'ancien mot de passe est incorrect");
     }
     try {
       await this.usersService.updatePassword(user.id, password);
       return {
         data: {
-          message: 'Votre mot de passe a été mis à jour avec succès',
-        },
+          message: 'Votre mot de passe a été mis à jour avec succès'
+        }
       };
     } catch {
-      throw new BadRequestException(
-        'Erreur lors de la mise à jour du mot de passe',
-      );
+      throw new BadRequestException('Erreur lors de la mise à jour du mot de passe');
     }
   }
 
-  async resetPasswordRequest(
-    dto: ResetPasswordRequestDto,
-  ): Promise<{ data: { message: string } }> {
+  async resetPasswordRequest(dto: ResetPasswordRequestDto): Promise<{ data: { message: string } }> {
     const { email } = dto;
     const { data: user } = await this.usersService.findByEmail(email);
     const token = randomPassword();
@@ -110,27 +90,23 @@ export class AuthService {
     await this.emailService.sendResetPasswordEmail(user, token);
     return {
       data: {
-        message: 'Un email de réinitialisation de mot de passe a été envoyé',
-      },
+        message: 'Un email de réinitialisation de mot de passe a été envoyé'
+      }
     };
   }
 
-  async resetPassword(
-    resetPasswordDto: ResetPasswordDto,
-  ): Promise<{ data: { message: string } }> {
+  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<{ data: { message: string } }> {
     const { token, password } = resetPasswordDto;
     const { data: user } = await this.usersService.findByResetToken(token);
     try {
       await this.usersService.updatePassword(user.id, password);
       return {
         data: {
-          message: 'Votre mot de passe a été réinitialisé avec succès',
-        },
+          message: 'Votre mot de passe a été réinitialisé avec succès'
+        }
       };
     } catch {
-      throw new BadRequestException(
-        'Erreur lors de la réinitialisation du mot de passe',
-      );
+      throw new BadRequestException('Erreur lors de la réinitialisation du mot de passe');
     }
   }
 }

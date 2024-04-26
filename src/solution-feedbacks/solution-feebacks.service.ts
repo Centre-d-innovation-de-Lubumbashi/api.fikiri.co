@@ -12,13 +12,10 @@ export class SolutionFeedbacksService {
   constructor(
     private readonly solutionsService: SolutionsService,
     private readonly feedbacksService: FeedbacksService,
-    private readonly quotationsService: QuotationsService,
+    private readonly quotationsService: QuotationsService
   ) {}
 
-  async addFeedback(
-    id: number,
-    dto: CreateFeedbackDto,
-  ): Promise<{ data: Solution }> {
+  async addFeedback(id: number, dto: CreateFeedbackDto): Promise<{ data: Solution }> {
     try {
       const { data: result } = await this.solutionsService.findOne(id);
       const { solution } = result;
@@ -27,16 +24,11 @@ export class SolutionFeedbacksService {
       const { data } = await this.solutionsService.saveSolution(solution);
       return { data };
     } catch {
-      throw new BadRequestException(
-        "Erreur lors de l'ajout du feedback à la solution",
-      );
+      throw new BadRequestException("Erreur lors de l'ajout du feedback à la solution");
     }
   }
 
-  async updateFeedback(
-    id: number,
-    dto: UpdateFeedbackDto,
-  ): Promise<{ data: Feedback }> {
+  async updateFeedback(id: number, dto: UpdateFeedbackDto): Promise<{ data: Feedback }> {
     try {
       await this.feedbacksService.findOne(id);
       const { data } = await this.feedbacksService.update(id, dto);
@@ -53,9 +45,7 @@ export class SolutionFeedbacksService {
       await this.feedbacksService.findOne(id);
       await this.feedbacksService.remove(id);
     } catch {
-      throw new BadRequestException(
-        'Erreur lors de la suppression du feedback à la solution',
-      );
+      throw new BadRequestException('Erreur lors de la suppression du feedback à la solution');
     }
   }
 }

@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateImageDto } from './dto/create-image.dto';
 import { UpdateImageDto } from './dto/update-image.dto';
 import { Repository } from 'typeorm';
@@ -17,7 +13,7 @@ export class ImagesService {
 
   constructor(
     @InjectRepository(Image)
-    private readonly imageRepository: Repository<Image>,
+    private readonly imageRepository: Repository<Image>
   ) {}
 
   async create(dto: CreateImageDto): Promise<{ data: Image }> {
@@ -31,7 +27,7 @@ export class ImagesService {
 
   async findAll(): Promise<{ data: Image[] }> {
     const data: Image[] = await this.imageRepository.find({
-      order: { created_at: 'DESC' },
+      order: { created_at: 'DESC' }
     });
     return { data };
   }
@@ -39,7 +35,7 @@ export class ImagesService {
   async findOne(id: number): Promise<{ data: Image }> {
     try {
       const data: Image = await this.imageRepository.findOneOrFail({
-        where: { id },
+        where: { id }
       });
       return { data };
     } catch {
@@ -54,9 +50,7 @@ export class ImagesService {
       const data: Image = await this.imageRepository.save(updatedImage);
       return { data };
     } catch {
-      throw new BadRequestException(
-        "Une erreur est survenue lors de la mise à jour de l'image",
-      );
+      throw new BadRequestException("Une erreur est survenue lors de la mise à jour de l'image");
     }
   }
 

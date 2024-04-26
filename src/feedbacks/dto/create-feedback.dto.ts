@@ -11,7 +11,7 @@ export class CreateFeedbackDto {
   userComment: string;
 
   @IsNotEmpty({
-    message: "L'utilisateur qui ajoute le feedback est obligatoire",
+    message: "L'utilisateur qui ajoute le feedback est obligatoire"
   })
   user: string;
 }

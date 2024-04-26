@@ -6,7 +6,7 @@ import {
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
+  UpdateDateColumn
 } from 'typeorm';
 import { Solution } from '../../solutions/entities/solution.entity';
 import { Call } from '../../calls/entities/call.entity';

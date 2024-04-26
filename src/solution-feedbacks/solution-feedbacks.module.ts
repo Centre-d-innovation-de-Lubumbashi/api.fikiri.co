@@ -8,6 +8,6 @@ import { SolutionsModule } from '../solutions/solutions.module';
 @Module({
   imports: [FeedbacksModule, QuotationsModule, SolutionsModule],
   controllers: [SolutionsFeedbacksController],
-  providers: [SolutionFeedbacksService],
+  providers: [SolutionFeedbacksService]
 })
 export class SolutionFeedbacksModule {}

@@ -9,12 +9,8 @@ import { GoogleStrategy } from './strategies/google.strategy';
 import { EmailModule } from '../email/email.module';
 
 @Module({
-  imports: [
-    PassportModule.register({ session: true }),
-    UsersModule,
-    EmailModule,
-  ],
+  imports: [PassportModule.register({ session: true }), UsersModule, EmailModule],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, Session, GoogleStrategy],
+  providers: [AuthService, LocalStrategy, Session, GoogleStrategy]
 })
 export class AuthModule {}

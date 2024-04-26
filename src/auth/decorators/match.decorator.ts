@@ -3,7 +3,7 @@ import {
   ValidationArguments,
   ValidationOptions,
   ValidatorConstraint,
-  ValidatorConstraintInterface,
+  ValidatorConstraintInterface
 } from 'class-validator';
 
 export function Match(property: string, validationOptions?: ValidationOptions) {
@@ -13,7 +13,7 @@ export function Match(property: string, validationOptions?: ValidationOptions) {
       propertyName,
       options: validationOptions,
       constraints: [property],
-      validator: MatchConstraint,
+      validator: MatchConstraint
     });
   };
 }

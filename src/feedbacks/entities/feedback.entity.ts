@@ -6,7 +6,7 @@ import {
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
+  UpdateDateColumn
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Solution } from '../../solutions/entities/solution.entity';
@@ -36,7 +36,7 @@ export class Feedback {
 
   @ManyToOne(() => User, (user) => user.feedbacks, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
+    onUpdate: 'CASCADE'
   })
   @JoinColumn()
   user: User;

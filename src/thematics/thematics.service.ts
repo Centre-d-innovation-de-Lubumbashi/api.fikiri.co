@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateThematicDto } from './dto/create-thematic.dto';
 import { UpdateThematicDto } from './dto/update-thematic.dto';
 import { Repository } from 'typeorm';
@@ -13,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 export class ThematicsService {
   constructor(
     @InjectRepository(Thematic)
-    private readonly thematicRepository: Repository<Thematic>,
+    private readonly thematicRepository: Repository<Thematic>
   ) {}
 
   async create(dto: CreateThematicDto): Promise<{ data: Thematic }> {
@@ -21,15 +17,13 @@ export class ThematicsService {
       const data: Thematic = await this.thematicRepository.save(dto);
       return { data };
     } catch {
-      throw new NotFoundException(
-        'Erreur lors de la création de la thématique',
-      );
+      throw new NotFoundException('Erreur lors de la création de la thématique');
     }
   }
 
   async findAll(): Promise<{ data: Thematic[] }> {
     const data: Thematic[] = await this.thematicRepository.find({
-      order: { updated_at: 'DESC' },
+      order: { updated_at: 'DESC' }
     });
     return { data };
   }
@@ -37,33 +31,22 @@ export class ThematicsService {
   async findOne(id: number): Promise<{ data: Thematic }> {
     try {
       const data: Thematic = await this.thematicRepository.findOneOrFail({
-        where: { id },
+        where: { id }
       });
       return { data };
     } catch {
-      throw new BadRequestException(
-        'Erreur lors de la récupération de la thématique',
-      );
+      throw new BadRequestException('Erreur lors de la récupération de la thématique');
     }
   }
 
-  async update(
-    id: number,
-    dto: UpdateThematicDto,
-  ): Promise<{ data: Thematic }> {
+  async update(id: number, dto: UpdateThematicDto): Promise<{ data: Thematic }> {
     try {
       const { data: thematic } = await this.findOne(id);
-      const updatedThematic: Thematic & UpdateThematicDto = Object.assign(
-        thematic,
-        dto,
-      );
-      const data: Thematic =
-        await this.thematicRepository.save(updatedThematic);
+      const updatedThematic: Thematic & UpdateThematicDto = Object.assign(thematic, dto);
+      const data: Thematic = await this.thematicRepository.save(updatedThematic);
       return { data };
     } catch {
-      throw new BadRequestException(
-        'Erreur lors de la modification de la thématique',
-      );
+      throw new BadRequestException('Erreur lors de la modification de la thématique');
     }
   }
 
@@ -72,9 +55,7 @@ export class ThematicsService {
       await this.findOne(id);
       await this.thematicRepository.delete(id);
     } catch {
-      throw new BadRequestException(
-        'Erreur lors de la suppression de la thématique',
-      );
+      throw new BadRequestException('Erreur lors de la suppression de la thématique');
     }
   }
 }

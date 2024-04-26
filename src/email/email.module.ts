@@ -16,23 +16,23 @@ import { join } from 'path';
           port: Number(config.get('MAIL_PORT')),
           auth: {
             user: config.get('MAIL_USERNAME'),
-            pass: config.get('MAIL_PASSWORD'),
-          },
+            pass: config.get('MAIL_PASSWORD')
+          }
         },
         defaults: {
-          from: `Suport fikiri <${config.get('MAIL_USERNAME')}>`,
+          from: `Suport fikiri <${config.get('MAIL_USERNAME')}>`
         },
         template: {
           dir: join(__dirname, '..', '..', 'templates'),
           adapter: new HandlebarsAdapter(),
           options: {
-            strict: true,
-          },
-        },
-      }),
-    }),
+            strict: true
+          }
+        }
+      })
+    })
   ],
   providers: [EmailService],
-  exports: [EmailService],
+  exports: [EmailService]
 })
 export class EmailModule {}

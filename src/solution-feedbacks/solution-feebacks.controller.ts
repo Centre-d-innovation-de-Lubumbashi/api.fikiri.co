@@ -9,24 +9,16 @@ import { Solution } from '../solutions/entities/solution.entity';
 
 @Controller('solution-feedbacks')
 export class SolutionsFeedbacksController {
-  constructor(
-    private readonly solutionsFeedbacksService: SolutionFeedbacksService,
-  ) {}
+  constructor(private readonly solutionsFeedbacksService: SolutionFeedbacksService) {}
 
   @Post(':id')
   @Roles([RoleEnum.Admin, RoleEnum.Curator])
-  addFeedback(
-    @Param('id') id: string,
-    @Body() dto: CreateFeedbackDto,
-  ): Promise<{ data: Solution }> {
+  addFeedback(@Param('id') id: string, @Body() dto: CreateFeedbackDto): Promise<{ data: Solution }> {
     return this.solutionsFeedbacksService.addFeedback(+id, dto);
   }
 
   @Patch(':id')
-  updateFeedback(
-    @Param('id') id: string,
-    @Body() dto: UpdateFeedbackDto,
-  ): Promise<{ data: Feedback }> {
+  updateFeedback(@Param('id') id: string, @Body() dto: UpdateFeedbackDto): Promise<{ data: Feedback }> {
     return this.solutionsFeedbacksService.updateFeedback(+id, dto);
   }
 

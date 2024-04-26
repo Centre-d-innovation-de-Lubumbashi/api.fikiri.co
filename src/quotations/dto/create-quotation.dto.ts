@@ -2,7 +2,7 @@ import { IsNotEmpty } from 'class-validator';
 
 export class CreateLableDto {
   @IsNotEmpty({
-    message: 'Le nom est obligatoire',
+    message: 'Le nom est obligatoire'
   })
   mention: string;
 

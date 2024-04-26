@@ -7,6 +7,6 @@ import { Call } from './entities/call.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Call])],
   controllers: [CallsController],
-  providers: [CallsService],
+  providers: [CallsService]
 })
 export class CallsModule {}

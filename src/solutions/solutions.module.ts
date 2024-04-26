@@ -9,6 +9,6 @@ import { ImagesModule } from '../images/images.module';
   imports: [ImagesModule, TypeOrmModule.forFeature([Solution])],
   controllers: [SolutionsController],
   providers: [SolutionsService],
-  exports: [SolutionsService],
+  exports: [SolutionsService]
 })
 export class SolutionsModule {}

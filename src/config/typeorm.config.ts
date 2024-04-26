@@ -3,7 +3,7 @@ import { DataSource } from 'typeorm';
 import * as process from 'node:process';
 
 config({
-  path: '.env',
+  path: '.env'
 });
 
 export const dataSource = new DataSource({
@@ -14,7 +14,7 @@ export const dataSource = new DataSource({
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   migrations: ['dist/src/database/migrations/**'],
-  entities: ['dist/**/*.entity.js'],
+  entities: ['dist/**/*.entity.js']
 });
 
 dataSource.initialize().catch((error) => console.log(error));

@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { CallsService } from './calls.service';
 import { CreateCallDto } from './dto/create-call.dto';
 import { UpdateCallDto } from './dto/update-call.dto';
@@ -39,18 +31,13 @@ export class CallsController {
 
   @Public()
   @Get(':id')
-  findOne(
-    @Param('id') id: string,
-  ): Promise<{ data: { call: Call; prev: number; next: number } }> {
+  findOne(@Param('id') id: string): Promise<{ data: { call: Call; prev: number; next: number } }> {
     return this.callsService.findOne(+id);
   }
 
   @Patch(':id')
   @Roles([RoleEnum.Admin])
-  update(
-    @Param('id') id: string,
-    @Body() updateCallsDto: UpdateCallDto,
-  ): Promise<{ data: Call }> {
+  update(@Param('id') id: string, @Body() updateCallsDto: UpdateCallDto): Promise<{ data: Call }> {
     return this.callsService.update(+id, updateCallsDto);
   }
 

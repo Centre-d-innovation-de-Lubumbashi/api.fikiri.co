@@ -15,9 +15,9 @@ import { ConfigService } from '@nestjs/config';
         password: configServie.get('DB_PASSWORD'),
         database: configServie.get('DB_NAME'),
         synchronize: false,
-        autoLoadEntities: true,
-      }),
-    }),
-  ],
+        autoLoadEntities: true
+      })
+    })
+  ]
 })
 export class DatabaseModule {}

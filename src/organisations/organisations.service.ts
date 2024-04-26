@@ -1,8 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateOrganisationDto } from './dto/create-organisation.dto';
 import { UpdateOrganisationDto } from './dto/update-organisation.dto';
 import { Repository } from 'typeorm';
@@ -13,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 export class OrganisationsService {
   constructor(
     @InjectRepository(Organisation)
-    private readonly organisationRepository: Repository<Organisation>,
+    private readonly organisationRepository: Repository<Organisation>
   ) {}
 
   async create(dto: CreateOrganisationDto): Promise<{ data: Organisation }> {
@@ -32,26 +28,20 @@ export class OrganisationsService {
 
   async findOne(id: number): Promise<{ data: Organisation }> {
     try {
-      const data: Organisation =
-        await this.organisationRepository.findOneOrFail({
-          where: { id },
-        });
+      const data: Organisation = await this.organisationRepository.findOneOrFail({
+        where: { id }
+      });
       return { data };
     } catch {
       throw new NotFoundException("Impossible de récupérer l'organisation");
     }
   }
 
-  async update(
-    id: number,
-    dto: UpdateOrganisationDto,
-  ): Promise<{ data: Organisation }> {
+  async update(id: number, dto: UpdateOrganisationDto): Promise<{ data: Organisation }> {
     try {
       const { data: organisation } = await this.findOne(id);
-      const updatedOrganisation: Organisation & UpdateOrganisationDto =
-        Object.assign(organisation, dto);
-      const data: Organisation =
-        await this.organisationRepository.save(updatedOrganisation);
+      const updatedOrganisation: Organisation & UpdateOrganisationDto = Object.assign(organisation, dto);
+      const data: Organisation = await this.organisationRepository.save(updatedOrganisation);
       return { data };
     } catch {
       throw new ConflictException("Impossible de mettre à jour l'organisation");

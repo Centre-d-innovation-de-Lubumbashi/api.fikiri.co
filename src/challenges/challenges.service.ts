@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { Repository } from 'typeorm';
 import { Challenge } from './entities/challenge.entity';
@@ -13,14 +9,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 export class ChallengesService {
   constructor(
     @InjectRepository(Challenge)
-    private readonly challengeRepository: Repository<Challenge>,
+    private readonly challengeRepository: Repository<Challenge>
   ) {}
 
   async create(dto: CreateChallengeDto): Promise<{ data: Challenge }> {
     try {
       const data: Challenge = await this.challengeRepository.save({
         ...dto,
-        thematics: dto.thematics.map((id: number) => ({ id })),
+        thematics: dto.thematics.map((id: number) => ({ id }))
       });
       return { data };
     } catch {
@@ -36,20 +32,18 @@ export class ChallengesService {
   async findByThematic(thematicId: number) {
     try {
       const data: Challenge[] = await this.challengeRepository.find({
-        where: { thematics: { id: thematicId } },
+        where: { thematics: { id: thematicId } }
       });
       return { data };
     } catch {
-      throw new BadRequestException(
-        'Impossible de trouver les défis pour cette thématique',
-      );
+      throw new BadRequestException('Impossible de trouver les défis pour cette thématique');
     }
   }
 
   async findOne(id: number): Promise<{ data: Challenge }> {
     try {
       const data: Challenge = await this.challengeRepository.findOne({
-        where: { id },
+        where: { id }
       });
       return { data };
     } catch {
@@ -57,18 +51,11 @@ export class ChallengesService {
     }
   }
 
-  async update(
-    id: number,
-    dto: UpdateChallengeDto,
-  ): Promise<{ data: Challenge }> {
+  async update(id: number, dto: UpdateChallengeDto): Promise<{ data: Challenge }> {
     try {
       const { data: challenge } = await this.findOne(id);
-      const updatedChallenge: Challenge & UpdateChallengeDto = Object.assign(
-        challenge,
-        dto,
-      );
-      const data: Challenge =
-        await this.challengeRepository.save(updatedChallenge);
+      const updatedChallenge: Challenge & UpdateChallengeDto = Object.assign(challenge, dto);
+      const data: Challenge = await this.challengeRepository.save(updatedChallenge);
       return { data };
     } catch {
       throw new BadRequestException('Impossible de mettre à jour le défi');

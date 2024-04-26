@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import { Repository } from 'typeorm';
@@ -13,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 export class FeedbacksService {
   constructor(
     @InjectRepository(Feedback)
-    private readonly feedbackRepository: Repository<Feedback>,
+    private readonly feedbackRepository: Repository<Feedback>
   ) {}
 
   async create(dto: CreateFeedbackDto): Promise<{ data: Feedback }> {
@@ -22,8 +18,8 @@ export class FeedbacksService {
         ...dto,
         quotations: dto.quotations.join(', '),
         user: {
-          email: dto.user,
-        },
+          email: dto.user
+        }
       });
       return { data };
     } catch {
@@ -33,7 +29,7 @@ export class FeedbacksService {
 
   async findAll(): Promise<{ data: Feedback[] }> {
     const data: Feedback[] = await this.feedbackRepository.find({
-      relations: ['user'],
+      relations: ['user']
     });
     return { data };
   }
@@ -42,7 +38,7 @@ export class FeedbacksService {
     try {
       const data: Feedback = await this.feedbackRepository.findOne({
         where: { id },
-        relations: ['user'],
+        relations: ['user']
       });
       return { data };
     } catch {
@@ -50,22 +46,16 @@ export class FeedbacksService {
     }
   }
 
-  async update(
-    id: number,
-    dto: UpdateFeedbackDto,
-  ): Promise<{ data: Feedback }> {
+  async update(id: number, dto: UpdateFeedbackDto): Promise<{ data: Feedback }> {
     try {
       const { data: feedback } = await this.findOne(id);
-      const updatedFeedbackDto: Feedback & UpdateFeedbackDto = Object.assign(
-        feedback,
-        dto,
-      );
+      const updatedFeedbackDto: Feedback & UpdateFeedbackDto = Object.assign(feedback, dto);
       const data: Feedback = await this.feedbackRepository.save({
         ...updatedFeedbackDto,
         quotations: updatedFeedbackDto.quotations.join(', '),
         user: {
-          email: updatedFeedbackDto.user,
-        },
+          email: updatedFeedbackDto.user
+        }
       });
       return { data };
     } catch {
