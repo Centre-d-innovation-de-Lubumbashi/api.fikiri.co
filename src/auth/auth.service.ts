@@ -100,19 +100,33 @@ export class AuthService {
     }
   }
 
-  async resetPasswordRequest(dto: ResetPasswordRequestDto): Promise<void> {
+  async resetPasswordRequest(
+    dto: ResetPasswordRequestDto,
+  ): Promise<{ data: { message: string } }> {
     const { email } = dto;
     const { data: user } = await this.usersService.findByEmail(email);
     const token = randomPassword();
     await this.usersService.update(user.id, { token });
     await this.emailService.sendResetPasswordEmail(user, token);
+    return {
+      data: {
+        message: 'Un email de réinitialisation de mot de passe a été envoyé',
+      },
+    };
   }
 
-  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<void> {
+  async resetPassword(
+    resetPasswordDto: ResetPasswordDto,
+  ): Promise<{ data: { message: string } }> {
     const { token, password } = resetPasswordDto;
     const { data: user } = await this.usersService.findByResetToken(token);
     try {
       await this.usersService.updatePassword(user.id, password);
+      return {
+        data: {
+          message: 'Votre mot de passe a été réinitialisé avec succès',
+        },
+      };
     } catch {
       throw new BadRequestException(
         'Erreur lors de la réinitialisation du mot de passe',

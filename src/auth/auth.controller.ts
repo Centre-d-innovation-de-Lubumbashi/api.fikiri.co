@@ -78,13 +78,17 @@ export class AuthController {
 
   @Public()
   @Post('reset-password-request')
-  resetPasswordRequest(@Body() dto: ResetPasswordRequestDto): Promise<any> {
+  resetPasswordRequest(
+    @Body() dto: ResetPasswordRequestDto,
+  ): Promise<{ data: { message: string } }> {
     return this.authService.resetPasswordRequest(dto);
   }
 
   @Public()
   @Post('reset-password')
-  resetPassword(@Body() dto: ResetPasswordDto): Promise<void> {
+  resetPassword(
+    @Body() dto: ResetPasswordDto,
+  ): Promise<{ data: { message: string } }> {
     return this.authService.resetPassword(dto);
   }
 }
