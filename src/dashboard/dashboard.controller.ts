@@ -10,7 +10,9 @@ export class DashboardController {
 
   @Public()
   @Get()
-  async getCounts(): Promise<{ data: { totalUsers: number; totalSolutions: number } }> {
+  async getCounts(): Promise<{
+    data: { totalUsers: number; totalSolutions: number };
+  }> {
     return this.dashboardService.getCounts();
   }
 
@@ -20,7 +22,9 @@ export class DashboardController {
   }
 
   @Get('solutions-status')
-  async countByStatus(): Promise<{ data: { status: string; count: number }[] }> {
+  async countByStatus(): Promise<{
+    data: { status: string; count: number }[];
+  }> {
     return this.dashboardService.countByStatus();
   }
 

@@ -16,7 +16,9 @@ export class EmailService {
     try {
       await this.mailerSerive.sendMail(mail);
     } catch {
-      throw new BadRequestException("Une erreur est survenenue lors de l'envoie d'email");
+      throw new BadRequestException(
+        "Une erreur est survenenue lors de l'envoie d'email",
+      );
     }
   }
 
@@ -30,7 +32,9 @@ export class EmailService {
     try {
       await this.mailerSerive.sendMail(mail);
     } catch {
-      throw new BadRequestException("Une erreur est survenenue lors de l'envoie d'email");
+      throw new BadRequestException(
+        "Une erreur est survenenue lors de l'envoie d'email",
+      );
     }
   }
 }

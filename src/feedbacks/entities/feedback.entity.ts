@@ -34,7 +34,10 @@ export class Feedback {
   @ManyToMany(() => Solution, (solution) => solution.feedbacks)
   solutions: Solution[];
 
-  @ManyToOne(() => User, (user) => user.feedbacks, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.feedbacks, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn()
   user: User;
 }

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateImageDto } from './dto/create-image.dto';
 import { UpdateImageDto } from './dto/update-image.dto';
 import { Repository } from 'typeorm';
@@ -50,7 +54,9 @@ export class ImagesService {
       const data: Image = await this.imageRepository.save(updatedImage);
       return { data };
     } catch {
-      throw new BadRequestException("Une erreur est survenue lors de la mise à jour de l'image");
+      throw new BadRequestException(
+        "Une erreur est survenue lors de la mise à jour de l'image",
+      );
     }
   }
 

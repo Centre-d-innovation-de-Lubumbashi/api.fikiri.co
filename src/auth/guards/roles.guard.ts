@@ -9,15 +9,17 @@ export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<RoleEnum[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const requiredRoles = this.reflector.getAllAndOverride<RoleEnum[]>(
+      ROLES_KEY,
+      [context.getHandler(), context.getClass()],
+    );
     if (!requiredRoles) {
       return true;
     }
     const { user } = context.switchToHttp().getRequest();
-    const userRoles = user.roles.map((role: Role) => role.name.toLocaleLowerCase());
+    const userRoles = user.roles.map((role: Role) =>
+      role.name.toLocaleLowerCase(),
+    );
     return requiredRoles.some((role) => userRoles?.includes(role));
   }
 }

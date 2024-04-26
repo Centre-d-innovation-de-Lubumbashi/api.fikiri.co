@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalGuard } from './guards/local.guard';
 import { Request } from 'express';
@@ -27,7 +36,10 @@ export class AuthController {
   }
 
   @Patch('profile')
-  updateProfile(@CurrentUser() currentUser: User, @Body() data: UpdateProfileDto): Promise<{ data: User }> {
+  updateProfile(
+    @CurrentUser() currentUser: User,
+    @Body() data: UpdateProfileDto,
+  ): Promise<{ data: User }> {
     return this.authService.updateProfile(currentUser, data);
   }
 
@@ -57,7 +69,10 @@ export class AuthController {
   }
 
   @Patch('update-password')
-  updatePassword(@CurrentUser() user: User, @Body() dto: UpdatePasswordDto): Promise<{ data: { message: string } }> {
+  updatePassword(
+    @CurrentUser() user: User,
+    @Body() dto: UpdatePasswordDto,
+  ): Promise<{ data: { message: string } }> {
     return this.authService.updatePassword(user, dto);
   }
 

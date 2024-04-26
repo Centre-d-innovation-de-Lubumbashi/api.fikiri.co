@@ -42,7 +42,10 @@ export class StatusService {
   async update(id: number, dto: UpdateStatusDto): Promise<{ data: Status }> {
     try {
       const { data: status } = await this.findOne(id);
-      const updatedStatus: Status & UpdateStatusDto = Object.assign(status, dto);
+      const updatedStatus: Status & UpdateStatusDto = Object.assign(
+        status,
+        dto,
+      );
       const data: Status = await this.statusRepository.save(updatedStatus);
       return { data };
     } catch {

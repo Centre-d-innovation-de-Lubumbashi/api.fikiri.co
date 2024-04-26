@@ -13,7 +13,9 @@ export class FileValidationPipe implements PipeTransform {
     const extension = extname(value.originalname);
     const oneMb = 1_000_000;
     if (value.size > oneMb) {
-      throw new BadRequestException(`Le fichier est trop lourd. La taille maximale autorisée est de 1MB`);
+      throw new BadRequestException(
+        `Le fichier est trop lourd. La taille maximale autorisée est de 1MB`,
+      );
     }
     if (!this.allowedExtensions.includes(extension)) {
       throw new BadRequestException(

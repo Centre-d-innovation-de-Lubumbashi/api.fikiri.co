@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateSolutionDto } from './dto/create-solution.dto';
 import { UpdateSolutionDto } from './dto/update-solution.dto';
 import { UpdateUserSolutionDto } from './dto/update-user-solution.dto';
@@ -27,7 +31,9 @@ export class SolutionsService {
       });
       return { data };
     } catch {
-      throw new BadRequestException('Erreur lors de la création de la solution');
+      throw new BadRequestException(
+        'Erreur lors de la création de la solution',
+      );
     }
   }
 
@@ -45,7 +51,9 @@ export class SolutionsService {
     return { data };
   }
 
-  async findOne(id: number): Promise<{ data: { solution: Solution; prev: number; next: number } }> {
+  async findOne(
+    id: number,
+  ): Promise<{ data: { solution: Solution; prev: number; next: number } }> {
     const solution: Solution = await this.solutionRepository
       .createQueryBuilder('s')
       .leftJoinAndSelect('s.user', 'innovator')
@@ -55,11 +63,15 @@ export class SolutionsService {
       .leftJoinAndSelect('s.challenges', 'challenges')
       .leftJoinAndSelect('s.thematic', 'thematic')
       .leftJoinAndSelect('feedbacks.user', 'feedbackUser')
-      .leftJoinAndSelect('feedbackUser.organisation', 'feedbackuserOrganisation')
+      .leftJoinAndSelect(
+        'feedbackUser.organisation',
+        'feedbackuserOrganisation',
+      )
       .leftJoinAndSelect('feedbackUser.pole', 'feedbackuserPole')
       .where('s.id = :id', { id })
       .getOne();
-    if (!solution) throw new NotFoundException("La solution n'a pas été trouvé");
+    if (!solution)
+      throw new NotFoundException("La solution n'a pas été trouvé");
     const { prev, next } = await this.findNeighbors(id);
     return {
       data: { solution, prev, next },
@@ -70,19 +82,31 @@ export class SolutionsService {
     try {
       const { data: oldSolution } = await this.findOne(id);
       const { solution } = oldSolution;
-      const updatedSolution: Solution & UpdateUserSolutionDto = Object.assign(solution, dto);
-      const data: Solution = await this.solutionRepository.save(updatedSolution);
+      const updatedSolution: Solution & UpdateUserSolutionDto = Object.assign(
+        solution,
+        dto,
+      );
+      const data: Solution =
+        await this.solutionRepository.save(updatedSolution);
       return { data };
     } catch {
-      throw new BadRequestException('Erreur lors de la mise à jour de la solution');
+      throw new BadRequestException(
+        'Erreur lors de la mise à jour de la solution',
+      );
     }
   }
 
-  async update(id: number, dto: UpdateSolutionDto): Promise<{ data: Solution }> {
+  async update(
+    id: number,
+    dto: UpdateSolutionDto,
+  ): Promise<{ data: Solution }> {
     try {
       const { data: oldSolution } = await this.findOne(id);
       const { solution } = oldSolution;
-      const updatedSolution: Solution & UpdateSolutionDto = Object.assign(solution, dto);
+      const updatedSolution: Solution & UpdateSolutionDto = Object.assign(
+        solution,
+        dto,
+      );
       const data = await this.solutionRepository.save({
         ...updatedSolution,
         pole: { id: dto.pole || solution.pole?.id },
@@ -90,11 +114,14 @@ export class SolutionsService {
         user: { email: dto.user || solution.user?.email },
         call: { id: dto.call || solution.call?.id },
         status: { id: dto.status || solution.status?.id },
-        challenges: dto?.challenges?.map((id: number) => ({ id })) ?? solution.challenges,
+        challenges:
+          dto?.challenges?.map((id: number) => ({ id })) ?? solution.challenges,
       });
       return { data };
     } catch {
-      throw new BadRequestException('Erreur lors de la mise à jour de la solution');
+      throw new BadRequestException(
+        'Erreur lors de la mise à jour de la solution',
+      );
     }
   }
 
@@ -103,7 +130,9 @@ export class SolutionsService {
       await this.findOne(id);
       await this.solutionRepository.delete(id);
     } catch {
-      throw new BadRequestException('Erreur lors de la suppression de la solution');
+      throw new BadRequestException(
+        'Erreur lors de la suppression de la solution',
+      );
     }
   }
 
@@ -111,11 +140,15 @@ export class SolutionsService {
     try {
       const { data: oldSolution } = await this.findOne(id);
       const { solution } = oldSolution;
-      const { data: image } = await this.imageService.create({ image_link: file.filename });
+      const { data: image } = await this.imageService.create({
+        image_link: file.filename,
+      });
       solution.images = [...solution.images, image];
       await this.solutionRepository.save(solution);
     } catch {
-      throw new BadRequestException("Erreur lors de l'ajout des images à la solution");
+      throw new BadRequestException(
+        "Erreur lors de l'ajout des images à la solution",
+      );
     }
   }
 
@@ -123,11 +156,20 @@ export class SolutionsService {
     try {
       const data: Solution[] = await this.solutionRepository.find({
         where: { pole: { id: poleId } },
-        relations: ['user', 'status', 'user', 'thematic', 'images', 'feedbacks'],
+        relations: [
+          'user',
+          'status',
+          'user',
+          'thematic',
+          'images',
+          'feedbacks',
+        ],
       });
       return { data };
     } catch {
-      throw new BadRequestException('Erreur lors de la récupération des solutions par pôle');
+      throw new BadRequestException(
+        'Erreur lors de la récupération des solutions par pôle',
+      );
     }
   }
 
@@ -147,10 +189,18 @@ export class SolutionsService {
     return { data };
   }
 
-  async findOneMapped(id: number): Promise<{ data: { solution: Solution; prev: number; next: number } }> {
+  async findOneMapped(
+    id: number,
+  ): Promise<{ data: { solution: Solution; prev: number; next: number } }> {
     const solution: Solution = await this.solutionRepository
       .createQueryBuilder('s')
-      .select(['s.id', 's.name', 's.description', 's.targeted_problem', 's.created_at'])
+      .select([
+        's.id',
+        's.name',
+        's.description',
+        's.targeted_problem',
+        's.created_at',
+      ])
       .leftJoinAndSelect('s.thematic', 'thematic')
       .leftJoinAndSelect('s.feedbacks', 'feedbacks')
       .leftJoinAndSelect('s.images', 'images')
@@ -159,18 +209,26 @@ export class SolutionsService {
       .leftJoinAndSelect('s.challenges', 'challenges')
       .where('s.id = :id AND status.id IN (2, 3, 4)', { id })
       .getOne();
-    if (!solution) throw new NotFoundException("La solution n'a pas été trouvé");
+    if (!solution)
+      throw new NotFoundException("La solution n'a pas été trouvé");
     const { prev, next } = await this.findNeighbors(id, true);
     return {
       data: { solution, prev, next },
     };
   }
 
-  async findNeighbors(solutionId: number, filtered: boolean = false): Promise<{ prev: number; next: number }> {
-    const query: SelectQueryBuilder<Solution> = this.solutionRepository.createQueryBuilder('s').select(['s.id']);
+  async findNeighbors(
+    solutionId: number,
+    filtered: boolean = false,
+  ): Promise<{ prev: number; next: number }> {
+    const query: SelectQueryBuilder<Solution> = this.solutionRepository
+      .createQueryBuilder('s')
+      .select(['s.id']);
     if (filtered) query.where('s.status.id IN (2, 3, 4)');
     const solutions: Solution[] = await query.getMany();
-    const currentIndex: number = solutions.findIndex((solution) => solution.id === solutionId);
+    const currentIndex: number = solutions.findIndex(
+      (solution) => solution.id === solutionId,
+    );
     const prev: number = solutions[currentIndex - 1]?.id ?? null;
     const next: number = solutions[currentIndex + 1]?.id ?? null;
     return { prev, next };
@@ -181,7 +239,9 @@ export class SolutionsService {
       .createQueryBuilder('s')
       .leftJoin('s.images', 'images')
       .leftJoinAndSelect('s.thematic', 'thematic')
-      .where('(images.id IS NOT NULL) OR (s.image_link IS NOT NULL) OR (LENGTH(s.video_link) > 0)')
+      .where(
+        '(images.id IS NOT NULL) OR (s.image_link IS NOT NULL) OR (LENGTH(s.video_link) > 0)',
+      )
       .getMany();
     return { data };
   }
@@ -195,7 +255,10 @@ export class SolutionsService {
       .leftJoinAndSelect('s.feedbacks', 'feedbacks')
       .leftJoinAndSelect('s.user', 'user')
       .leftJoinAndSelect('feedbacks.user', 'feedbacksUser')
-      .leftJoinAndSelect('feedbacksUser.organisation', 'feedbackuserOrganisation')
+      .leftJoinAndSelect(
+        'feedbacksUser.organisation',
+        'feedbackuserOrganisation',
+      )
       .leftJoinAndSelect('feedbacksUser.pole', 'feedbackuserPole')
       .where('feedbacks.id IS NOT NULL')
       .getMany();

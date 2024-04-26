@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { Repository } from 'typeorm';
 import { Challenge } from './entities/challenge.entity';
@@ -36,24 +40,35 @@ export class ChallengesService {
       });
       return { data };
     } catch {
-      throw new BadRequestException('Impossible de trouver les défis pour cette thématique');
+      throw new BadRequestException(
+        'Impossible de trouver les défis pour cette thématique',
+      );
     }
   }
 
   async findOne(id: number): Promise<{ data: Challenge }> {
     try {
-      const data: Challenge = await this.challengeRepository.findOne({ where: { id } });
+      const data: Challenge = await this.challengeRepository.findOne({
+        where: { id },
+      });
       return { data };
     } catch {
       throw new NotFoundException('Impossible de récupérer le défi');
     }
   }
 
-  async update(id: number, dto: UpdateChallengeDto): Promise<{ data: Challenge }> {
+  async update(
+    id: number,
+    dto: UpdateChallengeDto,
+  ): Promise<{ data: Challenge }> {
     try {
       const { data: challenge } = await this.findOne(id);
-      const updatedChallenge: Challenge & UpdateChallengeDto = Object.assign(challenge, dto);
-      const data: Challenge = await this.challengeRepository.save(updatedChallenge);
+      const updatedChallenge: Challenge & UpdateChallengeDto = Object.assign(
+        challenge,
+        dto,
+      );
+      const data: Challenge =
+        await this.challengeRepository.save(updatedChallenge);
       return { data };
     } catch {
       throw new BadRequestException('Impossible de mettre à jour le défi');

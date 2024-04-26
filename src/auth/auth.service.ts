@@ -23,8 +23,12 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<{ data: User }> {
     const { data } = await this.usersService.findByEmail(email);
-    const passwordMatch: boolean = await this.passwordMatch(password, data.password);
-    if (!passwordMatch) throw new BadRequestException('Les identifiants saisis sont invalides');
+    const passwordMatch: boolean = await this.passwordMatch(
+      password,
+      data.password,
+    );
+    if (!passwordMatch)
+      throw new BadRequestException('Les identifiants saisis sont invalides');
     return { data };
   }
 
@@ -42,7 +46,9 @@ export class AuthService {
     return { data };
   }
 
-  async logout(@Req() request: Request): Promise<{ data: { message: string } }> {
+  async logout(
+    @Req() request: Request,
+  ): Promise<{ data: { message: string } }> {
     request.session.destroy(() => {});
     return {
       data: {
@@ -55,7 +61,10 @@ export class AuthService {
     return { data };
   }
 
-  async updateProfile(@CurrentUser() currentUser: User, dto: UpdateProfileDto): Promise<{ data: User }> {
+  async updateProfile(
+    @CurrentUser() currentUser: User,
+    dto: UpdateProfileDto,
+  ): Promise<{ data: User }> {
     return await this.usersService.updateProfile(currentUser, dto);
   }
 
@@ -64,11 +73,18 @@ export class AuthService {
     return { data };
   }
 
-  async updatePassword(@CurrentUser() user: User, dto: UpdatePasswordDto): Promise<{ data: { message: string } }> {
+  async updatePassword(
+    @CurrentUser() user: User,
+    dto: UpdatePasswordDto,
+  ): Promise<{ data: { message: string } }> {
     const { password } = dto;
     if (user.password) {
-      const isMatch: boolean = await this.passwordMatch(dto.old_password, user.password);
-      if (!isMatch) throw new BadRequestException("L'ancien mot de passe est incorrect");
+      const isMatch: boolean = await this.passwordMatch(
+        dto.old_password,
+        user.password,
+      );
+      if (!isMatch)
+        throw new BadRequestException("L'ancien mot de passe est incorrect");
     }
     try {
       await this.usersService.updatePassword(user.id, password);
@@ -78,7 +94,9 @@ export class AuthService {
         },
       };
     } catch {
-      throw new BadRequestException('Erreur lors de la mise à jour du mot de passe');
+      throw new BadRequestException(
+        'Erreur lors de la mise à jour du mot de passe',
+      );
     }
   }
 
@@ -96,7 +114,9 @@ export class AuthService {
     try {
       await this.usersService.updatePassword(user.id, password);
     } catch {
-      throw new BadRequestException('Erreur lors de la réinitialisation du mot de passe');
+      throw new BadRequestException(
+        'Erreur lors de la réinitialisation du mot de passe',
+      );
     }
   }
 }

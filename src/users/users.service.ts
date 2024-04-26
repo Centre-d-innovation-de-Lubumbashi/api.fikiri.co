@@ -1,4 +1,9 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import * as fs from 'fs';
 import { promisify } from 'util';
 import { SignupDto } from '../auth/dto/register.dto';
@@ -41,7 +46,9 @@ export class UsersService {
       await this.emailService.sendRegistrationEmail(user, password);
       return { data: user };
     } catch {
-      throw new BadRequestException("Erreur lors de la création de l'utilisateur");
+      throw new BadRequestException(
+        "Erreur lors de la création de l'utilisateur",
+      );
     }
   }
 
@@ -91,7 +98,9 @@ export class UsersService {
       });
       return { data };
     } catch {
-      throw new BadRequestException('Aucun utilisateur trouvé avec cet identifiant');
+      throw new BadRequestException(
+        'Aucun utilisateur trouvé avec cet identifiant',
+      );
     }
   }
 
@@ -119,7 +128,9 @@ export class UsersService {
       });
       return { data: newUser };
     } catch {
-      throw new BadRequestException("Erreur lors de la récupération de l'utilisateur");
+      throw new BadRequestException(
+        "Erreur lors de la récupération de l'utilisateur",
+      );
     }
   }
 
@@ -135,13 +146,21 @@ export class UsersService {
       });
       return { data };
     } catch {
-      throw new BadRequestException("Erreur lors de la modification de l'utilisateur");
+      throw new BadRequestException(
+        "Erreur lors de la modification de l'utilisateur",
+      );
     }
   }
 
-  async updateProfile(@CurrentUser() currentUser: User, dto: UpdateProfileDto): Promise<{ data: User }> {
+  async updateProfile(
+    @CurrentUser() currentUser: User,
+    dto: UpdateProfileDto,
+  ): Promise<{ data: User }> {
     try {
-      const updatedProfile: User & UpdateProfileDto = Object.assign(currentUser, dto);
+      const updatedProfile: User & UpdateProfileDto = Object.assign(
+        currentUser,
+        dto,
+      );
       const data: User = await this.userRepository.save(updatedProfile);
       return { data };
     } catch {
@@ -149,7 +168,10 @@ export class UsersService {
     }
   }
 
-  async uploadImage(id: number, image: Express.Multer.File): Promise<{ data: User }> {
+  async uploadImage(
+    id: number,
+    image: Express.Multer.File,
+  ): Promise<{ data: User }> {
     const { data: user } = await this.findOne(id);
     try {
       await unlinkAsync(`./uploads/${user.profile}`);
@@ -188,7 +210,9 @@ export class UsersService {
       const updatedUser = await this.userRepository.save(user);
       return { data: updatedUser };
     } catch {
-      throw new BadRequestException('Erreur lors de la réinitialisation du mot de passe');
+      throw new BadRequestException(
+        'Erreur lors de la réinitialisation du mot de passe',
+      );
     }
   }
 
@@ -197,7 +221,9 @@ export class UsersService {
       await this.findOne(id);
       await this.userRepository.delete(id);
     } catch {
-      throw new BadRequestException("Erreur lors de la suppression de l'utilisateur");
+      throw new BadRequestException(
+        "Erreur lors de la suppression de l'utilisateur",
+      );
     }
   }
 }

@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { QuotationsService } from './quotations.service';
 import { CreateLableDto } from './dto/create-quotation.dto';
 import { UpdateLableDto } from './dto/update-quotation.dto';
@@ -27,7 +35,10 @@ export class QuotationsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLableDto: UpdateLableDto): Promise<{ data: Quotation }> {
+  update(
+    @Param('id') id: string,
+    @Body() updateLableDto: UpdateLableDto,
+  ): Promise<{ data: Quotation }> {
     return this.lablesService.update(+id, updateLableDto);
   }
 

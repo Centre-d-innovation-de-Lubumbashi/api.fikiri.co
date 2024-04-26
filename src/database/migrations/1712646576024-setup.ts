@@ -115,8 +115,12 @@ export class Setup1712646576024 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`ALTER TABLE \`user_roles_role\` DROP FOREIGN KEY \`FK_4be2f7adf862634f5f803d246b8\``);
-    await queryRunner.query(`ALTER TABLE \`user_roles_role\` DROP FOREIGN KEY \`FK_5f9286e6c25594c6b88c108db77\``);
+    await queryRunner.query(
+      `ALTER TABLE \`user_roles_role\` DROP FOREIGN KEY \`FK_4be2f7adf862634f5f803d246b8\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`user_roles_role\` DROP FOREIGN KEY \`FK_5f9286e6c25594c6b88c108db77\``,
+    );
     await queryRunner.query(
       `ALTER TABLE \`solution_feedbacks_feedback\` DROP FOREIGN KEY \`FK_3ca60cc263b2cf06704ca08480a\``,
     );
@@ -141,41 +145,89 @@ export class Setup1712646576024 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE \`call_thematics_thematic\` DROP FOREIGN KEY \`FK_6126deea99c4a6a70ae99f1ef1d\``,
     );
-    await queryRunner.query(`ALTER TABLE \`user\` DROP FOREIGN KEY \`FK_642763a1acbc9672d38429ea62a\``);
-    await queryRunner.query(`ALTER TABLE \`user\` DROP FOREIGN KEY \`FK_659711c5971695cda97f7db52a2\``);
-    await queryRunner.query(`ALTER TABLE \`solution\` DROP FOREIGN KEY \`FK_ed090fd84e131ffea722335fe99\``);
-    await queryRunner.query(`ALTER TABLE \`solution\` DROP FOREIGN KEY \`FK_577971bf35a3f85b2d6edd8329e\``);
-    await queryRunner.query(`ALTER TABLE \`solution\` DROP FOREIGN KEY \`FK_c60ee1656ee14bd7d6aa75968e3\``);
-    await queryRunner.query(`ALTER TABLE \`solution\` DROP FOREIGN KEY \`FK_2ec64e0e6d4845d0ee0f1b9e232\``);
-    await queryRunner.query(`ALTER TABLE \`solution\` DROP FOREIGN KEY \`FK_a6d648bdb9da84b174d72b5d9c1\``);
-    await queryRunner.query(`ALTER TABLE \`image\` DROP FOREIGN KEY \`FK_e69d86ad179c4a0389ed2860880\``);
-    await queryRunner.query(`ALTER TABLE \`feedback\` DROP FOREIGN KEY \`FK_4a39e6ac0cecdf18307a365cf3c\``);
-    await queryRunner.query(`DROP INDEX \`IDX_4be2f7adf862634f5f803d246b\` ON \`user_roles_role\``);
-    await queryRunner.query(`DROP INDEX \`IDX_5f9286e6c25594c6b88c108db7\` ON \`user_roles_role\``);
+    await queryRunner.query(
+      `ALTER TABLE \`user\` DROP FOREIGN KEY \`FK_642763a1acbc9672d38429ea62a\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`user\` DROP FOREIGN KEY \`FK_659711c5971695cda97f7db52a2\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`solution\` DROP FOREIGN KEY \`FK_ed090fd84e131ffea722335fe99\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`solution\` DROP FOREIGN KEY \`FK_577971bf35a3f85b2d6edd8329e\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`solution\` DROP FOREIGN KEY \`FK_c60ee1656ee14bd7d6aa75968e3\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`solution\` DROP FOREIGN KEY \`FK_2ec64e0e6d4845d0ee0f1b9e232\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`solution\` DROP FOREIGN KEY \`FK_a6d648bdb9da84b174d72b5d9c1\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`image\` DROP FOREIGN KEY \`FK_e69d86ad179c4a0389ed2860880\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`feedback\` DROP FOREIGN KEY \`FK_4a39e6ac0cecdf18307a365cf3c\``,
+    );
+    await queryRunner.query(
+      `DROP INDEX \`IDX_4be2f7adf862634f5f803d246b\` ON \`user_roles_role\``,
+    );
+    await queryRunner.query(
+      `DROP INDEX \`IDX_5f9286e6c25594c6b88c108db7\` ON \`user_roles_role\``,
+    );
     await queryRunner.query(`DROP TABLE \`user_roles_role\``);
-    await queryRunner.query(`DROP INDEX \`IDX_3ca60cc263b2cf06704ca08480\` ON \`solution_feedbacks_feedback\``);
-    await queryRunner.query(`DROP INDEX \`IDX_521114a7a31c095f35d3328abc\` ON \`solution_feedbacks_feedback\``);
+    await queryRunner.query(
+      `DROP INDEX \`IDX_3ca60cc263b2cf06704ca08480\` ON \`solution_feedbacks_feedback\``,
+    );
+    await queryRunner.query(
+      `DROP INDEX \`IDX_521114a7a31c095f35d3328abc\` ON \`solution_feedbacks_feedback\``,
+    );
     await queryRunner.query(`DROP TABLE \`solution_feedbacks_feedback\``);
-    await queryRunner.query(`DROP INDEX \`IDX_a8399cb4c251056986aeb3128d\` ON \`solution_challenges_challenge\``);
-    await queryRunner.query(`DROP INDEX \`IDX_8fa3feaecd6791dbdd8967a5fa\` ON \`solution_challenges_challenge\``);
+    await queryRunner.query(
+      `DROP INDEX \`IDX_a8399cb4c251056986aeb3128d\` ON \`solution_challenges_challenge\``,
+    );
+    await queryRunner.query(
+      `DROP INDEX \`IDX_8fa3feaecd6791dbdd8967a5fa\` ON \`solution_challenges_challenge\``,
+    );
     await queryRunner.query(`DROP TABLE \`solution_challenges_challenge\``);
-    await queryRunner.query(`DROP INDEX \`IDX_1508f649282e3c85f5b26ce805\` ON \`thematic_challenges_challenge\``);
-    await queryRunner.query(`DROP INDEX \`IDX_865e652eaaa5181185bfe9d0d5\` ON \`thematic_challenges_challenge\``);
+    await queryRunner.query(
+      `DROP INDEX \`IDX_1508f649282e3c85f5b26ce805\` ON \`thematic_challenges_challenge\``,
+    );
+    await queryRunner.query(
+      `DROP INDEX \`IDX_865e652eaaa5181185bfe9d0d5\` ON \`thematic_challenges_challenge\``,
+    );
     await queryRunner.query(`DROP TABLE \`thematic_challenges_challenge\``);
-    await queryRunner.query(`DROP INDEX \`IDX_3f13af8a47c8b7daf6b5cd1ee9\` ON \`call_thematics_thematic\``);
-    await queryRunner.query(`DROP INDEX \`IDX_6126deea99c4a6a70ae99f1ef1\` ON \`call_thematics_thematic\``);
+    await queryRunner.query(
+      `DROP INDEX \`IDX_3f13af8a47c8b7daf6b5cd1ee9\` ON \`call_thematics_thematic\``,
+    );
+    await queryRunner.query(
+      `DROP INDEX \`IDX_6126deea99c4a6a70ae99f1ef1\` ON \`call_thematics_thematic\``,
+    );
     await queryRunner.query(`DROP TABLE \`call_thematics_thematic\``);
-    await queryRunner.query(`DROP INDEX \`IDX_cd8c76405ea34f3da19bb9aa5d\` ON \`quotation\``);
+    await queryRunner.query(
+      `DROP INDEX \`IDX_cd8c76405ea34f3da19bb9aa5d\` ON \`quotation\``,
+    );
     await queryRunner.query(`DROP TABLE \`quotation\``);
-    await queryRunner.query(`DROP INDEX \`IDX_e12875dfb3b1d92d7d7c5377e2\` ON \`user\``);
+    await queryRunner.query(
+      `DROP INDEX \`IDX_e12875dfb3b1d92d7d7c5377e2\` ON \`user\``,
+    );
     await queryRunner.query(`DROP TABLE \`user\``);
-    await queryRunner.query(`DROP INDEX \`IDX_ae4578dcaed5adff96595e6166\` ON \`role\``);
+    await queryRunner.query(
+      `DROP INDEX \`IDX_ae4578dcaed5adff96595e6166\` ON \`role\``,
+    );
     await queryRunner.query(`DROP TABLE \`role\``);
-    await queryRunner.query(`DROP INDEX \`IDX_d9428f9c8e3052d6617e3aab0e\` ON \`organisation\``);
+    await queryRunner.query(
+      `DROP INDEX \`IDX_d9428f9c8e3052d6617e3aab0e\` ON \`organisation\``,
+    );
     await queryRunner.query(`DROP TABLE \`organisation\``);
     await queryRunner.query(`DROP TABLE \`solution\``);
     await queryRunner.query(`DROP TABLE \`image\``);
-    await queryRunner.query(`DROP INDEX \`IDX_bd7ae1c4c03a7b15e369bc4d5a\` ON \`pole\``);
+    await queryRunner.query(
+      `DROP INDEX \`IDX_bd7ae1c4c03a7b15e369bc4d5a\` ON \`pole\``,
+    );
     await queryRunner.query(`DROP TABLE \`pole\``);
     await queryRunner.query(`DROP TABLE \`feedback\``);
     await queryRunner.query(`DROP TABLE \`status\``);

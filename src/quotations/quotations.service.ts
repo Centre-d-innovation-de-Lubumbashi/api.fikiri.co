@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateLableDto } from './dto/create-quotation.dto';
 import { UpdateLableDto } from './dto/update-quotation.dto';
 import { Repository } from 'typeorm';
@@ -33,18 +37,26 @@ export class QuotationsService {
       });
       return { data };
     } catch {
-      throw new NotFoundException('Erreur lors de la récupération de la quotation');
+      throw new NotFoundException(
+        'Erreur lors de la récupération de la quotation',
+      );
     }
   }
 
   async update(id: number, dto: UpdateLableDto): Promise<{ data: Quotation }> {
     try {
       const { data: quotation } = await this.findOne(id);
-      const updatedQuotation: Quotation & UpdateLableDto = Object.assign(quotation, dto);
-      const data: Quotation = await this.quotationRepository.save(updatedQuotation);
+      const updatedQuotation: Quotation & UpdateLableDto = Object.assign(
+        quotation,
+        dto,
+      );
+      const data: Quotation =
+        await this.quotationRepository.save(updatedQuotation);
       return { data };
     } catch {
-      throw new ConflictException('Erreur lors de la mise à jour de la quotation');
+      throw new ConflictException(
+        'Erreur lors de la mise à jour de la quotation',
+      );
     }
   }
 
@@ -53,7 +65,9 @@ export class QuotationsService {
       await this.findOne(id);
       await this.quotationRepository.delete(id);
     } catch {
-      throw new ConflictException('Erreur lors de la suppression de la quotation');
+      throw new ConflictException(
+        'Erreur lors de la suppression de la quotation',
+      );
     }
   }
 }

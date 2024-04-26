@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import { Repository } from 'typeorm';
@@ -46,10 +50,16 @@ export class FeedbacksService {
     }
   }
 
-  async update(id: number, dto: UpdateFeedbackDto): Promise<{ data: Feedback }> {
+  async update(
+    id: number,
+    dto: UpdateFeedbackDto,
+  ): Promise<{ data: Feedback }> {
     try {
       const { data: feedback } = await this.findOne(id);
-      const updatedFeedbackDto: Feedback & UpdateFeedbackDto = Object.assign(feedback, dto);
+      const updatedFeedbackDto: Feedback & UpdateFeedbackDto = Object.assign(
+        feedback,
+        dto,
+      );
       const data: Feedback = await this.feedbackRepository.save({
         ...updatedFeedbackDto,
         quotations: updatedFeedbackDto.quotations.join(', '),
