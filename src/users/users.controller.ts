@@ -8,6 +8,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RoleEnum } from 'src/auth/enums/role.enum';
 import { User } from './entities/user.entity';
+import { FileValidationPipe, validateFile } from 'src/pipes/file-validation.pipe';
 
 @Controller('users')
 export class UsersController {
@@ -45,6 +46,7 @@ export class UsersController {
     return this.userService.update(+id, updateUserDto);
   }
 
+  @Post(':id/image')
   @UseInterceptors(
     FileInterceptor('thumb', {
       storage: diskStorage({
@@ -55,8 +57,11 @@ export class UsersController {
       }),
     }),
   )
-  @Post(':id/image')
-  uploadImage(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<void> {
+  uploadImage(
+    @Param('id') id: string,
+    @UploadedFile(validateFile())
+    file: Express.Multer.File,
+  ): Promise<void> {
     return this.userService.uploadImage(+id, file);
   }
 

@@ -150,21 +150,20 @@ export class UsersService {
   }
 
   async uploadImage(id: number, image: Express.Multer.File): Promise<void> {
+    const { data: user } = await this.findOne(id);
     try {
-      // const { data: user } = await this.findOne(id);
-      // if (user.profile) await unlinkAsync(`./uploads/${user.profile}`);
+      await unlinkAsync(`./uploads/${user.profile}`);
+    } finally {
       await this.userRepository.update(id, {
         profile: image.filename,
       });
-    } catch {
-      throw new BadRequestException("Erreur lors de la modification de l'image");
     }
   }
 
   async deleteProfileImage(id: number): Promise<void> {
     try {
       const { data: user } = await this.findOne(id);
-      await unlinkAsync(`./uploads/${user.profile} `);
+      await unlinkAsync(`./uploads/${user.profile}`);
       await this.userRepository.update(id, { profile: null });
     } catch {
       throw new BadRequestException("Erreur lors de la suppression de l'image");
