@@ -10,13 +10,13 @@ import { Role } from './entities/role.entity';
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
-  @Post()
+  @Post('')
   @Roles([RoleEnum.Admin])
   create(@Body() createRoleDto: CreateRoleDto): Promise<{ data: Role }> {
     return this.rolesService.create(createRoleDto);
   }
 
-  @Get()
+  @Get('')
   findAll(): Promise<{ data: Role[] }> {
     return this.rolesService.findAll();
   }

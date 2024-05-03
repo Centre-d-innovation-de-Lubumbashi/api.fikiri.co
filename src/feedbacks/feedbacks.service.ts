@@ -1,13 +1,16 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import { Repository } from 'typeorm';
 import { Feedback } from './entities/feedback.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CreateFeedbackDto } from './dto/create-feedback.dto';
+import { Score } from './entities/score.entity';
 
 @Injectable()
 export class FeedbacksService {
   constructor(
+    @InjectRepository(Score)
+    private readonly scoreRepository: Repository<Score>,
     @InjectRepository(Feedback)
     private readonly feedbackRepository: Repository<Feedback>
   ) {}
@@ -16,10 +19,9 @@ export class FeedbacksService {
     try {
       const data: Feedback = await this.feedbackRepository.save({
         ...dto,
-        quotations: dto.quotations.join(', '),
-        user: {
-          email: dto.user
-        }
+        quotations: '',
+        scores: dto.quotations.map((id) => ({ id })),
+        user: { email: dto.user }
       });
       return { data };
     } catch {
@@ -27,10 +29,49 @@ export class FeedbacksService {
     }
   }
 
+  async createScore(feedback: Feedback): Promise<void> {
+    const quotationsArray = feedback.quotations.split(', ').map((id) => parseInt(id));
+    const questions = [
+      'Pertinence par rapport aux ODD/thématique',
+      'Impact local',
+      'Innovation',
+      'Échelle de mise en œuvre'
+    ];
+    quotationsArray.map(async (id, i) => {
+      let score: number | null = null;
+      if (id === 1) {
+        score = 10;
+      }
+      if (id === 2) {
+        score = 7.5;
+      }
+      if (id === 3) {
+        score = 5;
+      }
+      if (id === 4) {
+        score = 2.5;
+      }
+      if (id === 5) {
+        score = 0;
+      }
+      if (score) {
+        await this.scoreRepository.save({
+          score,
+          question: questions[i]
+        });
+      }
+    });
+  }
+
   async findAll(): Promise<{ data: Feedback[] }> {
     const data: Feedback[] = await this.feedbackRepository.find({
-      relations: ['user']
+      relations: ['user', 'scores']
     });
+
+    data.map(async (feedback) => {
+      await this.createScore(feedback);
+    });
+
     return { data };
   }
 
@@ -49,13 +90,11 @@ export class FeedbacksService {
   async update(id: number, dto: UpdateFeedbackDto): Promise<{ data: Feedback }> {
     try {
       const { data: feedback } = await this.findOne(id);
-      const updatedFeedbackDto: Feedback & UpdateFeedbackDto = Object.assign(feedback, dto);
+      const updatedFeedback: Feedback & UpdateFeedbackDto = Object.assign(feedback, dto);
       const data: Feedback = await this.feedbackRepository.save({
-        ...updatedFeedbackDto,
-        quotations: updatedFeedbackDto.quotations.join(', '),
-        user: {
-          email: updatedFeedbackDto.user
-        }
+        ...updatedFeedback,
+        scores: dto.quotations.map((id) => ({ id })),
+        user: { email: dto.user }
       });
       return { data };
     } catch {

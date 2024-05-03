@@ -67,6 +67,24 @@ export class UsersService {
     return { data };
   }
 
+  async findAll(): Promise<{ data: User[] }> {
+    const data: User[] = await this.userRepository.find({
+      order: { created_at: 'DESC' }
+    });
+
+    // check if the data.profile exists on the disk and remove it from the database if it doesn't
+    data.forEach(async (user) => {
+      if (user.profile) {
+        const exists = fs.existsSync(`./uploads/${user.profile}`);
+        if (!exists) {
+          await this.userRepository.update(user.id, { profile: null });
+        }
+      }
+    });
+
+    return { data };
+  }
+
   async findCurators(): Promise<{ data: User[] }> {
     const data: User[] = await this.userRepository.find({
       where: { roles: { name: RoleEnum.Curator } },

@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 
-export class CreateCallDto {
+export class CreateEventDto {
   @IsNotEmpty({ message: 'Le nom ne peut pas être vide' })
   name: string;
 

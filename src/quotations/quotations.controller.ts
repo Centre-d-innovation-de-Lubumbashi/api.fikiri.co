@@ -10,13 +10,13 @@ import { Quotation } from './entities/quotation.entity';
 export class QuotationsController {
   constructor(private readonly lablesService: QuotationsService) {}
 
-  @Post()
+  @Post('')
   @Roles([RoleEnum.Admin, RoleEnum.Curator])
   create(@Body() createLableDto: CreateLableDto): Promise<{ data: Quotation }> {
     return this.lablesService.create(createLableDto);
   }
 
-  @Get()
+  @Get('')
   findAll(): Promise<{ data: Quotation[] }> {
     return this.lablesService.findAll();
   }

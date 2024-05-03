@@ -5,11 +5,14 @@ import {
   JoinColumn,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Solution } from '../../solutions/entities/solution.entity';
+import { Status } from 'src/status/entities/status.entity';
+import { Score } from './score.entity';
 
 @Entity()
 export class Feedback {
@@ -17,10 +20,7 @@ export class Feedback {
   id: number;
 
   @Column({ nullable: true })
-  admin_comment: string;
-
-  @Column({ nullable: true })
-  user_comment: string;
+  comment: string;
 
   @CreateDateColumn({ type: 'datetime' })
   created_at: Date;
@@ -28,16 +28,20 @@ export class Feedback {
   @UpdateDateColumn({ type: 'datetime' })
   updated_at: Date;
 
-  @Column()
+  @Column({ type: 'varchar' })
   quotations: string;
 
   @ManyToMany(() => Solution, (solution) => solution.feedbacks)
   solutions: Solution[];
 
-  @ManyToOne(() => User, (user) => user.feedbacks, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
-  })
+  @ManyToOne(() => User, (user) => user.feedbacks)
   @JoinColumn()
   user: User;
+
+  @ManyToOne(() => Status, (status) => status.feedbacks)
+  @JoinColumn()
+  status: Status;
+
+  @OneToMany(() => Score, (score) => score.feedback)
+  scores: Score[];
 }

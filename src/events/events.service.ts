@@ -1,46 +1,46 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateCallDto } from './dto/create-call.dto';
-import { UpdateCallDto } from './dto/update-call.dto';
+import { CreateEventDto } from './dto/create-event.dto';
+import { UpdateCallDto } from './dto/update-event.dto';
 import { Repository } from 'typeorm';
-import { Call } from './entities/call.entity';
+import { Event } from './entities/event.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
-export class CallsService {
+export class EventsService {
   constructor(
-    @InjectRepository(Call)
-    private readonly callRepository: Repository<Call>
+    @InjectRepository(Event)
+    private readonly callRepository: Repository<Event>
   ) {}
 
-  async create(dto: CreateCallDto): Promise<{ data: Call }> {
+  async create(dto: CreateEventDto): Promise<{ data: Event }> {
     try {
-      const data: Call = await this.callRepository.save(dto);
+      const data: Event = await this.callRepository.save(dto);
       return { data };
     } catch {
       throw new BadRequestException("Impossible de créer l'appel à solution");
     }
   }
 
-  async findAll(): Promise<{ data: Call[] }> {
-    const data: Call[] = await this.callRepository.find({
+  async findAll(): Promise<{ data: Event[] }> {
+    const data: Event[] = await this.callRepository.find({
       relations: ['thematics']
     });
     return { data };
   }
 
   async findRecent(): Promise<{
-    data: { call: Call; prev: number; next: number };
+    data: { call: Event; prev: number; next: number };
   }> {
-    const call: Call = await this.callRepository.createQueryBuilder('c').orderBy('c.created_at', 'DESC').getOne();
+    const call: Event = await this.callRepository.createQueryBuilder('c').orderBy('c.created_at', 'DESC').getOne();
     const { prev, next } = await this.findNeighbours(call.id);
     return {
       data: { call, prev, next }
     };
   }
 
-  async findOne(id: number): Promise<{ data: { call: Call; prev: number; next: number } }> {
+  async findOne(id: number): Promise<{ data: { call: Event; prev: number; next: number } }> {
     try {
-      const call: Call = await this.callRepository.findOneOrFail({
+      const call: Event = await this.callRepository.findOneOrFail({
         where: { id }
       });
       const { prev, next } = await this.findNeighbours(id);
@@ -53,20 +53,19 @@ export class CallsService {
   }
 
   async findNeighbours(id: number): Promise<{ prev: number; next: number }> {
-    const data: Call[] = await this.callRepository.createQueryBuilder('c').select('c.id').getMany();
-
+    const data: Event[] = await this.callRepository.createQueryBuilder('c').select('c.id').getMany();
     const index: number = data.findIndex((call) => call.id === id);
     const prev: number = data[index - 1]?.id ?? null;
     const next: number = data[index + 1]?.id ?? null;
     return { prev, next };
   }
 
-  async update(id: number, dto: UpdateCallDto): Promise<{ data: Call }> {
+  async update(id: number, dto: UpdateCallDto): Promise<{ data: Event }> {
     try {
       const { data: result } = await this.findOne(id);
       const { call } = result;
-      const updatedCall: Call & UpdateCallDto = Object.assign(call, dto);
-      const data: Call = await this.callRepository.save(updatedCall);
+      const updatedCall: Event & UpdateCallDto = Object.assign(call, dto);
+      const data: Event = await this.callRepository.save(updatedCall);
       return { data };
     } catch {
       throw new BadRequestException("Impossible de mettre à jour l'appel à solution");

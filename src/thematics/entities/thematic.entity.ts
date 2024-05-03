@@ -9,7 +9,7 @@ import {
   UpdateDateColumn
 } from 'typeorm';
 import { Solution } from '../../solutions/entities/solution.entity';
-import { Call } from '../../calls/entities/call.entity';
+import { Event } from '../../events/entities/event.entity';
 import { Challenge } from '../../challenges/entities/challenge.entity';
 
 @Entity()
@@ -32,8 +32,8 @@ export class Thematic {
   @OneToMany(() => Solution, (solution) => solution.thematic)
   solutions: Solution[];
 
-  @ManyToMany(() => Call, (call) => call.thematics)
-  calls: Call[];
+  @ManyToMany(() => Event, (call) => call.thematics)
+  calls: Event[];
 
   @ManyToMany(() => Challenge, (challenge) => challenge.thematics)
   @JoinTable()

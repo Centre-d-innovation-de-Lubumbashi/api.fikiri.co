@@ -10,9 +10,10 @@ import {
 } from 'typeorm';
 import { Solution } from '../../solutions/entities/solution.entity';
 import { Thematic } from '../../thematics/entities/thematic.entity';
+import { Category } from 'src/categories/entities/category.entity';
 
 @Entity()
-export class Call {
+export class Event {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -29,15 +30,19 @@ export class Call {
   description: string;
 
   @CreateDateColumn({ type: 'datetime' })
-  created_at?: Date;
+  created_at: Date;
 
   @UpdateDateColumn({ type: 'datetime' })
-  updated_at?: Date;
+  updated_at: Date;
 
-  @OneToMany(() => Solution, (solution) => solution.call)
+  @OneToMany(() => Solution, (solution) => solution.event)
   solutions: Solution[];
 
   @ManyToMany(() => Thematic, (thematic) => thematic.calls)
   @JoinTable()
   thematics: Thematic[];
+
+  @ManyToMany(() => Category, (category) => category.events)
+  @JoinTable()
+  categories: Category[];
 }

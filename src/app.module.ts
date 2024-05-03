@@ -5,7 +5,7 @@ import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
 import { SolutionsModule } from './solutions/solutions.module';
 import { ThematicsModule } from './thematics/thematics.module';
-import { CallsModule } from './calls/calls.module';
+import { EventsModule } from './events/events.module';
 import { ChallengesModule } from './challenges/challenges.module';
 import { StatusModule } from './status/status.module';
 import { APP_GUARD } from '@nestjs/core';
@@ -22,6 +22,7 @@ import { DatabaseModule } from './database/database.module';
 import { SolutionFeedbacksModule } from './solution-feedbacks/solution-feedbacks.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -37,7 +38,7 @@ import { join } from 'path';
     RolesModule,
     SolutionsModule,
     ThematicsModule,
-    CallsModule,
+    EventsModule,
     ChallengesModule,
     StatusModule,
     QuotationsModule,
@@ -48,7 +49,8 @@ import { join } from 'path';
     EmailModule,
     ImagesModule,
     DatabaseModule,
-    SolutionFeedbacksModule
+    SolutionFeedbacksModule,
+    CategoriesModule
   ],
   providers: [
     {

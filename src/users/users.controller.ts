@@ -14,6 +14,11 @@ import { validateFile } from 'src/pipes/file-validation.pipe';
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
+  @Get('all')
+  findAll(): Promise<{ data: User[] }> {
+    return this.userService.findAll();
+  }
+
   @Post('')
   @Roles([RoleEnum.Admin])
   create(@Body() createUserDto: CreateUserDto): Promise<{ data: User }> {

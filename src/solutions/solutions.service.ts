@@ -37,11 +37,33 @@ export class SolutionsService {
   }
 
   async findAll(): Promise<{ data: Solution[] }> {
-    const data: Solution[] = await this.solutionRepository.find({
-      select: ['id', 'name', 'created_at'],
-      relations: ['thematic', 'feedbacks'],
-      order: { updated_at: 'DESC' }
-    });
+    const data: Solution[] = await this.solutionRepository
+      .createQueryBuilder('s')
+      .select(['s.id', 's.name', 's.created_at'])
+      .leftJoinAndSelect('s.thematic', 'thematic')
+      .leftJoinAndSelect('s.feedbacks', 'feedbacks')
+      .leftJoinAndSelect('s.images', 'images')
+      .leftJoinAndSelect('feedbacks.scores', 'feedbacksScores')
+      .orderBy('s.created_at', 'ASC')
+      .getMany();
+
+    // TODO: Remove this code for production
+    // data.forEach(async (solution) => {
+    //   if (solution.video_link !== null && solution.video_link.length === 0) {
+    //     solution.video_link = null;
+    //     await this.solutionRepository.save(solution);
+    //     solution.video_link = null;
+    //     this.solutionRepository.save(solution);
+    //   }
+    //   solution.images.forEach(async (image) => {
+    //     const exists = await this.imageService.exists(image.image_link);
+    //     if (!exists) {
+    //       await this.imageService.remove(image.id);
+    //       solution.images = solution.images.filter((img) => img.id !== image.id);
+    //       await this.solutionRepository.save(solution);
+    //     }
+    //   });
+    // });
     return { data };
   }
 
@@ -55,6 +77,7 @@ export class SolutionsService {
       .leftJoinAndSelect('s.challenges', 'challenges')
       .leftJoinAndSelect('s.thematic', 'thematic')
       .leftJoinAndSelect('feedbacks.user', 'feedbackUser')
+      .leftJoinAndSelect('feedbacks.scores', 'feedbackScores')
       .leftJoinAndSelect('feedbackUser.organisation', 'feedbackuserOrganisation')
       .leftJoinAndSelect('feedbackUser.pole', 'feedbackuserPole')
       .where('s.id = :id', { id })
@@ -74,7 +97,7 @@ export class SolutionsService {
       const data: Solution = await this.solutionRepository.save(updatedSolution);
       return { data };
     } catch {
-      throw new BadRequestException('Erreur lors de la mise à jour de la solution');
+      throw new BadRequestException('Erreur lors de la mise à jou r de la solution');
     }
   }
 
@@ -88,7 +111,7 @@ export class SolutionsService {
         pole: { id: dto.pole || solution.pole?.id },
         thematic: { id: dto.thematic || solution.thematic?.id },
         user: { email: dto.user || solution.user?.email },
-        call: { id: dto.call || solution.call?.id },
+        call: { id: dto.call || solution.event?.id },
         status: { id: dto.status || solution.status?.id },
         challenges: dto?.challenges?.map((id: number) => ({ id })) ?? solution.challenges
       });
@@ -183,7 +206,8 @@ export class SolutionsService {
       .createQueryBuilder('s')
       .leftJoin('s.images', 'images')
       .leftJoinAndSelect('s.thematic', 'thematic')
-      .where('(images.id IS NOT NULL) OR (s.image_link IS NOT NULL) OR (LENGTH(s.video_link) > 0)')
+      .leftJoinAndSelect('s.feedbacks', 'feedbacks')
+      .where('(images.id IS NOT NULL) OR (s.video_link IS NOT NULL)')
       .getMany();
     return { data };
   }

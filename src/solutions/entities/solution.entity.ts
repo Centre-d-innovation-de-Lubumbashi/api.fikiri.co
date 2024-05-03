@@ -2,19 +2,21 @@ import { Thematic } from 'src/thematics/entities/thematic.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   JoinTable,
   ManyToMany,
   ManyToOne,
   OneToMany,
-  PrimaryGeneratedColumn
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
 } from 'typeorm';
 import { Challenge } from '../../challenges/entities/challenge.entity';
 import { Status } from '../../status/entities/status.entity';
 import { Feedback } from '../../feedbacks/entities/feedback.entity';
 import { Pole } from '../../poles/entities/pole.entity';
-import { Call } from '../../calls/entities/call.entity';
+import { Event } from '../../events/entities/event.entity';
 import { Image } from '../../images/entities/image.entity';
 
 @Entity()
@@ -26,9 +28,6 @@ export class Solution {
   name: string;
 
   @Column({ nullable: true })
-  image_link: string;
-
-  @Column({ nullable: true })
   video_link: string;
 
   @Column({ type: 'text' })
@@ -37,15 +36,15 @@ export class Solution {
   @Column({ type: 'text' })
   targeted_problem: string;
 
-  @Column({ type: 'datetime', nullable: true, default: () => 'now()' })
-  created_at?: Date;
+  @CreateDateColumn({ type: 'datetime' })
+  created_at: Date;
 
-  @Column({ type: 'datetime', nullable: true, onUpdate: 'CURRENT_TIMESTAMP' })
-  updated_at?: Date;
+  @UpdateDateColumn({ type: 'datetime' })
+  updated_at: Date;
 
-  @ManyToOne(() => Call, (call) => call.solutions)
+  @ManyToOne(() => Event, (event) => event.solutions)
   @JoinColumn()
-  call: Call;
+  event: Event;
 
   @ManyToOne(() => Status, (status) => status.solutions)
   @JoinColumn()

@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Solution } from '../../solutions/entities/solution.entity';
+import { Feedback } from 'src/feedbacks/entities/feedback.entity';
 
 @Entity()
 export class Status {
@@ -14,6 +15,9 @@ export class Status {
 
   @UpdateDateColumn({ type: 'datetime' })
   updated_at: Date;
+
+  @OneToMany(() => Feedback, (feedback) => feedback.status)
+  feedbacks: Feedback[];
 
   @OneToMany(() => Solution, (solution) => solution.status)
   solutions: Solution[];

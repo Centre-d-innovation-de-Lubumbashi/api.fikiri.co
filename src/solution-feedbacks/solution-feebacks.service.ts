@@ -2,7 +2,6 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateFeedbackDto } from 'src/feedbacks/dto/create-feedback.dto';
 import { UpdateFeedbackDto } from 'src/feedbacks/dto/update-feedback.dto';
 import { FeedbacksService } from 'src/feedbacks/feedbacks.service';
-import { QuotationsService } from '../quotations/quotations.service';
 import { Feedback } from '../feedbacks/entities/feedback.entity';
 import { Solution } from '../solutions/entities/solution.entity';
 import { SolutionsService } from '../solutions/solutions.service';
@@ -11,8 +10,7 @@ import { SolutionsService } from '../solutions/solutions.service';
 export class SolutionFeedbacksService {
   constructor(
     private readonly solutionsService: SolutionsService,
-    private readonly feedbacksService: FeedbacksService,
-    private readonly quotationsService: QuotationsService
+    private readonly feedbacksService: FeedbacksService
   ) {}
 
   async addFeedback(id: number, dto: CreateFeedbackDto): Promise<{ data: Solution }> {
