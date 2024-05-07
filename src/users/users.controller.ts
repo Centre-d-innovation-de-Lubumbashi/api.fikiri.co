@@ -14,7 +14,7 @@ import { validateFile } from 'src/pipes/file-validation.pipe';
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
-  @Get('all')
+  @Get('')
   findAll(): Promise<{ data: User[] }> {
     return this.userService.findAll();
   }

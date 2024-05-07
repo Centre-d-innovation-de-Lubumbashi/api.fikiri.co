@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class Setup1714744889194 implements MigrationInterface {
-  name = 'Setup1714744889194';
+export class Setup1715070199695 implements MigrationInterface {
+  name = 'Setup1715070199695';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`ALTER TABLE \`feedback\` DROP FOREIGN KEY \`FK_4a39e6ac0cecdf18307a365cf3c\``);
@@ -19,9 +19,6 @@ export class Setup1714744889194 implements MigrationInterface {
     );
     await queryRunner.query(
       `CREATE TABLE \`category\` (\`id\` int NOT NULL, \`name\` varchar(255) NOT NULL, \`description\` text NOT NULL, \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updated_At\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`
-    );
-    await queryRunner.query(
-      `CREATE TABLE \`score\` (\`id\` int NOT NULL AUTO_INCREMENT, \`question\` varchar(255) NOT NULL, \`score\` float NOT NULL, \`feedbackId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`
     );
     await queryRunner.query(
       `CREATE TABLE \`event_categories_category\` (\`eventId\` int NOT NULL, \`categoryId\` int NOT NULL, INDEX \`IDX_9fc5e5dab789917cc33940c08a\` (\`eventId\`), INDEX \`IDX_0c38526fad528c70c7c5baaa08\` (\`categoryId\`), PRIMARY KEY (\`eventId\`, \`categoryId\`)) ENGINE=InnoDB`
@@ -65,9 +62,6 @@ export class Setup1714744889194 implements MigrationInterface {
     );
     await queryRunner.query(
       `CREATE INDEX \`IDX_f190b63fe1a8ee99eca04bf320\` ON \`event_thematics_thematic\` (\`thematicId\`)`
-    );
-    await queryRunner.query(
-      `ALTER TABLE \`score\` ADD CONSTRAINT \`FK_8c32053083d0d526ff860b92669\` FOREIGN KEY (\`feedbackId\`) REFERENCES \`feedback\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`
     );
     await queryRunner.query(
       `ALTER TABLE \`feedback\` ADD CONSTRAINT \`FK_4a39e6ac0cecdf18307a365cf3c\` FOREIGN KEY (\`userId\`) REFERENCES \`user\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`
@@ -136,7 +130,6 @@ export class Setup1714744889194 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE \`image\` DROP FOREIGN KEY \`FK_e69d86ad179c4a0389ed2860880\``);
     await queryRunner.query(`ALTER TABLE \`feedback\` DROP FOREIGN KEY \`FK_a284c7d0e548d1de6aa41914057\``);
     await queryRunner.query(`ALTER TABLE \`feedback\` DROP FOREIGN KEY \`FK_4a39e6ac0cecdf18307a365cf3c\``);
-    await queryRunner.query(`ALTER TABLE \`score\` DROP FOREIGN KEY \`FK_8c32053083d0d526ff860b92669\``);
     await queryRunner.query(`DROP INDEX \`IDX_f190b63fe1a8ee99eca04bf320\` ON \`event_thematics_thematic\``);
     await queryRunner.query(`DROP INDEX \`IDX_7dea622c5fb87059c2ced2c1fd\` ON \`event_thematics_thematic\``);
     await queryRunner.query(`ALTER TABLE \`quotation\` CHANGE \`average\` \`average\` float(12) NULL DEFAULT 'NULL'`);
@@ -198,7 +191,6 @@ export class Setup1714744889194 implements MigrationInterface {
     await queryRunner.query(`DROP INDEX \`IDX_0c38526fad528c70c7c5baaa08\` ON \`event_categories_category\``);
     await queryRunner.query(`DROP INDEX \`IDX_9fc5e5dab789917cc33940c08a\` ON \`event_categories_category\``);
     await queryRunner.query(`DROP TABLE \`event_categories_category\``);
-    await queryRunner.query(`DROP TABLE \`score\``);
     await queryRunner.query(`DROP TABLE \`category\``);
     await queryRunner.query(
       `ALTER TABLE \`feedback\` CHANGE \`statusId\` \`user_comment\` varchar(255) NULL DEFAULT 'NULL'`

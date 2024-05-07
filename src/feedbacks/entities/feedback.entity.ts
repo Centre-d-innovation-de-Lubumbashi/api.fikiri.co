@@ -5,14 +5,12 @@ import {
   JoinColumn,
   ManyToMany,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Solution } from '../../solutions/entities/solution.entity';
 import { Status } from 'src/status/entities/status.entity';
-import { Score } from './score.entity';
 
 @Entity()
 export class Feedback {
@@ -41,7 +39,4 @@ export class Feedback {
   @ManyToOne(() => Status, (status) => status.feedbacks)
   @JoinColumn()
   status: Status;
-
-  @OneToMany(() => Score, (score) => score.feedback)
-  scores: Score[];
 }

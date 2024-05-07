@@ -39,31 +39,12 @@ export class SolutionsService {
   async findAll(): Promise<{ data: Solution[] }> {
     const data: Solution[] = await this.solutionRepository
       .createQueryBuilder('s')
-      .select(['s.id', 's.name', 's.created_at'])
+      .select(['s.id', 's.name', 's.video_link', 's.created_at'])
       .leftJoinAndSelect('s.thematic', 'thematic')
       .leftJoinAndSelect('s.feedbacks', 'feedbacks')
       .leftJoinAndSelect('s.images', 'images')
-      .leftJoinAndSelect('feedbacks.scores', 'feedbacksScores')
       .orderBy('s.created_at', 'ASC')
       .getMany();
-
-    // TODO: Remove this code for production
-    // data.forEach(async (solution) => {
-    //   if (solution.video_link !== null && solution.video_link.length === 0) {
-    //     solution.video_link = null;
-    //     await this.solutionRepository.save(solution);
-    //     solution.video_link = null;
-    //     this.solutionRepository.save(solution);
-    //   }
-    //   solution.images.forEach(async (image) => {
-    //     const exists = await this.imageService.exists(image.image_link);
-    //     if (!exists) {
-    //       await this.imageService.remove(image.id);
-    //       solution.images = solution.images.filter((img) => img.id !== image.id);
-    //       await this.solutionRepository.save(solution);
-    //     }
-    //   });
-    // });
     return { data };
   }
 

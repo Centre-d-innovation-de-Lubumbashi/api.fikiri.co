@@ -71,17 +71,6 @@ export class UsersService {
     const data: User[] = await this.userRepository.find({
       order: { created_at: 'DESC' }
     });
-
-    // check if the data.profile exists on the disk and remove it from the database if it doesn't
-    data.forEach(async (user) => {
-      if (user.profile) {
-        const exists = fs.existsSync(`./uploads/${user.profile}`);
-        if (!exists) {
-          await this.userRepository.update(user.id, { profile: null });
-        }
-      }
-    });
-
     return { data };
   }
 
@@ -130,6 +119,10 @@ export class UsersService {
       const existingUser: User = await this.userRepository.findOne({
         where: { email: dto.email }
       });
+      if (!existingUser.profile) {
+        existingUser.google_image = dto.google_image;
+        await this.userRepository.save(existingUser);
+      }
       if (existingUser) return { data: existingUser };
       const newUser: User = await this.userRepository.save({
         ...dto,
