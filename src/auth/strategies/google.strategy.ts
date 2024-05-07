@@ -24,7 +24,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     const userDto: CreateWithGoogleDto = {
       email: emails[0].value,
       name: `${name.givenName} ${name.familyName}`,
-      googleImage: photos[0].value
+      google_image: photos[0].value
     };
     const { data: user } = await this.userService.findOrCreate(userDto);
     done(null, user);

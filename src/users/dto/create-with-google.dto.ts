@@ -1,5 +1,5 @@
 export class CreateWithGoogleDto {
   name: string;
   email: string;
-  googleImage: string;
+  google_image: string;
 }
