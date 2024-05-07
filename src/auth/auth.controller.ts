@@ -17,7 +17,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('logout')
-  logout(@Req() request: Request): Promise<{ data: { message: string } }> {
+  logout(@Req() request: Request): Promise<void> {
     return this.authService.logout(request);
   }
 
@@ -57,19 +57,19 @@ export class AuthController {
   }
 
   @Patch('update-password')
-  updatePassword(@CurrentUser() user: User, @Body() dto: UpdatePasswordDto): Promise<{ data: { message: string } }> {
+  updatePassword(@CurrentUser() user: User, @Body() dto: UpdatePasswordDto): Promise<{ data: User }> {
     return this.authService.updatePassword(user, dto);
   }
 
   @Public()
   @Post('reset-password-request')
-  resetPasswordRequest(@Body() dto: ResetPasswordRequestDto): Promise<{ data: { message: string } }> {
+  resetPasswordRequest(@Body() dto: ResetPasswordRequestDto): Promise<{ data: User }> {
     return this.authService.resetPasswordRequest(dto);
   }
 
   @Public()
   @Post('reset-password')
-  resetPassword(@Body() dto: ResetPasswordDto): Promise<{ data: { message: string } }> {
+  resetPassword(@Body() dto: ResetPasswordDto): Promise<{ data: User }> {
     return this.authService.resetPassword(dto);
   }
 }

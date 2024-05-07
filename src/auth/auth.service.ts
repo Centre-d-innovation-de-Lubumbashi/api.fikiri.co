@@ -22,14 +22,13 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, password: string): Promise<{ data: User }> {
-    const { data } = await this.usersService.findByEmail(email);
-    const passwordMatch: boolean = await this.passwordMatch(password, data.password);
-    if (!passwordMatch) throw new BadRequestException('Les identifiants saisis sont invalides');
-    return { data };
+    const { data: user } = await this.usersService.findByEmail(email);
+    const passwordMatch: boolean = await this.passwordMatch(password, user.password);
+    if (!passwordMatch && !user) throw new BadRequestException('Les identifiants saisis sont invalides');
+    return { data: user };
   }
 
-  async passwordMatch(password: string, hash: string): Promise<boolean> {
-    if (!hash) return false;
+  async passwordMatch(password: string, hash: string = ''): Promise<boolean> {
     return await bcrypt.compare(password, hash);
   }
 
@@ -42,13 +41,8 @@ export class AuthService {
     return { data };
   }
 
-  async logout(@Req() request: Request): Promise<{ data: { message: string } }> {
+  async logout(@Req() request: Request): Promise<void> {
     request.session.destroy(() => {});
-    return {
-      data: {
-        message: 'Vous avez été déconnecté avec succès'
-      }
-    };
   }
 
   async profile(@CurrentUser() data: User): Promise<{ data: User }> {
@@ -64,7 +58,7 @@ export class AuthService {
     return { data };
   }
 
-  async updatePassword(@CurrentUser() user: User, dto: UpdatePasswordDto): Promise<{ data: { message: string } }> {
+  async updatePassword(@CurrentUser() user: User, dto: UpdatePasswordDto): Promise<{ data: User }> {
     const { password } = dto;
     if (user.password) {
       const isMatch: boolean = await this.passwordMatch(dto.old_password, user.password);
@@ -72,39 +66,28 @@ export class AuthService {
     }
     try {
       await this.usersService.updatePassword(user.id, password);
-      return {
-        data: {
-          message: 'Votre mot de passe a été mis à jour avec succès'
-        }
-      };
+      return { data: user };
     } catch {
       throw new BadRequestException('Erreur lors de la mise à jour du mot de passe');
     }
   }
 
-  async resetPasswordRequest(dto: ResetPasswordRequestDto): Promise<{ data: { message: string } }> {
+  async resetPasswordRequest(dto: ResetPasswordRequestDto): Promise<{ data: User }> {
     const { email } = dto;
-    const { data: user } = await this.usersService.findByEmail(email);
+    const { data } = await this.usersService.findByEmail(email);
+    if (!data) throw new BadRequestException('Aucun utilisateur trouvé avec cet email');
     const token = randomPassword();
-    await this.usersService.update(user.id, { token });
-    await this.emailService.sendResetPasswordEmail(user, token);
-    return {
-      data: {
-        message: 'Un email de réinitialisation de mot de passe a été envoyé'
-      }
-    };
+    await this.usersService.update(data.id, { token });
+    await this.emailService.sendResetPasswordEmail(data, token);
+    return { data };
   }
 
-  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<{ data: { message: string } }> {
+  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<{ data: User }> {
     const { token, password } = resetPasswordDto;
-    const { data: user } = await this.usersService.findByResetToken(token);
+    const { data } = await this.usersService.findByResetToken(token);
     try {
-      await this.usersService.updatePassword(user.id, password);
-      return {
-        data: {
-          message: 'Votre mot de passe a été réinitialisé avec succès'
-        }
-      };
+      await this.usersService.updatePassword(data.id, password);
+      return { data };
     } catch {
       throw new BadRequestException('Erreur lors de la réinitialisation du mot de passe');
     }

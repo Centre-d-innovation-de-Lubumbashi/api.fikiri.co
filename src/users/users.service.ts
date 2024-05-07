@@ -102,16 +102,12 @@ export class UsersService {
     }
   }
 
-  async findByEmail(email: string): Promise<{ data: User }> {
-    try {
-      const data: User = await this.userRepository.findOneOrFail({
-        where: { email },
-        relations: ['roles']
-      });
-      return { data };
-    } catch {
-      throw new BadRequestException('Aucun utilisateur trouvé avec cet email');
-    }
+  async findByEmail(email: string): Promise<{ data: User | null }> {
+    const data: User | null = await this.userRepository.findOne({
+      where: { email },
+      relations: ['roles']
+    });
+    return { data };
   }
 
   async findOrCreate(dto: CreateWithGoogleDto): Promise<{ data: User }> {
