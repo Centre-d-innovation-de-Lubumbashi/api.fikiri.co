@@ -25,43 +25,10 @@ export class FeedbacksService {
     }
   }
 
-  async createScore(feedback: Feedback): Promise<void> {
-    const quotationsArray = feedback.quotations.split(', ').map((id) => parseInt(id));
-    for (let i = 0; i < quotationsArray.length; i++) {
-      const id = quotationsArray[i];
-      let score: string | null = null;
-      if (id === null) {
-        score = '10';
-      }
-      if (id === 2) {
-        score = '7.5';
-      }
-      if (id === 3) {
-        score = '5';
-      }
-      if (id === 4) {
-        score = '2.5';
-      }
-      if (id === 5) {
-        score = '0';
-      }
-      if (id) {
-        feedback.quotations = feedback.quotations.replace(id.toString(), score);
-        // feedback.status.id = 1;
-        await this.feedbackRepository.save(feedback);
-      }
-    }
-  }
-
   async findAll(): Promise<{ data: Feedback[] }> {
     const data: Feedback[] = await this.feedbackRepository.find({
       relations: ['user']
     });
-
-    // data.map(async (feedback) => {
-    //   await this.createScore(feedback);
-    // });
-
     return { data };
   }
 
