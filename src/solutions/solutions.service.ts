@@ -58,7 +58,6 @@ export class SolutionsService {
       .leftJoinAndSelect('s.challenges', 'challenges')
       .leftJoinAndSelect('s.thematic', 'thematic')
       .leftJoinAndSelect('feedbacks.user', 'feedbackUser')
-      .leftJoinAndSelect('feedbacks.scores', 'feedbackScores')
       .leftJoinAndSelect('feedbackUser.organisation', 'feedbackuserOrganisation')
       .leftJoinAndSelect('feedbackUser.pole', 'feedbackuserPole')
       .where('s.id = :id', { id })
