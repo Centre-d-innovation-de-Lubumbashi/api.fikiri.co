@@ -23,12 +23,12 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<{ data: User }> {
     const { data: user } = await this.usersService.findByEmail(email);
-    const passwordMatch: boolean = await this.passwordMatch(password, user.password);
+    const passwordMatch: boolean = await this.passwordMatch(password, user?.password);
     if (!passwordMatch && !user) throw new BadRequestException('Les identifiants saisis sont invalides');
     return { data: user };
   }
 
-  async passwordMatch(password: string, hash: string = ''): Promise<boolean> {
+  async passwordMatch(password: string = '', hash: string = ''): Promise<boolean> {
     return await bcrypt.compare(password, hash);
   }
 
