@@ -142,6 +142,7 @@ export class SolutionsService {
       .leftJoin('s.feedbacks', 'feedbacks')
       .where('feedbacks.id IS NOT NULL')
       .getCount();
+    const perPage = 20;
     const data: Solution[] = await this.solutionRepository
       .createQueryBuilder('s')
       .select(['s.id', 's.name', 's.description', 's.created_at'])
@@ -149,8 +150,8 @@ export class SolutionsService {
       .leftJoinAndSelect('s.user', 'user')
       .leftJoin('s.feedbacks', 'feedbacks')
       .where('feedbacks.id IS NOT NULL')
-      .skip(page * 20)
-      .take(20)
+      .skip(page * perPage)
+      .take(perPage)
       .getMany();
     return { data: { solutions: data, count: count } };
   }
