@@ -23,8 +23,9 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<{ data: User }> {
     const { data: user } = await this.usersService.findByEmail(email);
+    if (!user) throw new BadRequestException('Les identifiants saisis sont invalides');
     const passwordMatch: boolean = await this.passwordMatch(password, user?.password);
-    if (!passwordMatch && !user) throw new BadRequestException('Les identifiants saisis sont invalides');
+    if (!passwordMatch) throw new BadRequestException('Les identifiants saisis sont invalides');
     return { data: user };
   }
 
