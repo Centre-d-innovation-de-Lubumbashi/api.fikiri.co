@@ -136,6 +136,25 @@ export class SolutionsService {
     }
   }
 
+  async findMapped(page: number): Promise<{ data: { solutions: Solution[]; count: number } }> {
+    const count: number = await this.solutionRepository
+      .createQueryBuilder('s')
+      .leftJoin('s.feedbacks', 'feedbacks')
+      .where('feedbacks.id IS NOT NULL')
+      .getCount();
+    const data: Solution[] = await this.solutionRepository
+      .createQueryBuilder('s')
+      .select(['s.id', 's.name', 's.description', 's.created_at'])
+      .leftJoinAndSelect('s.images', 'solutionImages')
+      .leftJoinAndSelect('s.user', 'user')
+      .leftJoin('s.feedbacks', 'feedbacks')
+      .where('feedbacks.id IS NOT NULL')
+      .skip(page * 20)
+      .take(20)
+      .getMany();
+    return { data: { solutions: data, count: count } };
+  }
+
   async findOneMapped(id: number): Promise<{ data: { solution: Solution; prev: number; next: number } }> {
     const solution: Solution = await this.solutionRepository
       .createQueryBuilder('s')
@@ -146,7 +165,8 @@ export class SolutionsService {
       .leftJoinAndSelect('s.status', 'status')
       .leftJoinAndSelect('s.user', 'user')
       .leftJoinAndSelect('s.challenges', 'challenges')
-      .where('s.id = :id AND status.id IN (2, 3, 4)', { id })
+      .leftJoin('s.feedbacks', 'feedbacks')
+      .where('feedbacks.id IS NOT NULL')
       .getOne();
     if (!solution) throw new NotFoundException("La solution n'a pas été trouvé");
     const { prev, next } = await this.findNeighbors(id, true);
@@ -191,22 +211,5 @@ export class SolutionsService {
       .where('feedbacks.id IS NOT NULL')
       .getMany();
     return { data };
-  }
-
-  async findMapped(page: number): Promise<{ data: { solutions: Solution[]; count: number } }> {
-    const count: number = await this.solutionRepository
-      .createQueryBuilder('s')
-      .leftJoin('s.feedbacks', 'feedbacks')
-      .where('feedbacks.id IS NOT NULL')
-      .getCount();
-    const data: Solution[] = await this.solutionRepository
-      .createQueryBuilder('s')
-      .select(['s.id', 's.name', 's.description', 's.created_at'])
-      .leftJoinAndSelect('s.images', 'solutionImages')
-      .leftJoinAndSelect('s.user', 'user')
-      .skip(page * 20)
-      .take(20)
-      .getMany();
-    return { data: { solutions: data, count: count } };
   }
 }
