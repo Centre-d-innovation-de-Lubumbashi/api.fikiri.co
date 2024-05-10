@@ -23,14 +23,17 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<{ data: User }> {
     const { data: user } = await this.usersService.findByEmail(email);
-    if (!user) throw new BadRequestException('Les identifiants saisis sont invalides');
     const passwordMatch: boolean = await this.passwordMatch(password, user?.password);
-    if (!passwordMatch) throw new BadRequestException('Les identifiants saisis sont invalides');
+    if (!passwordMatch || !user) throw new BadRequestException('Les identifiants saisis sont invalides');
     return { data: user };
   }
 
-  async passwordMatch(password: string = '', hash: string = ''): Promise<boolean> {
-    return await bcrypt.compare(password, hash);
+  async passwordMatch(password: string, hash: string): Promise<boolean> {
+    try {
+      return await bcrypt.compare(password, hash);
+    } catch {
+      throw new BadRequestException('Les identifiants saisis sont invalides');
+    }
   }
 
   async loginGoogle(@Res() res: Response): Promise<void> {
