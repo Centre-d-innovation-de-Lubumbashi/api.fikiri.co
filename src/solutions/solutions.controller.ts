@@ -43,6 +43,12 @@ export class SolutionsController {
   }
 
   @Public()
+  @Get('winning-solutions')
+  finWinningSolutions(): Promise<{ data: Solution[] }> {
+    return this.solutionsService.findWinningSolutions();
+  }
+
+  @Public()
   @Get('mapped/:id')
   findOneMapped(@Param('id') id: string): Promise<{ data: { solution: Solution; prev: number; next: number } }> {
     return this.solutionsService.findOneMapped(+id);

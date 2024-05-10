@@ -147,6 +147,7 @@ export class SolutionsService {
       .createQueryBuilder('s')
       .select(['s.id', 's.name', 's.description', 's.created_at'])
       .leftJoinAndSelect('s.images', 'solutionImages')
+      .leftJoinAndSelect('s.thematic', 'solutionThematic')
       .leftJoinAndSelect('s.user', 'user')
       .leftJoin('s.feedbacks', 'feedbacks')
       .where('feedbacks.id IS NOT NULL')
@@ -154,6 +155,19 @@ export class SolutionsService {
       .take(perPage)
       .getMany();
     return { data: { solutions: data, count: count } };
+  }
+
+  async findWinningSolutions(): Promise<{ data: Solution[] }> {
+    const data: Solution[] = await this.solutionRepository
+      .createQueryBuilder('s')
+      .select(['s.id', 's.name', 's.description', 's.created_at'])
+      .leftJoinAndSelect('s.thematic', 'thematic')
+      .leftJoinAndSelect('s.images', 'solutionImages')
+      .leftJoinAndSelect('s.user', 'user')
+      .leftJoin('s.status', 'status')
+      .where('status.id IN (2,3,4)')
+      .getMany();
+    return { data };
   }
 
   async findOneMapped(id: number): Promise<{ data: { solution: Solution; prev: number; next: number } }> {
