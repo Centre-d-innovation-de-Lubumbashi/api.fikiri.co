@@ -136,22 +136,6 @@ export class SolutionsService {
     }
   }
 
-  async findMapped(cursor: number): Promise<{ data: Solution[] }> {
-    if (isNaN(cursor) || cursor <= 0) cursor = 1;
-    const take: number = cursor * 8;
-    const data: Solution[] = await this.solutionRepository
-      .createQueryBuilder('s')
-      .select(['s.id', 's.name', 's.created_at'])
-      .leftJoinAndSelect('s.images', 'images')
-      .leftJoinAndSelect('s.user', 'user')
-      .leftJoinAndSelect('s.status', 'status')
-      .orderBy('s.created_at', 'ASC')
-      .take(take)
-      .where('status.id IN (2, 3, 4)')
-      .getMany();
-    return { data };
-  }
-
   async findOneMapped(id: number): Promise<{ data: { solution: Solution; prev: number; next: number } }> {
     const solution: Solution = await this.solutionRepository
       .createQueryBuilder('s')
@@ -198,6 +182,7 @@ export class SolutionsService {
       .select(['s.id', 's.name', 's.description', 's.created_at'])
       .leftJoinAndSelect('s.thematic', 'thematic')
       .leftJoinAndSelect('s.status', 'status')
+      .leftJoinAndSelect('s.images', 'solutionImages')
       .leftJoinAndSelect('s.feedbacks', 'feedbacks')
       .leftJoinAndSelect('s.user', 'user')
       .leftJoinAndSelect('feedbacks.user', 'feedbacksUser')
@@ -206,5 +191,22 @@ export class SolutionsService {
       .where('feedbacks.id IS NOT NULL')
       .getMany();
     return { data };
+  }
+
+  async findMapped(page: number): Promise<{ data: { solutions: Solution[]; count: number } }> {
+    const count: number = await this.solutionRepository
+      .createQueryBuilder('s')
+      .leftJoin('s.feedbacks', 'feedbacks')
+      .where('feedbacks.id IS NOT NULL')
+      .getCount();
+    const data: Solution[] = await this.solutionRepository
+      .createQueryBuilder('s')
+      .select(['s.id', 's.name', 's.description', 's.created_at'])
+      .leftJoinAndSelect('s.images', 'solutionImages')
+      .leftJoinAndSelect('s.user', 'user')
+      .skip(page * 20)
+      .take(20)
+      .getMany();
+    return { data: { solutions: data, count: count } };
   }
 }

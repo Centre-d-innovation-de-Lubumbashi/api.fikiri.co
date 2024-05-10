@@ -38,8 +38,8 @@ export class SolutionsController {
 
   @Public()
   @Get('mapped')
-  findMapped(@Query('cursor') cursor: string): Promise<{ data: Solution[] }> {
-    return this.solutionsService.findMapped(+cursor);
+  findMapped(@Query('page') page: string): Promise<{ data: { solutions: Solution[]; count: number } }> {
+    return this.solutionsService.findMapped(+page || 1);
   }
 
   @Public()
@@ -58,6 +58,7 @@ export class SolutionsController {
     return this.solutionsService.findConforms();
   }
 
+  @Public()
   @Get('curated')
   findCurated(): Promise<{ data: Solution[] }> {
     return this.solutionsService.findCurated();
