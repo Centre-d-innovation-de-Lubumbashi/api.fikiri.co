@@ -152,11 +152,10 @@ export class SolutionsService {
     if (event) query.andWhere('event.id = :event', { event });
     if (odd) query.andWhere("thematic.odds LIKE '%:odd%'", { odd: +odd });
     if (thematic) query.andWhere('thematic.id = :thematic', { thematic: +thematic });
+    const pageSize: number = 20;
+    const skip = ((page || 1) - 1) * pageSize;
     const count: number = await query.getCount();
-    const data: Solution[] = await query
-      .skip((page || 1) * 20)
-      .take(20)
-      .getMany();
+    const data: Solution[] = await query.skip(skip).take(pageSize).getMany();
     return { data: { solutions: data, count: count } };
   }
 
