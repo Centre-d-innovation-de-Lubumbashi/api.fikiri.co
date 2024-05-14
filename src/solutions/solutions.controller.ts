@@ -21,6 +21,7 @@ import { UpdateUserSolutionDto } from './dto/update-user-solution.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RoleEnum } from 'src/auth/enums/role.enum';
 import { Solution } from './entities/solution.entity';
+import { QueryParams } from './types/query-params.interface';
 
 @Controller('solutions')
 export class SolutionsController {
@@ -38,8 +39,8 @@ export class SolutionsController {
 
   @Public()
   @Get('mapped')
-  findMapped(@Query('page') page: string): Promise<{ data: { solutions: Solution[]; count: number } }> {
-    return this.solutionsService.findMapped(+page || 1);
+  findMapped(@Query() queryParams: QueryParams): Promise<{ data: { solutions: Solution[]; count: number } }> {
+    return this.solutionsService.findMapped(queryParams);
   }
 
   @Public()

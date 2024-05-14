@@ -6,6 +6,7 @@ import { Solution } from './entities/solution.entity';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { ImagesService } from '../images/images.service';
 import { InjectRepository } from '@nestjs/typeorm';
+import { QueryParams } from './types/query-params.interface';
 
 @Injectable()
 export class SolutionsService {
@@ -136,23 +137,25 @@ export class SolutionsService {
     }
   }
 
-  async findMapped(page: number): Promise<{ data: { solutions: Solution[]; count: number } }> {
-    const count: number = await this.solutionRepository
-      .createQueryBuilder('s')
-      .leftJoin('s.feedbacks', 'feedbacks')
-      .where('feedbacks.id IS NOT NULL')
-      .getCount();
-    const perPage = 20;
-    const data: Solution[] = await this.solutionRepository
+  async findMapped(queryParams: QueryParams): Promise<{ data: { solutions: Solution[]; count: number } }> {
+    const { page, odd, thematic, event } = queryParams;
+    const query = this.solutionRepository
       .createQueryBuilder('s')
       .select(['s.id', 's.name', 's.description', 's.created_at'])
+      .leftJoinAndSelect('s.thematic', 'thematic')
       .leftJoinAndSelect('s.images', 'solutionImages')
       .leftJoinAndSelect('s.thematic', 'solutionThematic')
       .leftJoinAndSelect('s.user', 'user')
       .leftJoin('s.feedbacks', 'feedbacks')
-      .where('feedbacks.id IS NOT NULL')
-      .skip(page * perPage)
-      .take(perPage)
+      .leftJoin('s.event', 'event')
+      .where('feedbacks.id IS NOT NULL');
+    if (event) query.andWhere('event.id = :event', { event });
+    if (odd) query.andWhere("thematic.odds LIKE '%:odd%'", { odd: +odd });
+    if (thematic) query.andWhere('thematic.id = :thematic', { thematic: +thematic });
+    const count: number = await query.getCount();
+    const data: Solution[] = await query
+      .skip((page || 1) * 20)
+      .take(20)
       .getMany();
     return { data: { solutions: data, count: count } };
   }

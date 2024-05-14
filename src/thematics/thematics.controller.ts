@@ -11,14 +11,20 @@ import { Thematic } from './entities/thematic.entity';
 export class ThematicsController {
   constructor(private readonly thematicsService: ThematicsService) {}
 
-  @Post()
+  @Post('')
   @Roles([RoleEnum.Admin])
   create(@Body() createThematicDto: CreateThematicDto): Promise<{ data: Thematic }> {
     return this.thematicsService.create(createThematicDto);
   }
 
   @Public()
-  @Get()
+  @Get('event/:eventId')
+  findByEvent(@Param('eventId') eventId: string): Promise<{ data: Thematic[] }> {
+    return this.thematicsService.findByEvent(+eventId);
+  }
+
+  @Public()
+  @Get('')
   findAll(): Promise<{ data: Thematic[] }> {
     return this.thematicsService.findAll();
   }

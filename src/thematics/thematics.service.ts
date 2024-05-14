@@ -28,6 +28,16 @@ export class ThematicsService {
     return { data };
   }
 
+  async findByEvent(eventId: number): Promise<{ data: Thematic[] }> {
+    const data: Thematic[] = await this.thematicRepository
+      .createQueryBuilder('t')
+      .select(['t.id', 't.name'])
+      .leftJoin('t.events', 'e')
+      .where('e.id = :eventId', { eventId })
+      .getMany();
+    return { data };
+  }
+
   async findOne(id: number): Promise<{ data: Thematic }> {
     try {
       const data: Thematic = await this.thematicRepository.findOneOrFail({

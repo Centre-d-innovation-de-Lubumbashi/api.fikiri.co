@@ -32,8 +32,8 @@ export class Thematic {
   @OneToMany(() => Solution, (solution) => solution.thematic)
   solutions: Solution[];
 
-  @ManyToMany(() => Event, (call) => call.thematics)
-  calls: Event[];
+  @ManyToMany(() => Event, (events) => events.thematics)
+  events: Event[];
 
   @ManyToMany(() => Challenge, (challenge) => challenge.thematics)
   @JoinTable()
