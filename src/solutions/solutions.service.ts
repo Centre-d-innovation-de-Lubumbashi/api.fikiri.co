@@ -141,7 +141,7 @@ export class SolutionsService {
   }
 
   async findMapped(queryParams: QueryParams): Promise<{ data: { solutions: Solution[]; count: number } }> {
-    const { page, odd, thematic, event } = queryParams;
+    const { page, thematic, event } = queryParams;
     const query = this.solutionRepository
       .createQueryBuilder('s')
       .select(['s.id', 's.name', 's.description', 's.created_at'])
@@ -153,7 +153,6 @@ export class SolutionsService {
       .leftJoin('s.event', 'event')
       .where('feedbacks.id IS NOT NULL');
     if (event) query.andWhere('event.id = :event', { event });
-    if (odd) query.andWhere("thematic.odds LIKE '%:odd%'", { odd: +odd });
     if (thematic) query.andWhere('thematic.id = :thematic', { thematic: +thematic });
     const pageSize: number = 20;
     const skip = ((page || 1) - 1) * pageSize;
