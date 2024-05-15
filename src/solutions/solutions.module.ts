@@ -4,9 +4,10 @@ import { SolutionsController } from './solutions.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Solution } from './entities/solution.entity';
 import { ImagesModule } from '../images/images.module';
+import { SearchModule } from 'src/search/search.module';
 
 @Module({
-  imports: [ImagesModule, TypeOrmModule.forFeature([Solution])],
+  imports: [ImagesModule, SearchModule, TypeOrmModule.forFeature([Solution])],
   controllers: [SolutionsController],
   providers: [SolutionsService],
   exports: [SolutionsService]

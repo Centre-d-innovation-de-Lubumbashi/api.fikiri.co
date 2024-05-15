@@ -23,6 +23,7 @@ import { SolutionFeedbacksModule } from './solution-feedbacks/solution-feedbacks
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { CategoriesModule } from './categories/categories.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -50,7 +51,8 @@ import { CategoriesModule } from './categories/categories.module';
     ImagesModule,
     DatabaseModule,
     SolutionFeedbacksModule,
-    CategoriesModule
+    CategoriesModule,
+    SearchModule
   ],
   providers: [
     {

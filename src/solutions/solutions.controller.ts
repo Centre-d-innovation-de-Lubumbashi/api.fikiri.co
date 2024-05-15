@@ -22,10 +22,17 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RoleEnum } from 'src/auth/enums/role.enum';
 import { Solution } from './entities/solution.entity';
 import { QueryParams } from './types/query-params.interface';
+import { SearchParams, SearchResponse } from 'meilisearch';
 
 @Controller('solutions')
 export class SolutionsController {
   constructor(private readonly solutionsService: SolutionsService) {}
+
+  @Public()
+  @Get('search')
+  search(@Query('q') query: string): Promise<{ data: SearchResponse<Record<string, any>, SearchParams> }> {
+    return this.solutionsService.search(query);
+  }
 
   @Post('')
   create(@Body() data: CreateSolutionDto): Promise<{ data: Solution }> {

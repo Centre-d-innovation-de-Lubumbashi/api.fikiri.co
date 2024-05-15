@@ -7,13 +7,16 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { ImagesService } from '../images/images.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryParams } from './types/query-params.interface';
+import { SearchService } from 'src/search/search.service';
+import { SearchParams, SearchResponse } from 'meilisearch';
 
 @Injectable()
 export class SolutionsService {
   constructor(
     @InjectRepository(Solution)
     private readonly solutionRepository: Repository<Solution>,
-    private readonly imageService: ImagesService
+    private readonly imageService: ImagesService,
+    private readonly searchService: SearchService
   ) {}
 
   async create(dto: CreateSolutionDto): Promise<{ data: Solution }> {
@@ -193,8 +196,11 @@ export class SolutionsService {
   }
 
   async findNeighbors(solutionId: number, filtered: boolean = false): Promise<{ prev: number; next: number }> {
-    const query: SelectQueryBuilder<Solution> = this.solutionRepository.createQueryBuilder('s').select(['s.id']);
-    if (filtered) query.where('s.status.id IN (2, 3, 4)');
+    const query: SelectQueryBuilder<Solution> = this.solutionRepository
+      .createQueryBuilder('s')
+      .select(['s.id'])
+      .leftJoin('s.feedbacks', 'feedbacks');
+    if (filtered) query.where('feedbacks.id IS NOT NULL');
     const solutions: Solution[] = await query.getMany();
     const currentIndex: number = solutions.findIndex((solution) => solution.id === solutionId);
     const prev: number = solutions[currentIndex - 1]?.id ?? null;
@@ -227,6 +233,19 @@ export class SolutionsService {
       .leftJoinAndSelect('feedbacksUser.pole', 'feedbackuserPole')
       .where('feedbacks.id IS NOT NULL')
       .getMany();
+    this.searchService.addDocument<Solution>('solutions', data);
+    this.searchService.updateFilterableAttributes('solutions', ['thematic']);
+    return { data };
+  }
+
+  async search(query: string): Promise<{ data: SearchResponse<Record<string, any>, SearchParams> }> {
+    const searchParams: SearchParams = {
+      attributesToRetrieve: ['id', 'name', 'description', 'created_at', 'video_link'],
+      attributesToCrop: ['description'],
+      attributesToHighlight: ['name', 'description'],
+      limit: 20
+    };
+    const { data } = await this.searchService.search('solutions', query, searchParams);
     return { data };
   }
 }
