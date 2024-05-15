@@ -34,6 +34,11 @@ export class SolutionsController {
     return this.solutionsService.search(query);
   }
 
+  @Get('add-document')
+  addDocument(): Promise<void> {
+    return this.solutionsService.addDocument();
+  }
+
   @Post('')
   create(@Body() data: CreateSolutionDto): Promise<{ data: Solution }> {
     return this.solutionsService.create(data);

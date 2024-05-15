@@ -232,8 +232,6 @@ export class SolutionsService {
       .leftJoinAndSelect('feedbacksUser.pole', 'feedbackuserPole')
       .where('feedbacks.id IS NOT NULL')
       .getMany();
-    this.searchService.addDocument<Solution>('solutions', data);
-    this.searchService.updateFilterableAttributes('solutions', ['thematic']);
     return { data };
   }
 
@@ -246,5 +244,11 @@ export class SolutionsService {
     };
     const { data } = await this.searchService.search('solutions', query, searchParams);
     return { data };
+  }
+
+  async addDocument(): Promise<void> {
+    const { data: solutions } = await this.findCurated();
+    this.searchService.addDocument<Solution>('solutions', solutions);
+    this.searchService.updateFilterableAttributes('solutions', ['thematic']);
   }
 }
