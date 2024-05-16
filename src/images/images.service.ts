@@ -54,13 +54,13 @@ export class ImagesService {
     }
   }
 
-  async exists(image_link: string): Promise<boolean> {
+  async existsOnDisk(image_link: string): Promise<boolean> {
     return fs.existsSync(`./uploads/${image_link}`);
   }
 
   async remove(id: number): Promise<void> {
-    await this.findOne(id);
+    const { data: image } = await this.findOne(id);
     await this.imageRepository.delete(id);
-    // await this.unlinkAsync(`./uploads/${image.image_link}`);
+    await this.unlinkAsync(`./uploads/${image.image_link}`);
   }
 }
