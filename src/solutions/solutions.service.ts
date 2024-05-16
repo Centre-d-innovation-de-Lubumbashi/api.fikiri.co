@@ -35,8 +35,8 @@ export class SolutionsService {
     }
   }
 
-  async saveSolution(user: Solution): Promise<{ data: Solution }> {
-    const data: Solution = await this.solutionRepository.save(user);
+  async saveSolution(solution: Solution): Promise<{ data: Solution }> {
+    const data: Solution = await this.solutionRepository.save(solution);
     return { data };
   }
 
