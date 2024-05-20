@@ -8,8 +8,8 @@ export class CreateEventDto {
   description: string;
 
   @IsNotEmpty({ message: 'La date de début ne peut pas être vide' })
-  startedAt: Date;
+  started_at: Date;
 
   @IsNotEmpty({ message: 'La date de fin ne peut pas être vide' })
-  endedAt: Date;
+  ended_at: Date;
 }
