@@ -13,7 +13,6 @@ import { v4 as uuidv4 } from 'uuid';
 @Controller('events')
 export class EcentsController {
   constructor(private readonly eventsService: EventsService) {}
-
   @Post('')
   @Roles([RoleEnum.Admin])
   create(@Body() createCallsDto: CreateEventDto): Promise<{ data: Event }> {

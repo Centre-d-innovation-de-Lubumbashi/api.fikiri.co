@@ -25,7 +25,7 @@ export class EventsService {
 
   async findAll(): Promise<{ data: Event[] }> {
     const data: Event[] = await this.eventRepository.find({
-      relations: ['thematics']
+      relations: ['images']
     });
     return { data };
   }
