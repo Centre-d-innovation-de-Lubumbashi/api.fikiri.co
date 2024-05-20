@@ -1,5 +1,14 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToMany,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from 'typeorm';
 import { Solution } from '../../solutions/entities/solution.entity';
+import { Event } from 'src/events/entities/event.entity';
 
 @Entity()
 export class Image {
@@ -17,4 +26,7 @@ export class Image {
 
   @ManyToOne(() => Solution, (solution) => solution.images)
   solution: Solution;
+
+  @ManyToMany(() => Event, (event) => event.images)
+  events: Event[];
 }

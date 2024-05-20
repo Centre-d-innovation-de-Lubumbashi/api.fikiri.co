@@ -11,6 +11,7 @@ import {
 import { Solution } from '../../solutions/entities/solution.entity';
 import { Thematic } from '../../thematics/entities/thematic.entity';
 import { Category } from 'src/categories/entities/category.entity';
+import { Image } from 'src/images/entities/image.entity';
 
 @Entity()
 export class Event {
@@ -45,4 +46,8 @@ export class Event {
   @ManyToMany(() => Category, (category) => category.events)
   @JoinTable()
   categories: Category[];
+
+  @ManyToMany(() => Image, (image) => image.events)
+  @JoinTable()
+  images: Image[];
 }
