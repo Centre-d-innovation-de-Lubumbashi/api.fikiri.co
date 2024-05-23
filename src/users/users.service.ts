@@ -60,15 +60,7 @@ export class UsersService {
 
   async findUsers(): Promise<{ data: User[] }> {
     const data: User[] = await this.userRepository.find({
-      // relations: ['roles'],
-      // where: { roles: { name: RoleEnum.User } },
       order: { created_at: 'DESC' }
-    });
-    // move profiles
-    data.forEach((user) => {
-      if (user.profile && fs.existsSync(`./uploads/${user.profile}`)) {
-        fs.move(`./uploads/${user.profile}`, `./uploads/profiles/${user.profile}`);
-      }
     });
     return { data };
   }
