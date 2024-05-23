@@ -109,7 +109,7 @@ export class SolutionsController {
   @UseInterceptors(
     FileInterceptor('thumb', {
       storage: diskStorage({
-        destination: './uploads',
+        destination: './uploads/solutions',
         filename: function (_req, file, cb) {
           cb(null, `${uuidv4()}.${file.mimetype.split('/')[1]}`);
         }

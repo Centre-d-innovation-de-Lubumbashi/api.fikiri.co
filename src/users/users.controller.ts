@@ -50,7 +50,7 @@ export class UsersController {
   @UseInterceptors(
     FileInterceptor('thumb', {
       storage: diskStorage({
-        destination: './uploads',
+        destination: './uploads/profiles',
         filename: function (_req, file, cb) {
           cb(null, `${uuidv4()}.${file.mimetype.split('/')[1]}`);
         }
