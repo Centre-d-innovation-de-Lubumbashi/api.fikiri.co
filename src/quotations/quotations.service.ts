@@ -23,6 +23,7 @@ export class QuotationsService {
 
   async findAll(): Promise<{ data: Quotation[] }> {
     const data: Quotation[] = await this.quotationRepository.find();
+
     return { data };
   }
 

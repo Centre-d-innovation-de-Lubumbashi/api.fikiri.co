@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { QueryParams } from './types/query-params.interface';
 import { SearchService } from 'src/search/search.service';
 import { SearchParams, SearchResponse } from 'meilisearch';
+import * as fs from 'fs-extra';
 
 @Injectable()
 export class SolutionsService {
@@ -232,6 +233,20 @@ export class SolutionsService {
       .leftJoinAndSelect('feedbacksUser.pole', 'feedbackuserPole')
       .where('feedbacks.id IS NOT NULL')
       .getMany();
+
+    // forEach solution is images is not empty, move images to uploads/solutions
+    data.forEach((solution) => {
+      if (solution.images.length > 0) {
+        solution.images.forEach((image) => {
+          if (this.imageService.existsOnDisk(image.image_link)) {
+            fs.move(`./uploads/${image.image_link}`, `./uploads/solutions/${image.image_link}`, (err) => {
+              if (err) throw err;
+            });
+          }
+        });
+      }
+    });
+
     return { data };
   }
 

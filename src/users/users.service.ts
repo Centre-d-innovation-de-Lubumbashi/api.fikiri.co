@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import { promisify } from 'util';
 import { SignupDto } from '../auth/dto/register.dto';
 import CreateUserDto from './dto/create-user.dto';
@@ -60,16 +60,15 @@ export class UsersService {
 
   async findUsers(): Promise<{ data: User[] }> {
     const data: User[] = await this.userRepository.find({
-      relations: ['roles'],
-      where: { roles: { name: RoleEnum.User } },
+      // relations: ['roles'],
+      // where: { roles: { name: RoleEnum.User } },
       order: { created_at: 'DESC' }
     });
-    return { data };
-  }
-
-  async findAll(): Promise<{ data: User[] }> {
-    const data: User[] = await this.userRepository.find({
-      order: { created_at: 'DESC' }
+    // move profiles
+    data.forEach((user) => {
+      if (user.profile && fs.existsSync(`./uploads/${user.profile}`)) {
+        fs.move(`./uploads/${user.profile}`, `./uploads/profiles/${user.profile}`);
+      }
     });
     return { data };
   }
