@@ -115,7 +115,7 @@ export class UsersService {
       const existingUser: User = await this.userRepository.findOne({
         where: { email: dto.email }
       });
-      if (!existingUser.profile) {
+      if (existingUser && !existingUser.profile) {
         existingUser.google_image = dto.google_image;
         await this.userRepository.save(existingUser);
       }

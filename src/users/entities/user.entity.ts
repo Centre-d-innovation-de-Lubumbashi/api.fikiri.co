@@ -28,22 +28,22 @@ export class User {
   name: string;
 
   @Column({ nullable: true })
-  password?: string;
+  password: string;
 
   @Column({ nullable: true })
-  phone_number?: string;
+  phone_number: string;
 
   @Column({ nullable: true })
-  address?: string;
+  address: string;
 
   @Column({ nullable: true })
-  token?: string;
+  token: string;
 
   @Column({ nullable: true })
-  google_image?: string;
+  google_image: string;
 
   @Column({ nullable: true })
-  profile?: string;
+  profile: string;
 
   @CreateDateColumn({ type: 'datetime' })
   created_at: Date;
