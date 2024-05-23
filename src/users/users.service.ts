@@ -133,12 +133,12 @@ export class UsersService {
   async update(id: number, dto: UpdateUserDto): Promise<{ data: User }> {
     try {
       const { data: user } = await this.findOne(id);
-      const updatedUser: User & UpdateUserDto = Object.assign(user, dto);
       const data: User = await this.userRepository.save({
-        ...updatedUser,
-        organisation: { id: dto.organisation || updatedUser.organisation?.id },
-        pole: { id: dto.pole || updatedUser.pole?.id },
-        roles: dto?.roles?.map((id) => ({ id })) || updatedUser.roles
+        ...user,
+        ...dto,
+        organisation: { id: dto.organisation || user.organisation?.id },
+        pole: { id: dto.pole || user.pole?.id },
+        roles: dto?.roles?.map((id) => ({ id })) || user.roles.map((role) => ({ id: role.id }))
       });
       return { data };
     } catch {
@@ -146,10 +146,12 @@ export class UsersService {
     }
   }
 
-  async updateProfile(@CurrentUser() currentUser: User, dto: UpdateProfileDto): Promise<{ data: User }> {
+  async updateProfile(@CurrentUser() user: User, dto: UpdateProfileDto): Promise<{ data: User }> {
     try {
-      const updatedProfile: User & UpdateProfileDto = Object.assign(currentUser, dto);
-      const data: User = await this.userRepository.save(updatedProfile);
+      const data: User = await this.userRepository.save({
+        ...user,
+        ...dto
+      });
       return { data };
     } catch {
       throw new BadRequestException('Erreur lors de la modification du profil');

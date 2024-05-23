@@ -3,7 +3,6 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ResetPasswordRequestDto } from './dto/reset-password-request.dto';
 import { BadRequestException, Injectable, Req, Res } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-import * as bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import { CurrentUser } from './decorators/user.decorator';
 import { SignupDto } from './dto/register.dto';
@@ -12,6 +11,7 @@ import UpdateProfileDto from './dto/update-profile.dto';
 import { EmailService } from 'src/email/email.service';
 import { User } from '../users/entities/user.entity';
 import { randomPassword } from '../helpers/random-password';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -23,17 +23,10 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<{ data: User }> {
     const { data: user } = await this.usersService.findByEmail(email);
-    const passwordMatch: boolean = await this.passwordMatch(password, user?.password);
-    if (!passwordMatch || !user) throw new BadRequestException('Les identifiants saisis sont invalides');
+    if (!user) throw new BadRequestException('Les identifiants saisis sont invalides');
+    const isMatch = await bcrypt.compare(password, user?.password);
+    if (!isMatch) throw new BadRequestException('Les identifiants saisis sont invalides');
     return { data: user };
-  }
-
-  async passwordMatch(password: string, hash: string): Promise<boolean> {
-    try {
-      return await bcrypt.compare(password, hash);
-    } catch {
-      throw new BadRequestException('Les identifiants saisis sont invalides');
-    }
   }
 
   async loginGoogle(@Res() res: Response): Promise<void> {
@@ -65,7 +58,7 @@ export class AuthService {
   async updatePassword(@CurrentUser() user: User, dto: UpdatePasswordDto): Promise<{ data: User }> {
     const { password } = dto;
     if (user.password) {
-      const isMatch: boolean = await this.passwordMatch(dto.old_password, user.password);
+      const isMatch: boolean = await bcrypt.compare(dto.old_password, user.password);
       if (!isMatch) throw new BadRequestException("L'ancien mot de passe est incorrect");
     }
     try {
