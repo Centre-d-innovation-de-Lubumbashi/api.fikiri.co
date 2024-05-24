@@ -155,8 +155,9 @@ export class UsersService {
       await unlinkAsync(`./uploads/${user.profile}`);
     } catch {
     } finally {
-      user.profile = image.filename;
-      await this.userRepository.save(user);
+      await this.userRepository.update(id, {
+        profile: image.filename
+      });
       return { data: user };
     }
   }
