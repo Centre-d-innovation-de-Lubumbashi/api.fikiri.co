@@ -60,8 +60,8 @@ importers:
         specifier: ^4.7.8
         version: 4.7.8
       meilisearch:
-        specifier: ^0.39.0
-        version: 0.39.0
+        specifier: ^0.40.0
+        version: 0.40.0
       multer:
         specifier: 1.4.5-lts.1
         version: 1.4.5-lts.1
@@ -2896,8 +2896,8 @@ packages:
     resolution: {integrity: sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==}
     engines: {node: '>= 0.6'}
 
-  meilisearch@0.39.0:
-    resolution: {integrity: sha512-nNf/HOqQ/wSxaSYKyIsE8thMPciLyIpEDIp0ZbJxkOZ/tETDNfaBNbY+Eq/wbTR9O769QSiQFf5OhssfGyOzbA==}
+  meilisearch@0.40.0:
+    resolution: {integrity: sha512-BoRhQMr2mBFLEeCfsvPluksGb01IaOiWvV3Deu3iEY+yYJ4jdGTu+IQi5FCjKlNQ7/TMWSN2XUToSgvH1tj0BQ==}
 
   memfs@3.5.3:
     resolution: {integrity: sha512-UERzLsxzllchadvbPs5aolHh65ISpKpM+ccLbOJ8/vvpBKmAWf+la7dXFy7Mr0ySHbdHrFv5kGFCUHHe6GFEmw==}
@@ -7710,7 +7710,7 @@ snapshots:
 
   media-typer@0.3.0: {}
 
-  meilisearch@0.39.0:
+  meilisearch@0.40.0:
     dependencies:
       cross-fetch: 3.1.8
     transitivePeerDependencies:

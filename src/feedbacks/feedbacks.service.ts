@@ -29,6 +29,20 @@ export class FeedbacksService {
     const data: Feedback[] = await this.feedbackRepository.find({
       relations: ['user']
     });
+    // TODO: Remove this block
+    data.forEach(async (feedback) => {
+      let quotations = '';
+      const quotes = feedback.quotations.split(',').map((id) => parseInt(id));
+      quotes.map((id) => {
+        if (id === 1) quotations += '10, ';
+        if (id === 2) quotations += '7.5, ';
+        if (id === 3) quotations += '5, ';
+        if (id === 4) quotations += '2.5, ';
+        if (id === 5) quotations += '1, ';
+      });
+      feedback.quotations = quotations;
+      await this.feedbackRepository.save(feedback);
+    });
     return { data };
   }
 

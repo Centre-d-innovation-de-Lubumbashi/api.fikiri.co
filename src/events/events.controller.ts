@@ -52,7 +52,7 @@ export class EcentsController {
   @UseInterceptors(
     FilesInterceptor('thumbs', 4, {
       storage: diskStorage({
-        destination: './uploads',
+        destination: './uploads/events',
         filename: function (_req, file, cb) {
           cb(null, `${uuidv4()}.${file.mimetype.split('/')[1]}`);
         }
