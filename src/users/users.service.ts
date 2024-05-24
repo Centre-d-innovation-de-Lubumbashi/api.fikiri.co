@@ -139,9 +139,10 @@ export class UsersService {
 
   async updateProfile(@CurrentUser() user: User, dto: UpdateProfileDto): Promise<{ data: User }> {
     try {
+      delete user.password;
+      const updatedUser = Object.assign(user, dto);
       const data: User = await this.userRepository.save({
-        ...user,
-        ...dto
+        ...updatedUser
       });
       return { data };
     } catch {
