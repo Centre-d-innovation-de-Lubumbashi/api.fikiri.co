@@ -152,13 +152,13 @@ export class UsersService {
   async uploadImage(id: number, image: Express.Multer.File): Promise<{ data: User }> {
     const { data: user } = await this.findOne(id);
     try {
-      await unlinkAsync(`./uploads/${user.profile}`);
-    } catch {
-    } finally {
+      if (user.profile) await unlinkAsync(`./uploads/profiles/${user.profile}`);
       await this.userRepository.update(id, {
         profile: image.filename
       });
       return { data: user };
+    } catch {
+      throw new BadRequestException("Erreur lors de la mise à jour de l'image");
     }
   }
 
