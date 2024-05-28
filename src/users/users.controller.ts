@@ -65,7 +65,7 @@ export class UsersController {
   }
 
   @Delete(':id/image/delete')
-  removeImage(@Param('id') id: string): Promise<{ data: { message: string } }> {
+  removeImage(@Param('id') id: string): Promise<{ data: User }> {
     return this.userService.deleteProfileImage(+id);
   }
 
