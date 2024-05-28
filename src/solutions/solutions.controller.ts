@@ -117,7 +117,7 @@ export class SolutionsController {
     })
   )
   @Post(':id/image')
-  uploadImage(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<void> {
+  uploadImage(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<{ data: Solution }> {
     return this.solutionsService.uploadImage(+id, file);
   }
 }

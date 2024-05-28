@@ -114,7 +114,7 @@ export class SolutionsService {
     }
   }
 
-  async uploadImage(id: number, file: Express.Multer.File): Promise<void> {
+  async uploadImage(id: number, file: Express.Multer.File): Promise<{ data: Solution }> {
     try {
       const { data: oldSolution } = await this.findOne(id);
       const { solution } = oldSolution;
@@ -122,7 +122,8 @@ export class SolutionsService {
         image_link: file.filename
       });
       solution.images = [...solution.images, image];
-      await this.solutionRepository.save(solution);
+      const data = await this.solutionRepository.save(solution);
+      return { data };
     } catch {
       throw new BadRequestException("Erreur lors de l'ajout des images à la solution");
     }
