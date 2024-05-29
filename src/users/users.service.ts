@@ -153,6 +153,7 @@ export class UsersService {
   async uploadImage(id: number, image: Express.Multer.File): Promise<{ data: User }> {
     const { data: user } = await this.findOne(id);
     delete user.password;
+    console.log('img', image);
     try {
       if (user.profile) await unlinkAsync(`./uploads/profiles/${user.profile}`);
       const updatedUser = Object.assign(user, { profile: image.filename });
