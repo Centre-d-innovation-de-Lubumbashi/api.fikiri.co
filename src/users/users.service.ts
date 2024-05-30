@@ -85,7 +85,7 @@ export class UsersService {
     try {
       const data: User = await this.userRepository.findOneOrFail({
         where: { id },
-        relations: ['roles', 'pole', 'organisation']
+        relations: ['roles', 'pole', 'organisation', 'solutions']
       });
       return { data };
     } catch {
@@ -140,8 +140,8 @@ export class UsersService {
   async updateProfile(@CurrentUser() user: User, dto: UpdateProfileDto): Promise<{ data: User }> {
     const { data: existingUser } = await this.findOne(user.id);
     try {
-      delete user.password;
       const updatedUser = Object.assign(existingUser, dto);
+      delete updatedUser.password;
       const data: User = await this.userRepository.save(updatedUser);
       return { data };
     } catch {
@@ -151,10 +151,10 @@ export class UsersService {
 
   async uploadImage(id: number, image: Express.Multer.File): Promise<{ data: User }> {
     const { data: user } = await this.findOne(id);
-    delete user.password;
     try {
       if (user.profile) await unlinkAsync(`./uploads/profiles/${user.profile}`);
       const updatedUser = Object.assign(user, { profile: image.filename });
+      delete updatedUser.password;
       const data = await this.userRepository.save(updatedUser);
       return { data };
     } catch {

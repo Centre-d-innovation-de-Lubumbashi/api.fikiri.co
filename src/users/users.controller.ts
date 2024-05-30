@@ -46,7 +46,7 @@ export class UsersController {
     return this.userService.update(+id, updateUserDto);
   }
 
-  @Post(':id/image')
+  @Post('image/:id')
   @UseInterceptors(
     FileInterceptor('thumb', {
       storage: diskStorage({
@@ -64,7 +64,7 @@ export class UsersController {
     return this.userService.uploadImage(+id, file);
   }
 
-  @Delete(':id/image/delete')
+  @Delete('image/:id')
   removeImage(@Param('id') id: string): Promise<{ data: User }> {
     return this.userService.deleteProfileImage(+id);
   }
