@@ -36,7 +36,7 @@ export class SolutionsController {
     return this.solutionsService.search(query);
   }
 
-  @Get('user/solutions')
+  @Get('user')
   findByUser(@CurrentUser() user: User): Promise<{ data: Solution[] }> {
     return this.solutionsService.findByUser(user);
   }
