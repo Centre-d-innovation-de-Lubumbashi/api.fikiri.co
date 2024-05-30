@@ -236,6 +236,15 @@ export class SolutionsService {
     return { data };
   }
 
+  async findByUser(userId: number): Promise<{ data: Solution[] }> {
+    const data: Solution[] = await this.solutionRepository
+      .createQueryBuilder('s')
+      .select(['s.id', 's.name', 's.userId'])
+      .where('s.userId = :userId', { userId })
+      .getMany();
+    return { data };
+  }
+
   async search(query: string): Promise<{ data: SearchResponse<Record<string, any>, SearchParams> }> {
     const searchParams: SearchParams = {
       attributesToRetrieve: ['id', 'name', 'description', 'created_at', 'video_link'],

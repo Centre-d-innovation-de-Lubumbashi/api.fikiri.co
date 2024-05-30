@@ -34,6 +34,11 @@ export class SolutionsController {
     return this.solutionsService.search(query);
   }
 
+  @Get('user/:id')
+  findByUser(@Param('id') id: string): Promise<{ data: Solution[] }> {
+    return this.solutionsService.findByUser(+id);
+  }
+
   @Get('add-document')
   addDocument(): Promise<void> {
     return this.solutionsService.addDocument();
@@ -101,7 +106,7 @@ export class SolutionsController {
     return this.solutionsService.remove(+id);
   }
 
-  @Patch(':id/user')
+  @Patch('user/:id')
   updateUserSolution(@Param('id') id: string, @Body() data: UpdateUserSolutionDto): Promise<{ data: Solution }> {
     return this.solutionsService.userUpdateSolution(+id, data);
   }
@@ -116,7 +121,7 @@ export class SolutionsController {
       })
     })
   )
-  @Post(':id/image')
+  @Post('image/:id')
   uploadImage(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<{ data: Solution }> {
     return this.solutionsService.uploadImage(+id, file);
   }
