@@ -23,6 +23,8 @@ import { RoleEnum } from 'src/auth/enums/role.enum';
 import { Solution } from './entities/solution.entity';
 import { QueryParams } from './types/query-params.interface';
 import { SearchParams, SearchResponse } from 'meilisearch';
+import { CurrentUser } from 'src/auth/decorators/user.decorator';
+import { User } from 'src/users/entities/user.entity';
 
 @Controller('solutions')
 export class SolutionsController {
@@ -34,9 +36,9 @@ export class SolutionsController {
     return this.solutionsService.search(query);
   }
 
-  @Get('user/:id')
-  findByUser(@Param('id') id: string): Promise<{ data: Solution[] }> {
-    return this.solutionsService.findByUser(+id);
+  @Get('user/solutions')
+  findByUser(@CurrentUser() user: User): Promise<{ data: Solution[] }> {
+    return this.solutionsService.findByUser(user);
   }
 
   @Get('add-document')

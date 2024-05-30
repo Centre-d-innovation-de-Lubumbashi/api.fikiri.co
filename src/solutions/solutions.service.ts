@@ -9,6 +9,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { QueryParams } from './types/query-params.interface';
 import { SearchService } from 'src/search/search.service';
 import { SearchParams, SearchResponse } from 'meilisearch';
+import { CurrentUser } from 'src/auth/decorators/user.decorator';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class SolutionsService {
@@ -236,11 +238,11 @@ export class SolutionsService {
     return { data };
   }
 
-  async findByUser(userId: number): Promise<{ data: Solution[] }> {
+  async findByUser(@CurrentUser() user: User): Promise<{ data: Solution[] }> {
     const data: Solution[] = await this.solutionRepository
       .createQueryBuilder('s')
       .select(['s.id', 's.name', 's.userId'])
-      .where('s.userId = :userId', { userId })
+      .where('s.userId = :userId', { userId: user.id })
       .getMany();
     return { data };
   }
