@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { AppModule } from './app/app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import * as passport from 'passport';
 import * as session from 'express-session';
