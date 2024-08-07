@@ -245,7 +245,8 @@ export class SolutionsService {
   async findByUser(@CurrentUser() user: User): Promise<{ data: Solution[] }> {
     const data: Solution[] = await this.solutionRepository
       .createQueryBuilder('s')
-      .select(['s.id', 's.name', 's.userId'])
+      .select(['s.id', 's.name', 's.userId', 's.created_at', 's.updated_at'])
+      .leftJoinAndSelect('s.images', 'images')
       .where('s.userId = :userId', { userId: user.id })
       .getMany();
     return { data };
