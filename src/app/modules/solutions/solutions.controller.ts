@@ -56,6 +56,11 @@ export class SolutionsController {
     return this.solutionsService.findAll();
   }
 
+  @Delete(':id/image/:imageId')
+  deleteImage(@Param('id') id: string, @Param('imageId') imageId: string): Promise<{ data: Solution }> {
+    return this.solutionsService.deleteImage(+id, +imageId);
+  }
+
   @Public()
   @Get('mapped')
   findMapped(@Query() queryParams: QueryParams): Promise<{ data: { solutions: Solution[]; count: number } }> {

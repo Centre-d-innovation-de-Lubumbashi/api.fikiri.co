@@ -76,6 +76,18 @@ export class SolutionsService {
     };
   }
 
+  async deleteImage(id: number, imageId: number): Promise<{ data: Solution }> {
+    try {
+      const { data: res } = await this.findOne(id);
+      res.solution.images = res.solution.images.filter((image) => image.id !== imageId);
+      const data = await this.solutionRepository.save(res.solution);
+      await this.imageService.remove(imageId);
+      return { data };
+    } catch {
+      throw new BadRequestException("Erreur lors de la suppression de l'image de la solution");
+    }
+  }
+
   async userUpdateSolution(id: number, dto: UpdateUserSolutionDto) {
     try {
       const { data: oldSolution } = await this.findOne(id);
@@ -245,8 +257,10 @@ export class SolutionsService {
   async findByUser(@CurrentUser() user: User): Promise<{ data: Solution[] }> {
     const data: Solution[] = await this.solutionRepository
       .createQueryBuilder('s')
-      .select(['s.id', 's.name', 's.userId', 's.created_at', 's.updated_at'])
+      .select(['s.id', 's.name', 's.userId', 's.description', 's.created_at', 's.updated_at'])
       .leftJoinAndSelect('s.images', 'images')
+      .leftJoinAndSelect('s.challenges', 'challenges')
+      .leftJoinAndSelect('s.thematic', 'thematic')
       .where('s.userId = :userId', { userId: user.id })
       .getMany();
     return { data };

@@ -25,18 +25,9 @@ export class ImagesService {
     }
   }
 
-  async findAll(): Promise<{ data: Image[] }> {
-    const data: Image[] = await this.imageRepository.find({
-      order: { created_at: 'DESC' }
-    });
-    return { data };
-  }
-
   async findOne(id: number): Promise<{ data: Image }> {
     try {
-      const data: Image = await this.imageRepository.findOneOrFail({
-        where: { id }
-      });
+      const data: Image = await this.imageRepository.findOneByOrFail({ id });
       return { data };
     } catch {
       throw new NotFoundException('Image introuvable');
@@ -61,6 +52,6 @@ export class ImagesService {
   async remove(id: number): Promise<void> {
     const { data: image } = await this.findOne(id);
     await this.imageRepository.delete(id);
-    await this.unlinkAsync(`./uploads/${image.image_link}`);
+    await this.unlinkAsync(`./uploads/solutions/${image.image_link}`);
   }
 }
