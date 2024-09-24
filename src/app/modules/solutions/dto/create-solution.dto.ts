@@ -11,7 +11,7 @@ export class CreateSolutionDto {
   description: string;
 
   @IsNotEmpty({ message: 'Le problème ciblé par la solution est obligatoire' })
-  targetedProblem: string;
+  targeted_problem: string;
 
   @IsNotEmpty({ message: 'La thématique est obligatoire' })
   thematic: number;

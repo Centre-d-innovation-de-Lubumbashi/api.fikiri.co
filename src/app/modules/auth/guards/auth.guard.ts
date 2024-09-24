@@ -9,14 +9,10 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic: boolean =
       this.reflector.getAllAndOverride<boolean>(IS_PUBLIC, [context.getHandler(), context.getClass()]) || false;
-    if (isPublic) {
-      return true;
-    }
+    if (isPublic) return true;
     const request = context.switchToHttp().getRequest();
     const isAuth = request.isAuthenticated();
-    if (isAuth) {
-      return true;
-    }
+    if (isAuth) return true;
     throw new ForbiddenException('Veuillez vous connecter');
   }
 }
