@@ -25,9 +25,9 @@ export class SolutionsService {
     try {
       const data: Solution = await this.solutionRepository.save({
         ...dto,
+        event: { id: dto.event },
         thematic: { id: dto.thematic },
         user: { email: dto.user },
-        call: { id: dto.call },
         status: { id: 1 },
         challenges: dto.challenges.map((id) => ({ id }))
       });
@@ -110,7 +110,7 @@ export class SolutionsService {
         pole: { id: dto.pole || solution.pole?.id },
         thematic: { id: dto.thematic || solution.thematic?.id },
         user: { email: dto.user || solution.user?.email },
-        call: { id: dto.call || solution.event?.id },
+        event: { id: dto.event || solution.event?.id },
         status: { id: dto.status || solution.status?.id },
         challenges: dto?.challenges?.map((id: number) => ({ id })) ?? solution.challenges
       });
