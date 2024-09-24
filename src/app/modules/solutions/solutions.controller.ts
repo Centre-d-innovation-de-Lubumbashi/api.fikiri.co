@@ -47,8 +47,8 @@ export class SolutionsController {
   }
 
   @Post('')
-  create(@Body() data: CreateSolutionDto): Promise<{ data: Solution }> {
-    return this.solutionsService.create(data);
+  create(@Body() dto: CreateSolutionDto, @CurrentUser() user: User): Promise<{ data: Solution }> {
+    return this.solutionsService.create(dto, user);
   }
 
   @Get('')

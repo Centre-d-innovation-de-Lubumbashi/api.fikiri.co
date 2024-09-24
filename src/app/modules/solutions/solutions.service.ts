@@ -21,13 +21,13 @@ export class SolutionsService {
     private readonly searchService: SearchService
   ) {}
 
-  async create(dto: CreateSolutionDto): Promise<{ data: Solution }> {
+  async create(dto: CreateSolutionDto, user: User): Promise<{ data: Solution }> {
     try {
       const data: Solution = await this.solutionRepository.save({
         ...dto,
         event: { id: dto.event },
         thematic: { id: dto.thematic },
-        user: { email: dto.user },
+        user: { email: user.email },
         status: { id: 1 },
         challenges: dto.challenges.map((id) => ({ id }))
       });
@@ -109,7 +109,6 @@ export class SolutionsService {
         ...updatedSolution,
         pole: { id: dto.pole || solution.pole?.id },
         thematic: { id: dto.thematic || solution.thematic?.id },
-        user: { email: dto.user || solution.user?.email },
         event: { id: dto.event || solution.event?.id },
         status: { id: dto.status || solution.status?.id },
         challenges: dto?.challenges?.map((id: number) => ({ id })) ?? solution.challenges
