@@ -20,7 +20,7 @@ export class CreateSolutionDto {
   user: string;
 
   @IsNotEmpty({ message: "L'appel est obligatoire" })
-  call: number;
+  event: number;
 
   @IsNotEmpty({ message: 'Les challenges sont obligatoires' })
   challenges: number[];
