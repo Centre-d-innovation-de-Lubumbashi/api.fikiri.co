@@ -21,16 +21,17 @@ export class SolutionsService {
     private readonly searchService: SearchService
   ) {}
 
-  async create(dto: CreateSolutionDto, user: User): Promise<{ data: Solution }> {
+  async create(dto: CreateSolutionDto, @CurrentUser() user: User): Promise<{ data: Solution }> {
     try {
-      const data: Solution = await this.solutionRepository.save({
+      const payload = {
         ...dto,
+        user: { id: user.id },
         event: { id: dto.event },
         thematic: { id: dto.thematic },
-        user: { email: user.email },
         status: { id: 1 },
         challenges: dto.challenges.map((id) => ({ id }))
-      });
+      };
+      const data: Solution = await this.solutionRepository.save(payload);
       return { data };
     } catch {
       throw new BadRequestException('Erreur lors de la création de la solution');
